@@ -9,7 +9,7 @@ namespace mau.Platforms.iOS;
 /// Keeps Shell on the native translucent UIKit appearance. On iOS 26 UIKit
 /// presents these standard bars as Liquid Glass automatically.
 /// </summary>
-public sealed class LiquidGlassShellRenderer : ShellRenderer
+internal sealed class LiquidGlassShellRenderer : ShellRenderer
 {
     protected override IShellTabBarAppearanceTracker CreateTabBarAppearanceTracker() =>
         new LiquidGlassTabBarAppearanceTracker();

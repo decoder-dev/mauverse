@@ -1,5 +1,5 @@
 using mau.Controls;
-using Microsoft.Maui.Controls.Handlers;
+using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 using UIKit;
 
@@ -13,19 +13,20 @@ internal static class LiquidGlassStyling
     {
         BorderHandler.Mapper.AppendToMapping(
             LiquidGlass.UsesLiquidGlassProperty.PropertyName,
-            static (handler, view) => Apply(handler.PlatformView, view));
+            static (handler, view) => LiquidGlassStyling.Apply(handler.PlatformView, view));
 
         // Dynamic theme changes remap Background, so re-apply the transparent
         // native host after MAUI has updated its brush.
         BorderHandler.Mapper.AppendToMapping(
             nameof(IView.Background),
-            static (handler, view) => Apply(handler.PlatformView, view));
+            static (handler, view) => LiquidGlassStyling.Apply(handler.PlatformView, view));
     }
 
-    static void Apply(UIView platformView, Border virtualView)
+    static void Apply(UIView platformView, IBorderView virtualView)
     {
         var existingGlass = platformView.ViewWithTag(GlassViewTag) as UIVisualEffectView;
-        if (!LiquidGlass.GetUsesLiquidGlass(virtualView))
+        if (virtualView is not BindableObject bindableView ||
+            !LiquidGlass.GetUsesLiquidGlass(bindableView))
         {
             existingGlass?.RemoveFromSuperview();
             return;
@@ -53,13 +54,15 @@ internal static class LiquidGlassStyling
         platformView.ClipsToBounds = true;
     }
 
-    static UIVisualEffectView CreateGlassView(Border virtualView)
+    static UIVisualEffectView CreateGlassView(IBorderView virtualView)
     {
         UIVisualEffect effect;
         if (OperatingSystem.IsIOSVersionAtLeast(26))
         {
             var glass = UIGlassEffect.Create(UIGlassEffectStyle.Regular);
-            glass.Interactive = virtualView.GestureRecognizers.Count > 0;
+            glass.Interactive =
+                virtualView is Microsoft.Maui.Controls.View view &&
+                view.GestureRecognizers.Count > 0;
             glass.TintColor = UIColor.FromRGBA(0, 140, 250, 18);
             effect = glass;
         }
