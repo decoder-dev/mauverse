@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Name="PageRoot"
+             x:Class="mau.HomeChatPage"
+             Title="Мессенджер"
+             xmlns:viewmodel="clr-namespace:mau.ViewModel"
+             xmlns:dto="clr-namespace:mau.DTOModels"
+             xmlns:controls="clr-namespace:mau.Controls"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:DataType="viewmodel:MainChatViewModel"
+             BackgroundColor="{DynamicResource Background}">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                        Command="{Binding LoadAllData}"
+                                        EventName="Appearing" />
+        <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                        Command="{Binding CancelPendingOperationsCommand}"
+                                        EventName="Disappearing" />
+    </ContentPage.Behaviors>
+    <Grid Padding="16,14,16,16" RowDefinitions="auto,auto,*" RowSpacing="14">
+        <VerticalStackLayout Spacing="4">
+            <Label Text="Диалоги с преподавателями в ЭИОС" Style="{StaticResource SectionSubtitle}" />
+        </VerticalStackLayout>
+
+        <VerticalStackLayout Grid.Row="1" Spacing="8">
+            <SearchBar Text="{Binding TeacherName}"
+                       Placeholder="Найти преподавателя">
+                <SearchBar.Behaviors>
+                    <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                                    EventName="TextChanged"
+                                                    Command="{Binding TextChanged}" />
+                </SearchBar.Behaviors>
+            </SearchBar>
+            <Border IsVisible="{Binding TeacherListIsVisible}"
+                    controls:LiquidGlass.UsesLiquidGlass="True"
+                    Padding="0"
+                    BackgroundColor="{DynamicResource Surface}"
+                    Stroke="{DynamicResource BorderSubtle}"
+                    StrokeThickness="1">
+                <CollectionView ItemsSource="{Binding TeacherList}"
+                                HeightRequest="{Binding TeacherListHeight}"
+                                SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="system:String">
+                            <Grid Padding="14,12"
+                                  MinimumHeightRequest="48"
+                                  SemanticProperties.Description="{Binding .}"
+                                  SemanticProperties.Hint="Начать диалог">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding Path=SelectTeacher, Source={RelativeSource AncestorType={x:Type viewmodel:MainChatViewModel}}, x:DataType={x:Type viewmodel:MainChatViewModel}}"
+                                        CommandParameter="{Binding .}" />
+                                </Grid.GestureRecognizers>
+                                <Label Text="{Binding .}"
+                                       FontFamily="MontserratMedium"
+                                       FontSize="13"
+                                       TextColor="{DynamicResource TextPrimary}"
+                                       MaxLines="1"
+                                       LineBreakMode="TailTruncation" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Border>
+        </VerticalStackLayout>
+
+        <Grid Grid.Row="2" RowDefinitions="auto,*" RowSpacing="8">
+            <Grid ColumnDefinitions="*,auto">
+                <Label Text="Последние диалоги" Style="{StaticResource SectionTitle}" />
+                <ActivityIndicator Grid.Column="1"
+                                   IsRunning="{Binding IsBusy}"
+                                   IsVisible="{Binding IsBusy}"
+                                   SemanticProperties.Description="Загрузка диалогов"
+                                   WidthRequest="24"
+                                   HeightRequest="24" />
+            </Grid>
+            <Border Style="{StaticResource SurfacePanel}"
+                    Grid.Row="1"
+                    IsVisible="{Binding NothingPanelIsVisible}"
+                    VerticalOptions="Start">
+                <Label Text="Сообщений нет" Style="{StaticResource EmptyStateTitle}" />
+            </Border>
+            <CollectionView Grid.Row="1"
+                            ItemsSource="{Binding RecentChat}"
+                            SelectionMode="None"
+                            SelectedItem="{Binding SelectedChat}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="dto:RecentChatsDTO">
+                        <Border Margin="0,0,0,10"
+                                controls:LiquidGlass.UsesLiquidGlass="True"
+                                Padding="14"
+                                BackgroundColor="{DynamicResource Surface}"
+                                Stroke="{DynamicResource BorderSubtle}"
+                                StrokeThickness="1"
+                                SemanticProperties.Description="{Binding User.FullName}"
+                                SemanticProperties.Hint="Открыть диалог">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Path=ChatSelected, Source={RelativeSource AncestorType={x:Type viewmodel:MainChatViewModel}}, x:DataType={x:Type viewmodel:MainChatViewModel}}"
+                                                      CommandParameter="{Binding User}" />
+                            </Border.GestureRecognizers>
+                            <Grid RowDefinitions="auto,auto" ColumnDefinitions="*,auto" RowSpacing="5">
+                                <Label Text="{Binding User.FullName}"
+                                       FontFamily="MontserratSemiBold"
+                                       FontSize="14"
+                                       TextColor="{DynamicResource TextPrimary}"
+                                       MaxLines="1"
+                                       LineBreakMode="TailTruncation" />
+                                <Label Grid.Column="1"
+                                       Text="{Binding Message.TimeCreateString}"
+                                       FontSize="11"
+                                       TextColor="{DynamicResource TextSecondary}" />
+                                <Label Grid.Row="1"
+                                       Grid.ColumnSpan="2"
+                                       Text="{Binding Message.Text}"
+                                       Style="{StaticResource SectionSubtitle}"
+                                       MaxLines="2"
+                                       LineBreakMode="TailTruncation" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+    </Grid>
+</ContentPage>

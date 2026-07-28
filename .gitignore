@@ -1,0 +1,36 @@
+# .NET and IDE state
+**/bin/
+**/obj/
+**/.vs/
+**/.idea/
+**/TestResults/
+*.user
+~$*
+
+# Python
+**/.venv/
+**/__pycache__/
+**/.ruff_cache/
+**/.pytest_cache/
+*.py[cod]
+
+# Secrets and local state
+**/.env
+**/.env.*
+!**/.env.example
+*.db
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.mobileprovision
+
+# Generated artifacts
+.artifacts/
+.nuget/
+*.apk
+*.aab
+*.zip
+*.log
+.DS_Store
+Thumbs.db

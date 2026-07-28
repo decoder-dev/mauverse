@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:viewmodel="clr-namespace:mau.ViewModel.Dialogs"
+               xmlns:controls="clr-namespace:mau.Controls"
+               x:Class="mau.Dialogs.Note.NotePopup"
+               x:DataType="viewmodel:NoteViewModel"
+               BackgroundColor="Transparent">
+
+    <Border controls:LiquidGlass.UsesLiquidGlass="True"
+            BackgroundColor="{DynamicResource Surface}"
+            Stroke="{DynamicResource BorderSubtle}"
+            StrokeThickness="1"
+            Padding="15">
+        <Grid RowDefinitions="auto, *, auto" RowSpacing="10">
+            <Label Text="{Binding PopupLabel}"
+                   Style="{StaticResource SectionTitle}" />
+            <ScrollView Grid.Row="1"
+                        Padding="7"
+                        IsVisible="{Binding IsEditOrCreate}">
+                <Grid 
+                      RowDefinitions="auto, *" 
+                      RowSpacing="5">
+                    <StackLayout>
+                        <Label Text="Название заметки" Style="{StaticResource FieldLabel}" />
+                        <Border Style="{StaticResource EntryBorder}" 
+                                IsEnabled="{Binding IsEditable}">
+                            <Entry Placeholder="Название"
+                                   IsEnabled="{Binding IsEditable}"
+                                   Text="{Binding Title}"/>
+                        </Border>
+                    </StackLayout>
+                    <StackLayout Grid.Row="1">
+                        <Label Text="Содержание" Style="{StaticResource FieldLabel}" />
+                        <Border Style="{StaticResource EntryBorder}"     
+                                IsEnabled="{Binding IsEditable}">
+                            <Editor MinimumHeightRequest="150"
+                                    Placeholder="Текст заметки"
+                                    IsEnabled="{Binding IsEditable}"
+                                    Text="{Binding Description}"/>
+                        </Border>
+                    </StackLayout>
+                </Grid>
+            </ScrollView>
+            <Grid Grid.Row="2"
+                  IsVisible="{Binding IsEditable}"
+                  ColumnDefinitions="*"
+                  ColumnSpacing="10">
+                <Button 
+                    IsVisible="{Binding IsCreate}"
+                    MinimumHeightRequest="{OnIdiom Phone=48, Tablet=52, Desktop=60}"
+                    Text="Добавить"
+                    HorizontalOptions="End"
+                    Command="{Binding CreateNoteCommand}"/>
+                <Button 
+                    IsVisible="{Binding IsEdit}"
+                    MinimumHeightRequest="{OnIdiom Phone=48, Tablet=52, Desktop=60}"
+                    Text="Сохранить"
+                    HorizontalOptions="End"
+                    Command="{Binding EditNoteCommand}"/>
+                <Button 
+                    IsVisible="{Binding IsDelete}"
+                    MinimumHeightRequest="{OnIdiom Phone=48, Tablet=52, Desktop=60}"
+                    Text="Удалить"
+                    Style="{StaticResource DangerButton}"
+                    HorizontalOptions="End"
+                    Command="{Binding DeleteNoteCommand}"/>
+            </Grid>
+        </Grid>
+    </Border>
+</toolkit:Popup>

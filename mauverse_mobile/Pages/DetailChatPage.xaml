@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Name="PageRoot"
+             x:Class="mau.DetailChatPage"
+             xmlns:viewmodel="clr-namespace:mau.ViewModel"
+             xmlns:fonts="clr-namespace:mau.Resources.Fonts"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:local="clr-namespace:mau.Templates"
+             BackgroundColor="{DynamicResource Background}"
+             x:DataType="viewmodel:DetailChatViewModel"
+             Title="{Binding ContactFullname}">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                        Command="{Binding LoadAllData}"
+                                        EventName="Appearing" />
+        <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                        Command="{Binding CancelPendingOperationsCommand}"
+                                        EventName="Disappearing" />
+    </ContentPage.Behaviors>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <local:MessagesTemplate x:Key="MessageTemplateSelector">
+            </local:MessagesTemplate>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <Grid RowDefinitions="*,auto">
+        <CollectionView x:Name="ChatCollection"
+                        Margin="0,12,0,0"
+                        ItemsSource="{Binding Messages}"
+                        SelectionMode="None"
+                        ItemTemplate="{StaticResource MessageTemplateSelector}"
+                        ItemsUpdatingScrollMode="KeepLastItemInView">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" />
+            </CollectionView.ItemsLayout>
+        </CollectionView>
+        <Border Grid.Row="1"
+                Margin="12,8,12,12"
+                Padding="4"
+                VerticalOptions="End"
+                HorizontalOptions="Fill"
+                Background="{DynamicResource Surface}"
+                Stroke="{DynamicResource BorderSubtle}"
+                StrokeThickness="1">
+            <Grid ColumnDefinitions="*,48" ColumnSpacing="4">
+                <Entry Placeholder="Сообщение"
+                       ReturnType="Send"
+                       Text="{Binding Message}">
+                    <Entry.Behaviors>
+                        <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                                        EventName="Completed"
+                                                        Command="{Binding SendMessageCommand}" />
+                    </Entry.Behaviors>
+                </Entry>
+                <Button Grid.Column="1"
+                        BackgroundColor="{DynamicResource PrimaryAccent}"
+                        WidthRequest="48"
+                        HeightRequest="48"
+                        Padding="10"
+                        HorizontalOptions="End"
+                        SemanticProperties.Description="Отправить сообщение"
+                        Command="{Binding SendMessageCommand}">
+                    <Button.ImageSource>
+                        <FontImageSource Glyph="{x:Static fonts:FluentUI.send_24_regular}"
+                                         FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                                         Color="{DynamicResource PrimaryAccentText}"
+                                         Size="24" />
+                    </Button.ImageSource>
+                </Button>
+            </Grid>
+        </Border>
+    </Grid>
+</ContentPage>

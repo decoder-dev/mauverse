@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:local="clr-namespace:mau"
+       xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+       x:Class="mau.AppShell"
+       Title="MAUverse"
+       Shell.FlyoutBehavior="Disabled"
+       Shell.NavBarIsVisible="True">
+    <Shell.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{DynamicResource Surface}"
+                                   StatusBarStyle="{AppThemeBinding Light=DarkContent, Dark=LightContent}" />
+    </Shell.Behaviors>
+
+    <ShellContent Title="Загрузка"
+                  ContentTemplate="{DataTemplate local:LoadingPage}"
+                  Route="LoadingPage" />
+    <ShellContent Title="Авторизация"
+                  ContentTemplate="{DataTemplate local:LoginPage}"
+                  Route="LoginPage" />
+
+    <TabBar Route="main">
+        <ShellContent Title="Главная"
+                      Icon="home_icon"
+                      ContentTemplate="{DataTemplate local:MainPage}"
+                      Route="MainPage" />
+        <ShellContent Title="Пары"
+                      Icon="schedule_icon"
+                      ContentTemplate="{DataTemplate local:SchedulePage}"
+                      Route="SchedulePage" />
+        <ShellContent Title="Сервисы"
+                      Icon="services_icon"
+                      ContentTemplate="{DataTemplate local:ServiceListPage}"
+                      Route="ServiceListPage" />
+        <ShellContent Title="Новости"
+                      Icon="news_icon"
+                      ContentTemplate="{DataTemplate local:NewsPage}"
+                      Route="NewsPage" />
+        <ShellContent Title="Профиль"
+                      Icon="profile_icon"
+                      ContentTemplate="{DataTemplate local:ProfilePage}"
+                      Route="ProfilePage" />
+    </TabBar>
+</Shell>

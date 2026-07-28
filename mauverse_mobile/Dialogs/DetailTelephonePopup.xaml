@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:viewmodel="clr-namespace:mau.ViewModel.Dialogs"
+               xmlns:controls="clr-namespace:mau.Controls"
+               x:Class="mau.Dialogs.DetailTelephonePopup"
+               x:DataType="viewmodel:DetailTelephoneViewModel"
+               BackgroundColor="Transparent">
+    <toolkit:Popup.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Templates/TelephoneInfoTemplate.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </toolkit:Popup.Resources>
+    <Border controls:LiquidGlass.UsesLiquidGlass="True"
+            BackgroundColor="{DynamicResource Surface}"
+            Stroke="{DynamicResource BorderSubtle}"
+            StrokeThickness="1"
+            Padding="16"
+            HorizontalOptions="Fill"
+            VerticalOptions="Fill">
+        <Grid RowDefinitions="auto,*" RowSpacing="10">
+            <Label FontSize="18"
+                   FontFamily="MontserratSemiBold"
+                   TextColor="{DynamicResource TextPrimary}"
+                   Text="{Binding DeptName}" />
+            <Grid Grid.Row="1"
+                  RowDefinitions="*"
+                  toolkit:StateContainer.CurrentState="{Binding CurrentState}"
+                  toolkit:StateContainer.CanStateChange="{Binding CanStateChange}">
+                <toolkit:StateContainer.StateViews>
+                    <Border toolkit:StateView.StateKey="Loading"
+                            Style="{StaticResource SurfacePanel}"
+                            VerticalOptions="Start">
+                        <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+                            <ActivityIndicator IsRunning="True"
+                                               SemanticProperties.Description="Загрузка контактной информации" />
+                            <Label Text="Загрузка контактов"
+                                   Style="{StaticResource SectionSubtitle}"
+                                   VerticalTextAlignment="Center" />
+                        </HorizontalStackLayout>
+                    </Border>
+                    <CollectionView
+                            toolkit:StateView.StateKey="Success"
+                            HorizontalOptions="Center"
+                            ItemsSource="{Binding TelephoneInfos}"
+                            ItemTemplate="{StaticResource InfoDetailsTemplate}">
+                    </CollectionView>
+                    <Border toolkit:StateView.StateKey="Empty"
+                            Style="{StaticResource SurfacePanel}"
+                            VerticalOptions="Start">
+                        <Label Text="Контакты не найдены"
+                               Style="{StaticResource EmptyStateTitle}" />
+                    </Border>
+                </toolkit:StateContainer.StateViews>
+            </Grid>
+        </Grid>
+    </Border>
+</toolkit:Popup>

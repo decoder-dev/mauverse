@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Name="PageRoot"
+             x:Class="mau.StudyPage"
+             Title="Задолженности"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:templates="clr-namespace:mau.Templates"
+             xmlns:viewmodel="clr-namespace:mau.ViewModel.Debts"
+             x:DataType="viewmodel:StudyViewModel"
+             Background="{DynamicResource Background}">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                        Command="{Binding LoadAllData}"
+                                        EventName="Appearing" />
+        <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                        Command="{Binding CancelPendingOperationsCommand}"
+                                        EventName="Disappearing" />
+    </ContentPage.Behaviors>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Templates/DebtsTemplate.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid Padding="16,12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <VerticalStackLayout Spacing="4">
+            <Label Text="Информация из университетской системы"
+                   Style="{StaticResource SectionSubtitle}" />
+        </VerticalStackLayout>
+        <Border Grid.Row="1"
+                Margin="0,12,0,0"
+                IsVisible="{Binding RequiredFillFrameIsVisible}"
+                Style="{StaticResource SurfacePanel}"
+                HorizontalOptions="Fill"
+                VerticalOptions="Start">
+            <VerticalStackLayout Spacing="5">
+                <Label
+                    Style="{StaticResource EmptyStateTitle}"
+                    Text="{Binding FrameLabel}" />
+                <Button Text="Открыть профиль"
+                        IsVisible="{Binding ProfileActionIsVisible}"
+                        HorizontalOptions="Center"
+                        BackgroundColor="Transparent"
+                        FontSize="12"
+                        TextColor="{DynamicResource Primary}"
+                        FontFamily="MontserratSemiBold"
+                        Command="{Binding GoToProfile}"/>
+            </VerticalStackLayout>
+        </Border>
+        <CollectionView 
+                Grid.Row="1"    
+                Margin="0,15,0,0"
+                IsVisible="{Binding CuratorDebtIsVisible}"
+                ItemsSource="{Binding Students}"
+                SelectedItem="{Binding SelectedStudent}"
+                SelectionMode="Single"
+                SelectionChangedCommand="{Binding StudentSelected}"
+                SelectionChangedCommandParameter="{Binding .}"
+                ItemTemplate="{StaticResource StudentItemTemplate}">
+        </CollectionView>
+
+        <CollectionView Margin="0,15,0,0"
+                Grid.Row="1"
+                IsVisible="{Binding StudentDebtIsVisible}"
+                ItemsSource="{Binding Semesters}"
+                SelectedItem="{Binding SelectedSemester}"
+                ItemTemplate="{StaticResource SemesterItemTemplate}">
+        </CollectionView>
+        <ActivityIndicator Grid.Row="1"
+                           IsVisible="{Binding IsBusy}"
+                           IsRunning="{Binding IsBusy}"
+                           SemanticProperties.Description="Загрузка задолженностей"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Start"
+                           Margin="0,28,0,0"
+                           ZIndex="2" />
+    </Grid>
+</ContentPage>

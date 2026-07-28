@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewmodel="clr-namespace:mau.ViewModel.Debts"
+             xmlns:models="clr-namespace:mau.Models"
+             xmlns:controls="clr-namespace:mau.Controls"
+             xmlns:fonts="clr-namespace:mau.Resources.Fonts"
+             x:Class="mau.Templates.DebtsTemplate">
+
+    <DataTemplate x:Key="StudentItemTemplate" x:DataType="models:StudentDebt">
+        <Border Padding="15"
+            controls:LiquidGlass.UsesLiquidGlass="True"
+            Margin="0,0,0,10"
+            BackgroundColor="{DynamicResource Surface}"
+            Stroke="{DynamicResource BorderSubtle}"
+            StrokeThickness="1">
+            <Grid RowDefinitions="auto,auto" ColumnDefinitions="*,auto" RowSpacing="7">
+                <Label FontFamily="MontserratSemiBold"
+                       FontSize="15"
+                       TextColor="{DynamicResource TextPrimary}">
+                    <Label.Text>
+                        <MultiBinding StringFormat="{}{0} {1} {2}">
+                            <Binding Path="FirstName"/>
+                            <Binding Path="Name"/>
+                            <Binding Path="LastName"/>
+                        </MultiBinding>
+                    </Label.Text>
+                </Label>
+                <Label Grid.Row="1" Text="{Binding TotalDebts, StringFormat='Всего задолженностей: {0}'}"
+                       Style="{StaticResource SectionSubtitle}" />
+                <Label Grid.RowSpan="2"
+                       Grid.Column="1"
+                       Text="{x:Static fonts:FluentUI.chevron_right_20_regular}"
+                       FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                       FontSize="20"
+                       TextColor="{DynamicResource TextMuted}"
+                       VerticalTextAlignment="Center" />
+            </Grid>
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup Name="CommonStates">
+                    <VisualState Name="Normal"/>
+                    <VisualState Name="Selected">
+                        <VisualState.Setters>
+                            <Setter Property="BackgroundColor" Value="{DynamicResource Surface}"/>
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+        </Border>
+    </DataTemplate>
+
+    <DataTemplate x:Key="SemesterItemTemplate" x:DataType="models:StudySemester">
+        <Border Padding="8"
+            controls:LiquidGlass.UsesLiquidGlass="True"
+            BackgroundColor="{DynamicResource Surface}"
+            Stroke="{DynamicResource BorderSubtle}"
+            StrokeThickness="1"
+            Margin="0,0,0,10">
+            <toolkit:Expander>
+                <toolkit:Expander.Header>
+                    <Grid Padding="6" ColumnDefinitions="*,auto" ColumnSpacing="8">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="{Binding Semester}"
+                               FontFamily="MontserratSemiBold"
+                               FontSize="15"
+                               TextColor="{DynamicResource TextPrimary}" />
+                            <Label Text="{Binding SemesterSubtitle}"
+                               Style="{StaticResource SectionSubtitle}" />
+                        </VerticalStackLayout>
+                        <Label Grid.Column="1"
+                               Text="{x:Static fonts:FluentUI.chevron_down_20_regular}"
+                               FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                               FontSize="20"
+                               TextColor="{DynamicResource TextMuted}"
+                               VerticalTextAlignment="Center" />
+                    </Grid>
+                </toolkit:Expander.Header>
+                <VerticalStackLayout Margin="0,5,0,0"
+                                     Spacing="10"
+                                     BindableLayout.ItemsSource="{Binding Debts}"
+                                     BindableLayout.ItemTemplate="{StaticResource DebtItemTemplate}" />
+            </toolkit:Expander>
+        </Border>
+    </DataTemplate>
+
+    <DataTemplate x:Key="DebtItemTemplate" x:DataType="models:Debts">
+        <Grid Margin="14,6,14,12" RowDefinitions="auto,auto" RowSpacing="4">
+            <Label Text="{Binding Discipline, StringFormat='Дисциплина: {0}'}"
+                   FontSize="13"
+                   TextColor="{DynamicResource TextPrimary}" />
+            <Label Grid.Row="1"
+                   Text="{Binding MarkType, StringFormat='Оценивание: {0}'}"
+                   Style="{StaticResource SectionSubtitle}" />
+        </Grid>
+    </DataTemplate>
+</ResourceDictionary>

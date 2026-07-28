@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Name="PageRoot"
+             x:Class="mau.NewsPage"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewmodel="clr-namespace:mau.ViewModel.News"
+             xmlns:fonts="clr-namespace:mau.Resources.Fonts"
+             BackgroundColor="{DynamicResource Background}"
+             x:DataType="viewmodel:NewsViewModel"
+             Shell.NavBarIsVisible="False"
+             Title="Новости">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                        EventName="Appearing"
+                                        Command="{Binding LoadDataCommand}"/>
+        <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                        EventName="Disappearing"
+                                        Command="{Binding CancelPendingOperationsCommand}" />
+    </ContentPage.Behaviors>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Templates/CardTemplate.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <Grid RowDefinitions="auto,auto,*" Padding="16,18,16,16" RowSpacing="10">
+        <VerticalStackLayout Spacing="3" Margin="0,0,0,4">
+            <Label Text="Новости" Style="{StaticResource PageTitle}" />
+            <Label Text="События и объявления университета"
+                   Style="{StaticResource SectionSubtitle}" />
+        </VerticalStackLayout>
+        <CollectionView Grid.Row="1"
+                        HeightRequest="52"
+                        ItemSizingStrategy="MeasureAllItems"
+                        BackgroundColor="Transparent"
+                        HorizontalScrollBarVisibility="Never"
+                        ItemsSource="{Binding FilterButtons}"
+                        SelectedItem="{Binding SelectedButton}"
+                        SelectionChangedCommand="{Binding FilterDataCommand}"
+                        SelectionMode="Single">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Horizontal"
+                                   ItemSpacing="6"/>
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="viewmodel:Buttons">
+                    <Border Style="{StaticResource FilterButtons}"
+                            HeightRequest="40"
+                            MinimumHeightRequest="40"
+                            Margin="0,6"
+                            Padding="14,0"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center">
+                        <Label x:Name="FilterLabel"
+                               Text="{Binding FilterName}"
+                               TextColor="{DynamicResource TextSecondary}"
+                               FontFamily="MontserratSemiBold"
+                               FontSize="12"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               HorizontalTextAlignment="Center"
+                               VerticalTextAlignment="Center"
+                               MaxLines="1"
+                               LineBreakMode="NoWrap" />
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <Grid Grid.Row="2"
+              RowDefinitions="*">
+            <Border Style="{StaticResource SurfacePanel}"
+                    IsVisible="{Binding IsLoading}"
+                    VerticalOptions="Start">
+                <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+                    <ActivityIndicator IsRunning="{Binding IsLoading}"
+                                       SemanticProperties.Description="Загрузка новостей" />
+                    <Label Text="Загружаем новости"
+                           Style="{StaticResource SectionSubtitle}"
+                           VerticalTextAlignment="Center" />
+                </HorizontalStackLayout>
+            </Border>
+            <CollectionView BackgroundColor="Transparent"
+                            IsVisible="{Binding HasContent}"
+                            ItemSizingStrategy="MeasureAllItems"
+                            ItemsSource="{Binding News}"
+                            SelectedItem="{Binding SelectedNews}"
+                            ItemTemplate="{StaticResource NewsItemTemplate}" />
+            <Border Style="{StaticResource SurfacePanel}"
+                    IsVisible="{Binding IsEmpty}"
+                    VerticalOptions="Start">
+                <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                    <Label Text="{x:Static fonts:FluentUI.news_24_regular}"
+                           FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                           FontSize="28"
+                           TextColor="{DynamicResource TextMuted}"
+                           HorizontalTextAlignment="Center" />
+                    <Label Text="Новостей в этой категории нет"
+                           Style="{StaticResource EmptyStateTitle}" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+    </Grid>
+</ContentPage>

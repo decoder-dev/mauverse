@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewmodels="clr-namespace:mau.ViewModel"
+             x:DataType="viewmodels:LoadingViewModel"
+             x:Class="mau.LoadingPage"
+             Shell.NavBarIsVisible="false"
+             BackgroundColor="{DynamicResource Surface}">
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{DynamicResource Surface}"
+                                   StatusBarStyle="{AppThemeBinding Light=DarkContent, Dark=LightContent}" />
+    </ContentPage.Behaviors>
+
+    <Grid Padding="28">
+        <Image Source="mauverce_logo.svg"
+               HeightRequest="156"
+               WidthRequest="156"
+               AutomationProperties.IsInAccessibleTree="False"
+               Aspect="AspectFit"
+               HorizontalOptions="Center"
+               VerticalOptions="Center" />
+
+        <VerticalStackLayout Spacing="12"
+                             TranslationY="132"
+                             MaximumWidthRequest="320"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center">
+            <ActivityIndicator IsRunning="True"
+                               Color="{DynamicResource PrimaryAccent}"
+                               HeightRequest="28"
+                               WidthRequest="28"
+                               SemanticProperties.Description="Инициализация приложения"
+                               HorizontalOptions="Center" />
+            <Label Text="{Binding ProgressLabel}"
+                   MinimumHeightRequest="22"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"
+                   FontFamily="MontserratMedium"
+                   FontSize="14"
+                   TextColor="{DynamicResource TextSecondary}" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

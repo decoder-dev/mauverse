@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:viewmodel="clr-namespace:mau.ViewModel.Dialogs"
+               xmlns:controls="clr-namespace:mau.Controls"
+               x:Class="mau.Dialogs.MenuPopup"
+               x:DataType="viewmodel:MenuViewModel"
+               BackgroundColor="Transparent">
+
+    <Border controls:LiquidGlass.UsesLiquidGlass="True"
+            BackgroundColor="{DynamicResource Surface}"
+            Stroke="{DynamicResource BorderSubtle}"
+            StrokeThickness="1"
+            Padding="10">
+
+        <VerticalStackLayout Spacing="4">
+            <Button Text="Создать заметку"
+                    BackgroundColor="Transparent"
+                    TextColor="{DynamicResource Primary}"
+                    IsVisible="{Binding IsNoteEmpty}"
+                    Command="{Binding CreateNoteCommand}" />
+            <Button Text="Редактировать"
+                    BackgroundColor="Transparent"
+                    TextColor="{DynamicResource TextPrimary}"
+                    IsVisible="{Binding IsNoteCreated}"
+                    Command="{Binding EditNoteCommand}" />
+            <Button Text="Удалить"
+                    BackgroundColor="Transparent"
+                    TextColor="{AppThemeBinding Light={StaticResource Error}, Dark={StaticResource ErrorDarkForeground}}"
+                    IsVisible="{Binding IsNoteCreated}"
+                    Command="{Binding DeleteNoteCommand}" />
+        </VerticalStackLayout>
+    </Border>
+</toolkit:Popup>

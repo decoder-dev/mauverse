@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Name="PageRoot"
+             xmlns:viewmodel="clr-namespace:mau.ViewModel"
+             xmlns:fonts="clr-namespace:mau.Resources.Fonts"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="mau.MainPage"
+             x:DataType="viewmodel:MainViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{DynamicResource Background}">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                        EventName="Appearing"
+                                        Command="{Binding LoadData}" />
+        <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                        EventName="Disappearing"
+                                        Command="{Binding CancelPendingOperationsCommand}" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Templates/ScheduleTemplate.xaml" />
+                <ResourceDictionary Source="/Templates/NotificationTemplate.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16,18,16,32"
+                             Spacing="22"
+                             MaximumWidthRequest="720">
+            <Grid ColumnDefinitions="*,auto" ColumnSpacing="12">
+                <VerticalStackLayout Spacing="5" VerticalOptions="Center">
+                    <Label Text="{Binding TodayLabel}"
+                           Style="{StaticResource HeaderMeta}" />
+                    <Label Text="{Binding GreetingsLabel}"
+                           Style="{StaticResource DisplayTitle}"
+                           MaxLines="2"
+                           LineBreakMode="TailTruncation" />
+                    <Label Text="{Binding ContextLabel}"
+                           Style="{StaticResource SectionSubtitle}" />
+                </VerticalStackLayout>
+
+                <Border Grid.Column="1"
+                        Style="{StaticResource IconButton}"
+                        SemanticProperties.Description="Открыть профиль"
+                        VerticalOptions="Start">
+                    <Label Text="{x:Static fonts:FluentUI.person_24_regular}"
+                           FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                           FontSize="24"
+                           TextColor="{DynamicResource Primary}"
+                           HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OpenProfile}" />
+                    </Border.GestureRecognizers>
+                </Border>
+            </Grid>
+
+            <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
+                <Border HeightRequest="7"
+                        WidthRequest="7"
+                        BackgroundColor="{StaticResource Success}"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 4"
+                        VerticalOptions="Center" />
+                <Label Grid.Column="1"
+                       Text="{Binding SyncStatusLabel}"
+                       Style="{StaticResource HeaderMeta}"
+                       VerticalTextAlignment="Center" />
+                <Border Grid.Column="2"
+                        HeightRequest="48"
+                        WidthRequest="48"
+                        Padding="0"
+                        SemanticProperties.Description="Обновить данные"
+                        BackgroundColor="Transparent">
+                    <Label Text="{x:Static fonts:FluentUI.arrow_sync_20_regular}"
+                           FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                           FontSize="20"
+                           TextColor="{DynamicResource Primary}"
+                           HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding Refresh}" />
+                    </Border.GestureRecognizers>
+                </Border>
+            </Grid>
+
+            <Border Style="{StaticResource SurfacePanel}"
+                    BackgroundColor="{DynamicResource WarningLight}"
+                    Stroke="{AppThemeBinding Light={StaticResource Warning}, Dark={StaticResource WarningDarkForeground}}"
+                    SemanticProperties.Description="Укажите учебную группу"
+                    SemanticProperties.Hint="Открыть профиль"
+                    IsVisible="{Binding IsProfileSetupRequired}">
+                <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="12">
+                    <Label Text="{x:Static fonts:FluentUI.person_alert_24_regular}"
+                           FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                           FontSize="24"
+                           TextColor="{AppThemeBinding Light={StaticResource Warning}, Dark={StaticResource WarningDarkForeground}}"
+                           VerticalTextAlignment="Start" />
+                    <VerticalStackLayout Grid.Column="1" Spacing="3">
+                        <Label Text="Укажите учебную группу"
+                               Style="{StaticResource SectionTitle}" />
+                        <Label Text="После этого появится ваше расписание"
+                               Style="{StaticResource SectionSubtitle}" />
+                    </VerticalStackLayout>
+                    <Label Grid.Column="2"
+                           Text="{x:Static fonts:FluentUI.chevron_right_20_regular}"
+                           FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                           FontSize="20"
+                           TextColor="{AppThemeBinding Light={StaticResource Warning}, Dark={StaticResource WarningDarkForeground}}"
+                           VerticalTextAlignment="Center" />
+                </Grid>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding OpenProfile}" />
+                </Border.GestureRecognizers>
+            </Border>
+
+            <VerticalStackLayout Spacing="10" IsVisible="{Binding IsProfileReady}">
+                <Label Text="Следующая пара" Style="{StaticResource SectionTitle}" />
+
+                <Border Style="{StaticResource PrimaryPanel}"
+                        SemanticProperties.Description="Открыть следующую пару в расписании"
+                        IsVisible="{Binding HasNextLesson}">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OpenSchedule}" />
+                    </Border.GestureRecognizers>
+                    <Grid RowDefinitions="auto,auto,auto" RowSpacing="12">
+                        <Grid ColumnDefinitions="*,auto" ColumnSpacing="12">
+                            <Label Text="{Binding NextLessonStatusLabel}"
+                                   FontFamily="MontserratSemiBold"
+                                   FontSize="12"
+                                   TextColor="{StaticResource PrimaryPanelMuted}" />
+                            <Label Grid.Column="1"
+                                   Text="{Binding NextLesson.StartTime}"
+                                   FontFamily="MontserratBold"
+                                   FontSize="18"
+                                   TextColor="{StaticResource White}" />
+                        </Grid>
+                        <Label Grid.Row="1"
+                               Text="{Binding NextLesson.Name}"
+                               FontFamily="MontserratBold"
+                               FontSize="19"
+                               TextColor="{StaticResource White}"
+                               MaxLines="2"
+                               LineBreakMode="TailTruncation" />
+                        <Grid Grid.Row="2" ColumnDefinitions="*,*" ColumnSpacing="14">
+                            <Grid ColumnDefinitions="auto,*" ColumnSpacing="7">
+                                <Label Text="{x:Static fonts:FluentUI.building_20_regular}"
+                                       FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                                       FontSize="18"
+                                       TextColor="{StaticResource PrimaryPanelMuted}" />
+                                <Label Grid.Column="1"
+                                       Text="{Binding NextLesson.Room}"
+                                       FontFamily="MontserratMedium"
+                                       FontSize="13"
+                                       TextColor="{StaticResource White}"
+                                       MaxLines="1"
+                                       LineBreakMode="TailTruncation" />
+                            </Grid>
+                            <Grid Grid.Column="1"
+                                  ColumnDefinitions="auto,*"
+                                  ColumnSpacing="7">
+                                <Label Text="{x:Static fonts:FluentUI.person_20_regular}"
+                                       FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                                       FontSize="18"
+                                       TextColor="{StaticResource PrimaryPanelMuted}" />
+                                <Label Grid.Column="1"
+                                       Text="{Binding NextLesson.Teacher}"
+                                       FontFamily="MontserratMedium"
+                                       FontSize="13"
+                                       TextColor="{StaticResource White}"
+                                       MaxLines="1"
+                                       LineBreakMode="TailTruncation" />
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource SurfacePanel}"
+                        IsVisible="{Binding ShowNoNextLesson}">
+                    <Grid ColumnDefinitions="auto,*" ColumnSpacing="12">
+                        <Label Text="{x:Static fonts:FluentUI.calendar_empty_24_regular}"
+                               FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                               FontSize="24"
+                               TextColor="{AppThemeBinding Light={StaticResource Success}, Dark={StaticResource SuccessDarkForeground}}" />
+                        <Label Grid.Column="1"
+                               Text="На сегодня все"
+                               Style="{StaticResource EmptyStateTitle}"
+                               VerticalTextAlignment="Center" />
+                    </Grid>
+                </Border>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Быстрый доступ" Style="{StaticResource SectionTitle}" />
+                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                    <Border Style="{StaticResource SurfacePanel}"
+                            Padding="10"
+                            MinimumHeightRequest="88"
+                            SemanticProperties.Description="Открыть расписание">
+                        <VerticalStackLayout Spacing="7" VerticalOptions="Center">
+                            <Label Text="{x:Static fonts:FluentUI.calendar_day_24_regular}"
+                                   FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                                   FontSize="23"
+                                   TextColor="{DynamicResource PrimaryAccent}"
+                                   HorizontalTextAlignment="Center" />
+                            <Label Text="Расписание"
+                                   FontFamily="MontserratSemiBold"
+                                   FontSize="11"
+                                   MaxLines="2"
+                                   LineBreakMode="WordWrap"
+                                   HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding OpenSchedule}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                    <Border Grid.Column="1"
+                            Style="{StaticResource SurfacePanel}"
+                            Padding="10"
+                            MinimumHeightRequest="88"
+                            SemanticProperties.Description="Открыть сервисы">
+                        <VerticalStackLayout Spacing="7" VerticalOptions="Center">
+                            <Label Text="{x:Static fonts:FluentUI.grid_24_regular}"
+                                   FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                                   FontSize="23"
+                                   TextColor="{DynamicResource PrimaryAccent}"
+                                   HorizontalTextAlignment="Center" />
+                            <Label Text="Сервисы"
+                                   FontFamily="MontserratSemiBold"
+                                   FontSize="11"
+                                   MaxLines="2"
+                                   LineBreakMode="WordWrap"
+                                   HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding OpenServices}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                    <Border Grid.Column="2"
+                            Style="{StaticResource SurfacePanel}"
+                            Padding="10"
+                            MinimumHeightRequest="88"
+                            SemanticProperties.Description="Открыть новости">
+                        <VerticalStackLayout Spacing="7" VerticalOptions="Center">
+                            <Label Text="{x:Static fonts:FluentUI.news_24_regular}"
+                                   FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                                   FontSize="23"
+                                   TextColor="{DynamicResource PrimaryAccent}"
+                                   HorizontalTextAlignment="Center" />
+                            <Label Text="Новости"
+                                   FontFamily="MontserratSemiBold"
+                                   FontSize="11"
+                                   MaxLines="2"
+                                   LineBreakMode="WordWrap"
+                                   HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding OpenNews}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                </Grid>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="10" IsVisible="{Binding IsProfileReady}">
+                <Grid ColumnDefinitions="*,auto">
+                    <Label Text="Расписание на сегодня" Style="{StaticResource SectionTitle}" />
+                    <Label Grid.Column="1"
+                           Text="{Binding ScheduleSummaryLabel}"
+                           Style="{StaticResource HeaderMeta}"
+                           VerticalTextAlignment="Center" />
+                </Grid>
+                <Border Style="{StaticResource SurfacePanel}"
+                        IsVisible="{Binding ScheduleFrameIsVisible}">
+                    <Label Text="Сегодня занятий нет"
+                           Style="{StaticResource EmptyStateTitle}" />
+                </Border>
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Schedules}"
+                                     BindableLayout.ItemTemplate="{StaticResource ScheduleDataTemplate}" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Обновления ЭИОС" Style="{StaticResource SectionTitle}" />
+                <Border Style="{StaticResource SurfacePanel}"
+                        IsVisible="{Binding IsBusy}">
+                    <Grid ColumnDefinitions="auto,*" ColumnSpacing="10">
+                        <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                           SemanticProperties.Description="Загрузка обновлений ЭИОС" />
+                        <Label Grid.Column="1"
+                               Text="Загружаем обновления"
+                               Style="{StaticResource SectionSubtitle}"
+                               VerticalTextAlignment="Center" />
+                    </Grid>
+                </Border>
+                <CollectionView ItemsSource="{Binding Notifications}"
+                                ItemsLayout="HorizontalList"
+                                ItemSizingStrategy="MeasureAllItems"
+                                MinimumHeightRequest="156"
+                                HorizontalScrollBarVisibility="Never"
+                                ItemTemplate="{StaticResource NotificationItemTemplate}">
+                    <CollectionView.Triggers>
+                        <DataTrigger TargetType="CollectionView"
+                                     Binding="{Binding IsBusy}"
+                                     Value="True">
+                            <Setter Property="IsVisible" Value="False" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="CollectionView"
+                                     Binding="{Binding NotificationFrameIsVisible}"
+                                     Value="True">
+                            <Setter Property="IsVisible" Value="False" />
+                        </DataTrigger>
+                    </CollectionView.Triggers>
+                </CollectionView>
+                <Border Style="{StaticResource SurfacePanel}"
+                        IsVisible="{Binding NotificationFrameIsVisible}">
+                    <Grid ColumnDefinitions="auto,*" ColumnSpacing="12">
+                        <Label Text="{x:Static fonts:FluentUI.alert_off_24_regular}"
+                               FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                               FontSize="24"
+                               TextColor="{DynamicResource TextMuted}" />
+                        <Label Grid.Column="1"
+                               Text="{Binding NotificationStateText}"
+                               Style="{StaticResource EmptyStateTitle}"
+                               VerticalTextAlignment="Center" />
+                    </Grid>
+                </Border>
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

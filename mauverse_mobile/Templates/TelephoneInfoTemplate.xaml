@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewmodel="clr-namespace:mau.ViewModel.Services"
+             xmlns:converters="clr-namespace:mau.Utils.Converters"
+             xmlns:controls="clr-namespace:mau.Controls"
+             xmlns:dto="clr-namespace:mau.DTOModels"
+             xmlns:models="clr-namespace:mau.Models"
+             xmlns:fonts="clr-namespace:mau.Resources.Fonts"
+             x:Class="mau.Templates.TelephoneInfoTemplate">
+    <converters:SelectedDeptConverter x:Key="SelectedDeptConverter" />
+    <converters:HideLabelConverter x:Key="HideLabelConverter" />
+    <converters:HideMultiLabelConverter x:Key="HideMultiLabelConverter" />
+    <DataTemplate x:Key="PaginatedTelephoneTemplate" x:DataType="dto:DeptInfoDTO">
+        <Border Padding="14"
+            controls:LiquidGlass.UsesLiquidGlass="True"
+            BackgroundColor="{DynamicResource Surface}"
+            Stroke="{DynamicResource BorderSubtle}"
+            StrokeThickness="1"
+            Margin="0,0,0,8"
+            VerticalOptions="Fill"
+            SemanticProperties.Description="{Binding Name}"
+            SemanticProperties.Hint="Открыть контактную информацию">
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding Path=GetPhone, Source={RelativeSource AncestorType={x:Type viewmodel:TelephoneViewModel}}, x:DataType={x:Type viewmodel:TelephoneViewModel}}">
+                    <TapGestureRecognizer.CommandParameter>
+                        <MultiBinding Converter="{StaticResource SelectedDeptConverter}">
+                            <Binding Path="Name"/>
+                            <Binding Path="Id" />
+                        </MultiBinding>
+                    </TapGestureRecognizer.CommandParameter>
+                </TapGestureRecognizer>
+            </Border.GestureRecognizers>
+            <Grid ColumnDefinitions="*,auto" ColumnSpacing="12">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="{Binding Name}"
+                           FontFamily="MontserratSemiBold"
+                           FontSize="14"
+                           TextColor="{DynamicResource TextPrimary}"
+                           MaxLines="2"
+                           LineBreakMode="TailTruncation" />
+                    <Label Text="Контактная информация"
+                           Style="{StaticResource SectionSubtitle}" />
+                </VerticalStackLayout>
+                <Label Grid.Column="1"
+                       Text="{x:Static fonts:FluentUI.chevron_right_20_regular}"
+                       FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                       FontSize="20"
+                       TextColor="{DynamicResource TextMuted}"
+                       VerticalTextAlignment="Center" />
+            </Grid>
+        </Border>
+    </DataTemplate>
+    <DataTemplate x:Key="InfoDetailsTemplate" x:DataType="dto:TelephoneInfoDTO">
+        <Grid Padding="0,8">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <StackLayout Spacing="4" Margin="0,8,0,10">
+                <Label FontSize="16" FontFamily="MontserratSemiBold" TextColor="{DynamicResource Primary}" Text="{Binding Person}"
+                       IsVisible="{Binding Person, Converter={StaticResource HideLabelConverter}}"/>
+                <Label FontSize="14" TextColor="{DynamicResource TextSecondary}" Text="{Binding Title}"
+                       IsVisible="{Binding Title, Converter={StaticResource HideLabelConverter}}"/>
+            </StackLayout>
+            <StackLayout Grid.Row="1"
+                         Spacing="6">
+                <Label FontSize="13" TextColor="{DynamicResource TextPrimary}"
+                       Text="{Binding DepEmail, StringFormat='Почта: {0}'}"
+                       IsVisible="{Binding DepEmail, Converter={StaticResource HideLabelConverter}}"/>
+                <Label FontSize="13" TextColor="{DynamicResource TextPrimary}"
+                       Text="{Binding Phone, StringFormat='Телефон: {0}'}"
+                       IsVisible="{Binding Phone, Converter={StaticResource HideLabelConverter}}"/>
+                <Label FontSize="13" TextColor="{DynamicResource TextPrimary}"
+                       Text="{Binding Phone2, StringFormat='Доп.: {0}'}"
+                       IsVisible="{Binding Phone2, Converter={StaticResource HideLabelConverter}}"/>
+                <Label FontSize="13" TextColor="{DynamicResource TextPrimary}"
+                       Text="{Binding Fax, StringFormat='Факс: {0}'}"
+                       IsVisible="{Binding Fax, Converter={StaticResource HideLabelConverter}}"/>
+                <Label FontSize="13" TextColor="{DynamicResource TextPrimary}">
+                    <Label.Text>
+                        <MultiBinding StringFormat="{}Адрес: {0} каб. {1}">
+                            <Binding Path="Building2"/>
+                            <Binding Path="Room"/>
+                        </MultiBinding>
+                    </Label.Text>
+                    <Label.IsVisible>
+                        <MultiBinding Converter="{StaticResource HideMultiLabelConverter}">
+                            <Binding Path="Building2"/>
+                            <Binding Path="Room"/>
+                        </MultiBinding>
+                    </Label.IsVisible>
+                </Label>
+            </StackLayout>
+            <BoxView Grid.Row="2"
+                     HeightRequest="1"
+                     Margin="0,14,0,0"
+                     Color="{DynamicResource BorderSubtle}" />
+        </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="TeacherDetailsTemplate" x:DataType="models:UniversityInfo">
+        <Grid Padding="0,8">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <StackLayout Spacing="4" Margin="0,8,0,10">
+                <Label FontSize="16" FontFamily="MontserratSemiBold" TextColor="{DynamicResource Primary}" Text="{Binding Name}"/>
+                <Label FontSize="14" TextColor="{DynamicResource TextSecondary}" Text="{Binding Post}"/>
+            </StackLayout>
+            <StackLayout Grid.Row="1"
+                     Spacing="5">
+                <Label FontSize="14" TextColor="{DynamicResource TextPrimary}" Text="{Binding Email, StringFormat='Почта: {0}'}"/>
+            </StackLayout>
+            <BoxView Grid.Row="2"
+                     HeightRequest="1"
+                     Margin="0,14,0,0"
+                     Color="{DynamicResource BorderSubtle}" />
+        </Grid>
+    </DataTemplate>
+</ResourceDictionary>

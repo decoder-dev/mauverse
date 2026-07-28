@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36119.2
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mau", "mau.csproj", "{D7D2DC2E-BB4C-43E7-A54F-975441F55177}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mauverse_mobile.Tests", "..\mauverse_mobile.Tests\mauverse_mobile.Tests.csproj", "{7A14A46D-0417-4C51-A9B3-7DA697806DBE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D7D2DC2E-BB4C-43E7-A54F-975441F55177}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7D2DC2E-BB4C-43E7-A54F-975441F55177}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7D2DC2E-BB4C-43E7-A54F-975441F55177}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{D7D2DC2E-BB4C-43E7-A54F-975441F55177}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7D2DC2E-BB4C-43E7-A54F-975441F55177}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7D2DC2E-BB4C-43E7-A54F-975441F55177}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{7A14A46D-0417-4C51-A9B3-7DA697806DBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A14A46D-0417-4C51-A9B3-7DA697806DBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A14A46D-0417-4C51-A9B3-7DA697806DBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A14A46D-0417-4C51-A9B3-7DA697806DBE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {913200F0-7A6F-49E7-8853-6670D9EFA7FC}
+	EndGlobalSection
+EndGlobal

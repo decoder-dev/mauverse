@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="mau.Dialogs.ExceptionPopup"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewmodel="clr-namespace:mau.ViewModel.Dialogs"
+             xmlns:controls="clr-namespace:mau.Controls"
+             x:DataType="viewmodel:ExceptionViewModel"
+             BackgroundColor="Transparent">
+    <Border controls:LiquidGlass.UsesLiquidGlass="True"
+        BackgroundColor="{DynamicResource Surface}"
+        Stroke="{DynamicResource BorderSubtle}"
+        StrokeThickness="1"
+        MaximumWidthRequest="360"
+        Padding="22">
+        <Border.Shadow>
+            <Shadow Brush="{StaticResource Black}"
+                    Offset="0,8"
+                    Radius="20"
+                    Opacity="0.2" />
+        </Border.Shadow>
+        <Grid RowDefinitions="auto, auto, auto" RowSpacing="14">
+            <Label Text="Внимание"
+                   FontFamily="MontserratBold"
+                   TextColor="{DynamicResource TextPrimary}"
+                   FontSize="20"/>
+            <ScrollView Grid.Row="1" MaximumHeightRequest="300">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="{Binding Message}"
+                           FontFamily="MontserratSemiBold"
+                           TextColor="{DynamicResource TextPrimary}"
+                           FontSize="15"/>
+                    <Label Text="{Binding Description}"
+                           TextColor="{DynamicResource TextSecondary}"
+                           FontSize="13"/>
+                </VerticalStackLayout>
+            </ScrollView>
+            <Button Grid.Row="2"
+                    Text="Закрыть"
+                    HorizontalOptions="End"
+                    Command="{Binding OkCommand}"/>
+        </Grid>
+    </Border>
+</toolkit:Popup>
