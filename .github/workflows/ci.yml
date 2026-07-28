@@ -134,7 +134,11 @@ jobs:
         run: dotnet workload install maui-android --skip-manifest-update
 
       - name: Restore projects
-        run: dotnet restore mau.sln
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet restore mau.sln
+          dotnet restore mau.csproj --runtime android-arm64
 
       - name: Run mobile unit tests
         run: dotnet test ../mauverse_mobile.Tests/mauverse_mobile.Tests.csproj --configuration Release --no-restore --warnaserror
@@ -144,6 +148,7 @@ jobs:
           dotnet build mau.csproj
           --configuration Release
           --framework net10.0-android
+          --runtime android-arm64
           --no-restore
           --warnaserror
           -p:ContinuousIntegrationBuild=true
@@ -152,7 +157,7 @@ jobs:
       - name: Create unsigned artifact checksums
         shell: bash
         run: |
-          mapfile -t artifacts < <(find bin/Release/net10.0-android -maxdepth 1 \
+          mapfile -t artifacts < <(find bin/Release/net10.0-android \
             -type f \( -name '*.aab' -o \( -name '*.apk' ! -name '*-Signed.apk' \) \) \
             -print | sort)
           test "${#artifacts[@]}" -ge 2
@@ -163,9 +168,9 @@ jobs:
         with:
           name: mauverce-android-release-unsigned
           path: |
-            mauverse_mobile/bin/Release/net10.0-android/*.apk
-            !mauverse_mobile/bin/Release/net10.0-android/*-Signed.apk
-            mauverse_mobile/bin/Release/net10.0-android/*.aab
+            mauverse_mobile/bin/Release/net10.0-android/**/*.apk
+            !mauverse_mobile/bin/Release/net10.0-android/**/*-Signed.apk
+            mauverse_mobile/bin/Release/net10.0-android/**/*.aab
             mauverse_mobile/bin/Release/net10.0-android/checksums.txt
           if-no-files-found: error
           retention-days: 14
@@ -188,6 +193,14 @@ jobs:
         uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
         with:
           global-json-file: mauverse_mobile/global.json
+
+      - name: Select Xcode 26.0.1
+        shell: bash
+        run: |
+          set -euo pipefail
+          developer_dir="/Applications/Xcode_26.0.1.app/Contents/Developer"
+          test -d "$developer_dir"
+          sudo xcode-select --switch "$developer_dir"
 
       - name: Report Apple toolchain
         shell: bash
