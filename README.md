@@ -1,5 +1,24 @@
 # MAUverce
 
+## Native iPhone app
+
+The native SwiftUI implementation lives in `MauverseIOS`. It targets iPhone,
+uses the system Liquid Glass appearance on iOS 26, and falls back to native
+materials on iOS 18–25.
+
+Generate the Xcode project and build it locally:
+
+```bash
+brew install xcodegen
+cd MauverseIOS
+xcodegen generate
+open MAUverse.xcodeproj
+```
+
+The `ios-release-unsigned` GitHub Actions job builds with Xcode 26.5 and
+explicitly disables code signing. Its artifact contains an unsigned IPA that
+can be signed with your own Apple certificate and provisioning profile.
+
 MAUverce is a student mobile application for Murmansk Arctic University. The
 repository contains a .NET 9 MAUI client and a FastAPI gateway.
 
