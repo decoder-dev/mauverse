@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:mau.ViewModel.Services"
+             xmlns:fonts="clr-namespace:mau.Resources.Fonts"
+             xmlns:controls="clr-namespace:mau.Controls"
+             x:Class="mau.ServiceListPage"
+             x:DataType="viewmodel:ServicesViewModel"
+             BackgroundColor="{DynamicResource Background}"
+             Shell.NavBarIsVisible="False"
+             Title="Сервисы">
+    <Grid Padding="16,18,16,18" MaximumWidthRequest="760">
+        <CollectionView ItemsSource="{Binding ServiceRows}"
+                        VerticalScrollBarVisibility="Never">
+            <CollectionView.Header>
+                <VerticalStackLayout Spacing="4" Margin="0,0,0,14">
+                    <Label Text="Сервисы" Style="{StaticResource PageTitle}" />
+                    <Label Text="{Binding PageDescription}" Style="{StaticResource SectionSubtitle}" />
+                </VerticalStackLayout>
+            </CollectionView.Header>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="viewmodel:ServiceRow">
+                    <VerticalStackLayout Spacing="8" Margin="0,0,0,12">
+                        <Label Text="{Binding SectionTitle}"
+                               IsVisible="{Binding HasSectionTitle}"
+                               Style="{StaticResource SectionTitle}" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                            <Border Grid.Column="0"
+                                    controls:LiquidGlass.UsesLiquidGlass="True"
+                                    MinimumHeightRequest="138"
+                                    Padding="14"
+                                    BackgroundColor="{DynamicResource Surface}"
+                                    Stroke="{DynamicResource BorderSubtle}"
+                                    StrokeThickness="1"
+                                    SemanticProperties.Description="{Binding Left.ServiceName}"
+                                    SemanticProperties.Hint="Открыть сервис">
+                                <Grid RowDefinitions="auto,*" ColumnDefinitions="*,auto" RowSpacing="12">
+                                    <Border WidthRequest="46"
+                                            HeightRequest="46"
+                                            Padding="0"
+                                            BackgroundColor="{DynamicResource PrimaryLight}"
+                                            HorizontalOptions="Start">
+                                        <Label Text="{Binding Left.Glyph}"
+                                               FontFamily="FluentUI"
+                                               FontSize="25"
+                                               TextColor="{DynamicResource Primary}"
+                                               HorizontalTextAlignment="Center"
+                                               VerticalTextAlignment="Center" />
+                                    </Border>
+                                    <Label Grid.Row="1"
+                                           Text="{Binding Left.ServiceName}"
+                                           FontFamily="MontserratSemiBold"
+                                           FontSize="12"
+                                           TextColor="{DynamicResource TextPrimary}"
+                                           VerticalOptions="End"
+                                           VerticalTextAlignment="End"
+                                           MaxLines="3"
+                                           LineBreakMode="WordWrap" />
+                                    <Label Grid.Row="1"
+                                           Grid.Column="1"
+                                           Text="{x:Static fonts:FluentUI.chevron_right_20_regular}"
+                                           FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                                           FontSize="20"
+                                           TextColor="{DynamicResource TextMuted}"
+                                           VerticalTextAlignment="End" />
+                                </Grid>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Path=SelectService, Source={RelativeSource AncestorType={x:Type viewmodel:ServicesViewModel}}, x:DataType={x:Type viewmodel:ServicesViewModel}}"
+                                                          CommandParameter="{Binding Left.ServicePage}" />
+                                </Border.GestureRecognizers>
+                            </Border>
+
+                            <Border Grid.Column="1"
+                                    controls:LiquidGlass.UsesLiquidGlass="True"
+                                    MinimumHeightRequest="138"
+                                    Padding="14"
+                                    BackgroundColor="{DynamicResource Surface}"
+                                    Stroke="{DynamicResource BorderSubtle}"
+                                    StrokeThickness="1"
+                                    SemanticProperties.Description="{Binding Right.ServiceName}"
+                                    SemanticProperties.Hint="Открыть сервис">
+                                <Grid RowDefinitions="auto,*" ColumnDefinitions="*,auto" RowSpacing="12">
+                                    <Border WidthRequest="46"
+                                            HeightRequest="46"
+                                            Padding="0"
+                                            BackgroundColor="{DynamicResource PrimaryLight}"
+                                            HorizontalOptions="Start">
+                                        <Label Text="{Binding Right.Glyph}"
+                                               FontFamily="FluentUI"
+                                               FontSize="25"
+                                               TextColor="{DynamicResource Primary}"
+                                               HorizontalTextAlignment="Center"
+                                               VerticalTextAlignment="Center" />
+                                    </Border>
+                                    <Label Grid.Row="1"
+                                           Text="{Binding Right.ServiceName}"
+                                           FontFamily="MontserratSemiBold"
+                                           FontSize="12"
+                                           TextColor="{DynamicResource TextPrimary}"
+                                           VerticalOptions="End"
+                                           VerticalTextAlignment="End"
+                                           MaxLines="3"
+                                           LineBreakMode="WordWrap" />
+                                    <Label Grid.Row="1"
+                                           Grid.Column="1"
+                                           Text="{x:Static fonts:FluentUI.chevron_right_20_regular}"
+                                           FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                                           FontSize="20"
+                                           TextColor="{DynamicResource TextMuted}"
+                                           VerticalTextAlignment="End" />
+                                </Grid>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Path=SelectService, Source={RelativeSource AncestorType={x:Type viewmodel:ServicesViewModel}}, x:DataType={x:Type viewmodel:ServicesViewModel}}"
+                                                          CommandParameter="{Binding Right.ServicePage}" />
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </Grid>
+                    </VerticalStackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

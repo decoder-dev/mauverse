@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewmodel="clr-namespace:mau.ViewModel"
+             x:Class="mau.LoginPage"
+             x:DataType="viewmodel:LoginViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{DynamicResource Surface}">
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="{DynamicResource Surface}"
+                                   StatusBarStyle="{AppThemeBinding Light=DarkContent, Dark=LightContent}" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Resources>
+        <Style x:Key="LoginFieldBorder" TargetType="Border">
+            <Setter Property="BackgroundColor" Value="{DynamicResource Surface}" />
+            <Setter Property="Stroke" Value="{DynamicResource BorderSubtle}" />
+            <Setter Property="StrokeThickness" Value="1" />
+            <Setter Property="StrokeShape" Value="RoundRectangle 8" />
+            <Setter Property="Padding" Value="14,0" />
+            <Setter Property="MinimumHeightRequest" Value="54" />
+        </Style>
+        <Style x:Key="LoginFieldLabel" TargetType="Label">
+            <Setter Property="FontFamily" Value="MontserratSemiBold" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="TextColor" Value="{DynamicResource TextSecondary}" />
+        </Style>
+        <Style x:Key="LoginEntry" TargetType="Entry">
+            <Setter Property="BackgroundColor" Value="Transparent" />
+            <Setter Property="FontFamily" Value="MontserratRegular" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="TextColor" Value="{DynamicResource TextPrimary}" />
+            <Setter Property="PlaceholderColor" Value="{DynamicResource TextSecondary}" />
+            <Setter Property="VerticalTextAlignment" Value="Center" />
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid toolkit:StateContainer.CurrentState="{Binding CurrentState}"
+          toolkit:StateContainer.CanStateChange="{Binding CanStateChange}">
+        <toolkit:StateContainer.StateViews>
+            <Grid toolkit:StateView.StateKey="Empty"
+                  BackgroundColor="{DynamicResource Surface}">
+                <ScrollView x:Name="LoginScroll">
+                    <VerticalStackLayout Padding="28,40,28,64"
+                                         Spacing="0"
+                                         MaximumWidthRequest="460"
+                                         HorizontalOptions="Center"
+                                         VerticalOptions="Center">
+                        <Image Source="images/icon.svg"
+                               HeightRequest="104"
+                               MaximumWidthRequest="280"
+                               HorizontalOptions="Start"
+                               AutomationProperties.IsInAccessibleTree="False"
+                               Aspect="AspectFit">
+                            <Image.Behaviors>
+                                <toolkit:IconTintColorBehavior TintColor="{DynamicResource Primary}" />
+                            </Image.Behaviors>
+                        </Image>
+
+                        <BoxView Margin="0,28,0,20"
+                                 HeightRequest="4"
+                                 WidthRequest="42"
+                                 CornerRadius="2"
+                                 HorizontalOptions="Start"
+                                 Color="{DynamicResource PrimaryAccent}" />
+
+                        <Label Text="MAUverse"
+                               FontFamily="MontserratBold"
+                               FontSize="30"
+                               TextColor="{DynamicResource TextPrimary}" />
+                        <Label Margin="0,6,0,30"
+                               Text="Вход в университетские сервисы"
+                               FontFamily="MontserratRegular"
+                               FontSize="15"
+                               TextColor="{DynamicResource TextSecondary}" />
+
+                        <Label Style="{StaticResource LoginFieldLabel}"
+                               Text="Логин ЭИОС" />
+                        <Border Margin="0,8,0,20"
+                                Style="{StaticResource LoginFieldBorder}">
+                            <Entry Style="{StaticResource LoginEntry}"
+                                   Text="{Binding Username}"
+                                   SemanticProperties.Description="Логин ЭИОС"
+                                   Focused="OnFieldFocused"
+                                   Placeholder="Введите логин"
+                                   ClearButtonVisibility="WhileEditing"
+                                   IsTextPredictionEnabled="False"
+                                   ReturnType="Next" />
+                        </Border>
+
+                        <Label Style="{StaticResource LoginFieldLabel}"
+                               Text="Пароль ЭИОС" />
+                        <Border Margin="0,8,0,28"
+                                Style="{StaticResource LoginFieldBorder}">
+                            <Entry Style="{StaticResource LoginEntry}"
+                                   Text="{Binding Password}"
+                                   SemanticProperties.Description="Пароль ЭИОС"
+                                   Focused="OnFieldFocused"
+                                   Placeholder="Введите пароль"
+                                   IsPassword="True"
+                                   IsTextPredictionEnabled="False"
+                                   ReturnType="Go"
+                                   ReturnCommand="{Binding Auth}" />
+                        </Border>
+
+                        <Button Text="Войти"
+                                Command="{Binding Auth}"
+                                MinimumHeightRequest="54"
+                                HorizontalOptions="Fill"
+                                BackgroundColor="{DynamicResource PrimaryAccent}"
+                                TextColor="{DynamicResource PrimaryAccentText}"
+                                FontFamily="MontserratSemiBold"
+                                FontSize="16"
+                                CornerRadius="8"
+                                Padding="16,0" />
+                    </VerticalStackLayout>
+                </ScrollView>
+            </Grid>
+
+            <Grid toolkit:StateView.StateKey="Loading"
+                  BackgroundColor="{DynamicResource Surface}"
+                  Padding="28">
+                <VerticalStackLayout MaximumWidthRequest="320"
+                                     HorizontalOptions="Center"
+                                     VerticalOptions="Center"
+                                     Spacing="18">
+                    <ActivityIndicator IsRunning="True"
+                                       Color="{DynamicResource PrimaryAccent}"
+                                       HeightRequest="44"
+                                       WidthRequest="44"
+                                       SemanticProperties.Description="Выполняется вход" />
+                    <Label Text="Выполняем вход"
+                           HorizontalTextAlignment="Center"
+                           FontFamily="MontserratSemiBold"
+                           FontSize="17"
+                           TextColor="{DynamicResource TextPrimary}" />
+                </VerticalStackLayout>
+            </Grid>
+        </toolkit:StateContainer.StateViews>
+    </Grid>
+</ContentPage>

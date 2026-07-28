@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:mau.ViewModel"
+             xmlns:converters="clr-namespace:mau.Utils.Converters"
+             xmlns:fonts="clr-namespace:mau.Resources.Fonts"
+             xmlns:dto="clr-namespace:mau.DTOModels"
+             xmlns:models="clr-namespace:mau.Models"
+             xmlns:controls="clr-namespace:mau.Controls"
+             x:Class="mau.Templates.ScheduleTemplate">
+    <converters:MenuPopupConverter x:Key="MenuParametersConverter" />
+    <DataTemplate x:Key="ScheduleDataTemplate" x:DataType="models:Schedule">
+        <Grid Margin="0,5" ColumnDefinitions="62,*" ColumnSpacing="10">
+            <VerticalStackLayout Padding="0,12,0,0"
+                                 Spacing="2"
+                                 HorizontalOptions="Center">
+                <Label Text="{Binding StartTime}"
+                       FontFamily="MontserratBold"
+                       FontSize="15"
+                       TextColor="{DynamicResource TextPrimary}"
+                       HorizontalTextAlignment="Center" />
+                <Label Text="{Binding EndTime}"
+                       FontFamily="MontserratMedium"
+                       FontSize="12"
+                       TextColor="{DynamicResource TextSecondary}"
+                       HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+
+            <Border Grid.Column="1"
+                    controls:LiquidGlass.UsesLiquidGlass="True"
+                    Padding="0"
+                    BackgroundColor="{DynamicResource Surface}"
+                    Stroke="{DynamicResource BorderSubtle}"
+                    StrokeThickness="1">
+                <Grid ColumnDefinitions="4,*,52">
+                    <BoxView Color="{DynamicResource Primary}" />
+                    <VerticalStackLayout Grid.Column="1" Padding="14,12" Spacing="6">
+                        <Label Text="{Binding PairType}"
+                               Style="{StaticResource Eyebrow}" />
+                        <Label Text="{Binding Name}"
+                               FontFamily="MontserratSemiBold"
+                               FontSize="15"
+                               TextColor="{DynamicResource TextPrimary}"
+                               MaxLines="2"
+                               LineBreakMode="TailTruncation" />
+                        <Label Text="{Binding Room}"
+                               Style="{StaticResource SectionSubtitle}"
+                               MaxLines="1"
+                               LineBreakMode="TailTruncation" />
+                        <Label Text="{Binding Teacher}"
+                               Style="{StaticResource SectionSubtitle}"
+                               MaxLines="2"
+                               LineBreakMode="TailTruncation" />
+                        <Border BackgroundColor="{DynamicResource PrimaryLight}"
+                                StrokeThickness="0"
+                                Padding="10,7"
+                                Margin="0,2,0,0"
+                                MinimumHeightRequest="48"
+                                HorizontalOptions="Start"
+                                SemanticProperties.Description="Открыть заметку к занятию"
+                                IsVisible="{Binding HaveNote}">
+                            <Label Text="Открыть заметку"
+                                   TextColor="{DynamicResource Primary}"
+                                   FontFamily="MontserratSemiBold"
+                                   FontSize="12" />
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Path=ShowNote, Source={RelativeSource AncestorType={x:Type viewmodel:Schedules.BaseScheduleViewModel}}, x:DataType={x:Type viewmodel:Schedules.BaseScheduleViewModel}}">
+                                    <TapGestureRecognizer.CommandParameter>
+                                        <MultiBinding Converter="{StaticResource MenuParametersConverter}">
+                                            <MultiBinding.Bindings>
+                                                <Binding Source="{x:Reference MenuButton}" />
+                                                <Binding Path="ExternalId" />
+                                            </MultiBinding.Bindings>
+                                        </MultiBinding>
+                                    </TapGestureRecognizer.CommandParameter>
+                                </TapGestureRecognizer>
+                            </Border.GestureRecognizers>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <Border Grid.Column="2"
+                            x:Name="MenuButton"
+                            WidthRequest="48"
+                            HeightRequest="48"
+                            Padding="0"
+                            Margin="2"
+                            BackgroundColor="Transparent"
+                            SemanticProperties.Description="Действия с занятием"
+                            VerticalOptions="Center">
+                        <Label Text="{x:Static fonts:FluentUI.more_horizontal_24_regular}"
+                               FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                               FontSize="24"
+                               TextColor="{DynamicResource Primary}"
+                               HorizontalTextAlignment="Center"
+                               VerticalTextAlignment="Center" />
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Path=ShowMenu, Source={RelativeSource AncestorType={x:Type viewmodel:Schedules.BaseScheduleViewModel}}, x:DataType={x:Type viewmodel:Schedules.BaseScheduleViewModel}}">
+                                <TapGestureRecognizer.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource MenuParametersConverter}">
+                                        <MultiBinding.Bindings>
+                                            <Binding Source="{x:Reference MenuButton}" />
+                                            <Binding Path="ExternalId" />
+                                        </MultiBinding.Bindings>
+                                    </MultiBinding>
+                                </TapGestureRecognizer.CommandParameter>
+                            </TapGestureRecognizer>
+                        </Border.GestureRecognizers>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </DataTemplate>
+    
+    <DataTemplate x:Key="DateButtonTemplate" x:DataType="dto:WeekDaysDTO">
+        <Border Style="{StaticResource DateButton}" MinimumWidthRequest="54" MinimumHeightRequest="58">
+            <Grid>
+                <VerticalStackLayout Spacing="0"
+                                     Padding="4,6,4,0"
+                                     HorizontalOptions="Center">
+                    <Label x:Name="DayNameLabel"
+                           Text="{Binding DayName}"
+                           HorizontalTextAlignment="Center"
+                           TextColor="{DynamicResource TextSecondary}"
+                           FontFamily="MontserratMedium"
+                           FontSize="11" />
+                    <Label x:Name="DateLabel"
+                           Text="{Binding Day}"
+                           HorizontalTextAlignment="Center"
+                           TextColor="{DynamicResource TextPrimary}"
+                           FontFamily="MontserratSemiBold"
+                           FontSize="15" />
+                </VerticalStackLayout>
+                <Border IsVisible="{Binding IsWeekend}" BackgroundColor="{StaticResource Success}" HeightRequest="5" WidthRequest="5" Margin="0,7,0,0" ZIndex="1000" HorizontalOptions="End" VerticalOptions="Start"/>
+            </Grid>
+        </Border>
+    </DataTemplate>
+</ResourceDictionary>

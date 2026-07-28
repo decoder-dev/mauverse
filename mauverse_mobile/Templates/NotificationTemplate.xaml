@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="mau.Templates.NotificationTemplate"
+             xmlns:viewmodel="clr-namespace:mau.ViewModel"
+             xmlns:models="clr-namespace:mau.Models"
+             xmlns:controls="clr-namespace:mau.Controls"
+             xmlns:fonts="clr-namespace:mau.Resources.Fonts"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit">
+    <DataTemplate x:Key="NotificationItemTemplate" x:DataType="models:Message">
+        <Border Margin="0,0,10,0"
+                controls:LiquidGlass.UsesLiquidGlass="True"
+                WidthRequest="{OnIdiom Phone=280, Tablet=292, Desktop=292}"
+                Padding="14,12"
+                Stroke="{DynamicResource BorderSubtle}"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 8"
+                BackgroundColor="{DynamicResource Surface}">
+            <Grid RowDefinitions="auto,*,auto" RowSpacing="8">
+                <Grid ColumnDefinitions="auto,*" ColumnSpacing="8">
+                    <Border HeightRequest="8"
+                            WidthRequest="8"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 4"
+                            BackgroundColor="{Binding ColorName}"
+                            VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           Text="ОБНОВЛЕНИЕ КУРСА"
+                           Style="{StaticResource Eyebrow}"
+                           VerticalTextAlignment="Center" />
+                </Grid>
+                <VerticalStackLayout Grid.Row="1" Spacing="4">
+                    <Label Text="{Binding ContextUrlName}"
+                            FontSize="15"
+                            FontFamily="MontserratSemiBold"
+                            TextColor="{DynamicResource TextPrimary}"
+                            MaxLines="2"
+                            LineBreakMode="TailTruncation" />
+                    <Label Text="{Binding Subject}"
+                           Style="{StaticResource SectionSubtitle}"
+                           MaxLines="1"
+                           LineBreakMode="TailTruncation" />
+                </VerticalStackLayout>
+                <Grid Grid.Row="2" ColumnDefinitions="*,auto" ColumnSpacing="8">
+                    <Label Text="{Binding TimeCreatedString}"
+                           Style="{StaticResource SectionSubtitle}"
+                           VerticalTextAlignment="Center" />
+                    <Button Grid.Column="1"
+                            Text="Открыть"
+                            Padding="12,0"
+                            BackgroundColor="Transparent"
+                            TextColor="{DynamicResource Primary}"
+                            FontSize="12"
+                            MinimumHeightRequest="48"
+                            SemanticProperties.Hint="Открыть обновление в ЭИОС"
+                            Command="{Binding Path=OpenNotification, Source={RelativeSource AncestorType={x:Type viewmodel:MainViewModel}}, x:DataType={x:Type viewmodel:MainViewModel}}"
+                            CommandParameter="{Binding .}" />
+                </Grid>
+            </Grid>
+        </Border>
+    </DataTemplate>
+</ResourceDictionary>

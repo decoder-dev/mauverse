@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:fonts="clr-namespace:mau.Resources.Fonts"
+             xmlns:models="clr-namespace:mau.Models"
+             xmlns:controls="clr-namespace:mau.Controls"
+             xmlns:viewmodel="clr-namespace:mau.ViewModel.Services"
+             x:Class="mau.CampusNavigatorPage"
+             x:DataType="viewmodel:CampusNavigatorViewModel"
+             Title="Навигатор"
+             BackgroundColor="{DynamicResource Background}">
+    <ContentPage.Resources>
+        <DataTemplate x:Key="BuildingTemplate"
+                      x:DataType="models:CampusBuilding">
+            <Border Margin="0,0,0,8"
+                    controls:LiquidGlass.UsesLiquidGlass="True"
+                    Padding="14,12"
+                    BackgroundColor="{DynamicResource Surface}"
+                    Stroke="{DynamicResource BorderSubtle}"
+                    StrokeThickness="1"
+                    SemanticProperties.Description="{Binding Title}"
+                    SemanticProperties.Hint="Открыть маршрут в 2GIS">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer
+                        Command="{Binding Path=OpenRouteCommand, Source={RelativeSource AncestorType={x:Type viewmodel:CampusNavigatorViewModel}}, x:DataType={x:Type viewmodel:CampusNavigatorViewModel}}"
+                        CommandParameter="{Binding .}" />
+                </Border.GestureRecognizers>
+                <Grid ColumnDefinitions="44,*,auto"
+                      ColumnSpacing="12"
+                      RowDefinitions="auto,auto"
+                      RowSpacing="3">
+                    <Border Grid.RowSpan="2"
+                            WidthRequest="44"
+                            HeightRequest="44"
+                            Padding="0"
+                            BackgroundColor="{DynamicResource PrimaryLight}"
+                            VerticalOptions="Center">
+                        <Label Text="{x:Static fonts:FluentUI.building_24_regular}"
+                               FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                               FontSize="23"
+                               TextColor="{DynamicResource Primary}"
+                               HorizontalTextAlignment="Center"
+                               VerticalTextAlignment="Center" />
+                    </Border>
+                    <Label Grid.Column="1"
+                           Text="{Binding Title}"
+                           FontFamily="MontserratSemiBold"
+                           FontSize="14"
+                           TextColor="{DynamicResource TextPrimary}" />
+                    <Label Grid.Row="1"
+                           Grid.Column="1"
+                           Text="{Binding Address}"
+                           FontSize="12"
+                           TextColor="{DynamicResource TextSecondary}" />
+                    <HorizontalStackLayout Grid.RowSpan="2"
+                                           Grid.Column="2"
+                                           Spacing="5"
+                                           VerticalOptions="Center">
+                        <Label Text="2GIS"
+                               FontFamily="MontserratSemiBold"
+                               FontSize="11"
+                               TextColor="{DynamicResource Primary}" />
+                        <Label Text="{x:Static fonts:FluentUI.open_20_regular}"
+                               FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                               FontSize="18"
+                               TextColor="{DynamicResource Primary}" />
+                    </HorizontalStackLayout>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </ContentPage.Resources>
+
+    <Grid Padding="16,16,16,20"
+          RowDefinitions="auto,*"
+          RowSpacing="16"
+          MaximumWidthRequest="720">
+        <VerticalStackLayout Spacing="14">
+            <Label Text="Адреса и маршруты между кампусами"
+                   Style="{StaticResource SectionSubtitle}" />
+
+            <SearchBar Placeholder="Корпус или адрес"
+                       Text="{Binding SearchText}" />
+        </VerticalStackLayout>
+
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding CampusGroups}"
+                        IsGrouped="True"
+                        SelectionMode="None"
+                        ItemSizingStrategy="MeasureAllItems"
+                        VerticalScrollBarVisibility="Never"
+                        ItemTemplate="{StaticResource BuildingTemplate}">
+            <CollectionView.GroupHeaderTemplate>
+                <DataTemplate x:DataType="models:CampusBuildingGroup">
+                    <VerticalStackLayout Margin="0,4,0,8" Spacing="3">
+                        <Label Text="{Binding Name}"
+                               Style="{StaticResource SectionTitle}" />
+                        <Label Text="{Binding Stops}"
+                               Style="{StaticResource SectionSubtitle}" />
+                    </VerticalStackLayout>
+                </DataTemplate>
+            </CollectionView.GroupHeaderTemplate>
+            <CollectionView.EmptyView>
+                <Border Style="{StaticResource SurfacePanel}"
+                        VerticalOptions="Start">
+                    <Label Text="Корпус не найден"
+                           Style="{StaticResource EmptyStateTitle}" />
+                </Border>
+            </CollectionView.EmptyView>
+        </CollectionView>
+    </Grid>
+</ContentPage>

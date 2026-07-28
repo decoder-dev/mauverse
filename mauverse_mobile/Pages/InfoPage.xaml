@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Name="PageRoot"
+             x:Class="mau.InfoPage"
+             Title="Контакты преподавателя"
+             BackgroundColor="{DynamicResource Background}"
+             xmlns:viewmodel="clr-namespace:mau.ViewModel.Services"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:DataType="viewmodel:InfoViewModel">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Templates/TelephoneInfoTemplate.xaml"/>
+                <ResourceDictionary Source="/Templates/SearchListTemplate.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid Padding="16,12" RowDefinitions="auto, auto, *" RowSpacing="12">
+        <VerticalStackLayout Spacing="4">
+            <Label Text="Поиск преподавателя" Style="{StaticResource SectionTitle}" />
+            <Label Text="Телефон и электронная почта"
+                   Style="{StaticResource SectionSubtitle}" />
+        </VerticalStackLayout>
+
+        <VerticalStackLayout Grid.Row="1" Spacing="0">
+            <Grid ColumnDefinitions="*, auto" ColumnSpacing="8">
+                <Border Style="{StaticResource EntryBorder}"
+                        Margin="0"
+                        VerticalOptions="Center">
+                    <Entry Text="{Binding TeacherName}"
+                           Placeholder="Фамилия Имя Отчество"
+                           ReturnType="Search">
+                        <Entry.Behaviors>
+                            <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                                            EventName="TextChanged"
+                                                            Command="{Binding TextChangedCommand}"/>
+                            <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                                            EventName="Completed"
+                                                            Command="{Binding GetTeacherInfoCommand}"/>
+                        </Entry.Behaviors>
+                    </Entry>
+                </Border>
+                <Button Grid.Column="1"
+                        Command="{Binding GetTeacherInfoCommand}"
+                        VerticalOptions="Center"
+                        Text="Найти"/>
+            </Grid>
+            <CollectionView IsVisible="{Binding IsListVisible}"
+                            MaximumHeightRequest="220"
+                            ItemsSource="{Binding TeacherList}"
+                            ItemTemplate="{StaticResource TeacherListItemTemplate}"/>
+        </VerticalStackLayout>
+
+        <Grid Grid.Row="2" RowDefinitions="auto, *" RowSpacing="10">
+            <Label Text="{Binding ContactLabel}" Style="{StaticResource SectionTitle}" />
+            <Border Grid.Row="1"
+                    Style="{StaticResource SurfacePanel}"
+                    IsVisible="{Binding PanelVisible}"
+                    VerticalOptions="Start">
+                <Label Style="{StaticResource EmptyStateTitle}"
+                       Text="Контактные данные не найдены" />
+            </Border>
+            <CollectionView Grid.Row="1"
+                            SelectionMode="None"
+                            ItemsSource="{Binding TeacherInfo}"
+                            ItemTemplate="{StaticResource TeacherDetailsTemplate}"/>
+        </Grid>
+    </Grid>
+</ContentPage>

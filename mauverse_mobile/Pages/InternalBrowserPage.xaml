@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:fonts="clr-namespace:mau.Resources.Fonts"
+             xmlns:controls="clr-namespace:mau.Controls"
+             xmlns:pages="clr-namespace:mau.Pages"
+             x:Class="mau.Pages.InternalBrowserPage"
+             x:Name="BrowserPage"
+             x:DataType="pages:InternalBrowserPage"
+             Title="Браузер"
+             BackgroundColor="{DynamicResource Background}"
+             Shell.NavBarIsVisible="True"
+             Shell.TabBarIsVisible="False">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding BackCommand, Source={x:Reference BrowserPage}}"
+                            IsVisible="True" />
+    </Shell.BackButtonBehavior>
+
+    <ContentPage.Resources>
+        <Style x:Key="BrowserToolbarButton" TargetType="ImageButton">
+            <Setter Property="WidthRequest" Value="48" />
+            <Setter Property="HeightRequest" Value="48" />
+            <Setter Property="MinimumWidthRequest" Value="48" />
+            <Setter Property="MinimumHeightRequest" Value="48" />
+            <Setter Property="Padding" Value="12" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="BackgroundColor" Value="Transparent" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+            <Setter Property="VerticalOptions" Value="Center" />
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup Name="CommonStates">
+                        <VisualState Name="Normal" />
+                        <VisualState Name="Disabled">
+                            <VisualState.Setters>
+                                <Setter Property="Opacity" Value="0.35" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="36,2,*,56"
+          RowSpacing="0">
+        <Grid Grid.Row="0"
+              Padding="16,0"
+              ColumnDefinitions="Auto,*"
+              ColumnSpacing="8"
+              BackgroundColor="{DynamicResource Surface}">
+            <Label x:Name="DomainIcon"
+                   Grid.Column="0"
+                   Text="{x:Static fonts:FluentUI.lock_closed_16_regular}"
+                   FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                   FontSize="16"
+                   TextColor="{DynamicResource Success}"
+                   VerticalTextAlignment="Center"
+                   SemanticProperties.Description="Защищенное соединение" />
+            <Label x:Name="DomainLabel"
+                   Grid.Column="1"
+                   Text="mauniver.ru"
+                   FontFamily="MontserratMedium"
+                   FontSize="12"
+                   LineBreakMode="TailTruncation"
+                   TextColor="{DynamicResource TextSecondary}"
+                   VerticalTextAlignment="Center" />
+        </Grid>
+
+        <ProgressBar x:Name="LoadingProgress"
+                     Grid.Row="1"
+                     Progress="0"
+                     ProgressColor="{DynamicResource Primary}"
+                     BackgroundColor="{DynamicResource SurfaceMuted}"
+                     HorizontalOptions="Fill"
+                     VerticalOptions="Fill"
+                     IsVisible="False" />
+
+        <Grid x:Name="BrowserHost"
+              Grid.Row="2"
+              BackgroundColor="{DynamicResource Background}">
+            <controls:ResilientWebView x:Name="BrowserWebView"
+                                      AutomationId="InternalBrowserWebView"
+                                      Navigating="OnWebViewNavigating"
+                                      Navigated="OnWebViewNavigated"
+                                      ProcessTerminated="OnWebViewProcessTerminated" />
+
+            <Grid x:Name="ErrorState"
+                  ZIndex="1"
+                  IsVisible="False"
+                  Padding="28"
+                  BackgroundColor="{DynamicResource Background}">
+                <VerticalStackLayout MaximumWidthRequest="360"
+                                     HorizontalOptions="Center"
+                                     VerticalOptions="Center"
+                                     Spacing="12">
+                    <Label x:Name="ErrorIcon"
+                           Text="{x:Static fonts:FluentUI.wifi_off_24_regular}"
+                           FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                           FontSize="44"
+                           TextColor="{DynamicResource TextMuted}"
+                           HorizontalTextAlignment="Center"
+                           SemanticProperties.Description="Ошибка загрузки" />
+                    <Label x:Name="ErrorTitle"
+                           Text="Не удалось открыть страницу"
+                           FontFamily="MontserratSemiBold"
+                           FontSize="19"
+                           TextColor="{DynamicResource TextPrimary}"
+                           HorizontalTextAlignment="Center" />
+                    <Label x:Name="ErrorMessage"
+                           Text="Проверьте подключение и повторите попытку"
+                           FontFamily="MontserratRegular"
+                           FontSize="14"
+                           LineHeight="1.2"
+                           TextColor="{DynamicResource TextSecondary}"
+                           HorizontalTextAlignment="Center" />
+                    <Button x:Name="RetryButton"
+                            Text="Повторить"
+                            Margin="0,8,0,0"
+                            HorizontalOptions="Center"
+                            Clicked="OnRetryClicked" />
+                </VerticalStackLayout>
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="3"
+              RowDefinitions="1,*"
+              BackgroundColor="{DynamicResource Surface}">
+            <BoxView Grid.Row="0"
+                     HeightRequest="1"
+                     BackgroundColor="{DynamicResource BorderSubtle}" />
+            <Grid Grid.Row="1"
+                  ColumnDefinitions="*,*,*"
+                  HeightRequest="55">
+                <ImageButton x:Name="WebBackButton"
+                             AutomationId="BrowserHistoryBackButton"
+                             Grid.Column="0"
+                             Style="{StaticResource BrowserToolbarButton}"
+                             IsEnabled="False"
+                             Clicked="OnWebBackClicked"
+                             ToolTipProperties.Text="Назад"
+                             SemanticProperties.Description="Назад по истории страницы">
+                    <ImageButton.Source>
+                        <FontImageSource Glyph="{x:Static fonts:FluentUI.arrow_left_24_regular}"
+                                         FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                                         Size="24"
+                                         Color="{DynamicResource TextPrimary}" />
+                    </ImageButton.Source>
+                </ImageButton>
+
+                <ImageButton x:Name="WebForwardButton"
+                             AutomationId="BrowserHistoryForwardButton"
+                             Grid.Column="1"
+                             Style="{StaticResource BrowserToolbarButton}"
+                             IsEnabled="False"
+                             Clicked="OnWebForwardClicked"
+                             ToolTipProperties.Text="Вперед"
+                             SemanticProperties.Description="Вперед по истории страницы">
+                    <ImageButton.Source>
+                        <FontImageSource Glyph="{x:Static fonts:FluentUI.arrow_right_24_regular}"
+                                         FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                                         Size="24"
+                                         Color="{DynamicResource TextPrimary}" />
+                    </ImageButton.Source>
+                </ImageButton>
+
+                <Grid Grid.Column="2"
+                      WidthRequest="48"
+                      HeightRequest="48"
+                      HorizontalOptions="Center"
+                      VerticalOptions="Center">
+                    <ImageButton x:Name="ReloadButton"
+                                 AutomationId="BrowserReloadButton"
+                                 Style="{StaticResource BrowserToolbarButton}"
+                                 IsEnabled="False"
+                                 Clicked="OnReloadClicked"
+                                 ToolTipProperties.Text="Обновить"
+                                 SemanticProperties.Description="Обновить страницу">
+                        <ImageButton.Source>
+                            <FontImageSource Glyph="{x:Static fonts:FluentUI.arrow_sync_24_regular}"
+                                             FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                                             Size="24"
+                                             Color="{DynamicResource TextPrimary}" />
+                        </ImageButton.Source>
+                    </ImageButton>
+                    <ImageButton x:Name="StopButton"
+                                 AutomationId="BrowserStopButton"
+                                 Style="{StaticResource BrowserToolbarButton}"
+                                 IsVisible="False"
+                                 Clicked="OnStopClicked"
+                                 ToolTipProperties.Text="Остановить"
+                                 SemanticProperties.Description="Остановить загрузку">
+                        <ImageButton.Source>
+                            <FontImageSource Glyph="{x:Static fonts:FluentUI.stop_24_regular}"
+                                             FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                                             Size="24"
+                                             Color="{DynamicResource TextPrimary}" />
+                        </ImageButton.Source>
+                    </ImageButton>
+                </Grid>
+
+            </Grid>
+        </Grid>
+    </Grid>
+</ContentPage>

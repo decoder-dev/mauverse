@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewmodel="clr-namespace:mau.ViewModel.Services"
+             x:Class="mau.CertificateRequestPage"
+             x:DataType="viewmodel:CertificateRequestViewModel"
+             Title="Заказ справки"
+             BackgroundColor="{DynamicResource Background}">
+    <ScrollView>
+        <VerticalStackLayout Padding="16,16,16,32"
+                             Spacing="20"
+                             MaximumWidthRequest="720">
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Справка об обучении"
+                       Style="{StaticResource SectionTitle}" />
+                <Label Text="Заявка в Студенческий офис МАУ"
+                       Style="{StaticResource SectionSubtitle}" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Контактные данные"
+                       Style="{StaticResource SectionTitle}" />
+
+                <Label Text="ФИО (как в паспорте)"
+                       Style="{StaticResource FieldLabel}" />
+                <Border Style="{StaticResource EntryBorder}">
+                    <Entry Text="{Binding FullName}"
+                           SemanticProperties.Description="ФИО как в паспорте"
+                           Placeholder="Фамилия Имя Отчество"
+                           ClearButtonVisibility="WhileEditing" />
+                </Border>
+
+                <Label Text="Контактный e-mail"
+                       Style="{StaticResource FieldLabel}" />
+                <Border Style="{StaticResource EntryBorder}">
+                    <Entry Text="{Binding Email}"
+                           SemanticProperties.Description="Контактный e-mail"
+                           Keyboard="Email"
+                           Placeholder="name@example.ru"
+                           ClearButtonVisibility="WhileEditing" />
+                </Border>
+
+                <Label Text="Телефон"
+                       Style="{StaticResource FieldLabel}" />
+                <Border Style="{StaticResource EntryBorder}">
+                    <Entry Text="{Binding Phone}"
+                           SemanticProperties.Description="Телефон"
+                           Keyboard="Telephone"
+                           Placeholder="+7 (900) 000-00-00">
+                        <Entry.Behaviors>
+                            <toolkit:MaskedBehavior Mask="+7 (XXX) XXX-XX-XX" />
+                        </Entry.Behaviors>
+                    </Entry>
+                </Border>
+
+                <Label Text="Дата рождения"
+                       Style="{StaticResource FieldLabel}" />
+                <Border Style="{StaticResource EntryBorder}">
+                    <DatePicker Date="{Binding BirthDate}"
+                                SemanticProperties.Description="Дата рождения"
+                                MinimumDate="{Binding MinimumBirthDate}"
+                                MaximumDate="{Binding MaximumBirthDate}"
+                                Format="dd.MM.yyyy" />
+                </Border>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Учебные данные"
+                       Style="{StaticResource SectionTitle}" />
+
+                <Label Text="Факультет или институт"
+                       Style="{StaticResource FieldLabel}" />
+                <Border Style="{StaticResource EntryBorder}">
+                    <Picker Title="Выберите подразделение"
+                            SemanticProperties.Description="Факультет или институт"
+                            ItemsSource="{Binding Institutes}"
+                            SelectedItem="{Binding Institute}" />
+                </Border>
+
+                <Label Text="Форма обучения"
+                       Style="{StaticResource FieldLabel}" />
+                <Border Style="{StaticResource EntryBorder}">
+                    <Picker Title="Выберите форму обучения"
+                            SemanticProperties.Description="Форма обучения"
+                            ItemsSource="{Binding StudyForms}"
+                            SelectedItem="{Binding StudyForm}" />
+                </Border>
+
+                <Label Text="Источник финансирования"
+                       Style="{StaticResource FieldLabel}" />
+                <Border Style="{StaticResource EntryBorder}">
+                    <Picker Title="Бюджет или договор"
+                            SemanticProperties.Description="Источник финансирования"
+                            ItemsSource="{Binding FundingSources}"
+                            SelectedItem="{Binding FundingSource}" />
+                </Border>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Документ"
+                       Style="{StaticResource SectionTitle}" />
+
+                <Label Text="Вид справки"
+                       Style="{StaticResource FieldLabel}" />
+                <Border Style="{StaticResource EntryBorder}">
+                    <Picker Title="Выберите вид справки"
+                            SemanticProperties.Description="Вид справки"
+                            ItemsSource="{Binding CertificateTypes}"
+                            SelectedItem="{Binding CertificateType}" />
+                </Border>
+
+                <Grid ColumnDefinitions="*,auto,auto"
+                      ColumnSpacing="12">
+                    <Label Text="Количество экземпляров"
+                           Style="{StaticResource FieldLabel}"
+                           VerticalTextAlignment="Center" />
+                    <Label Grid.Column="1"
+                           Text="{Binding Copies}"
+                           FontFamily="MontserratSemiBold"
+                           FontSize="16"
+                           TextColor="{DynamicResource TextPrimary}"
+                           VerticalTextAlignment="Center"
+                           WidthRequest="24"
+                           HorizontalTextAlignment="Center" />
+                    <Stepper Grid.Column="2"
+                             SemanticProperties.Description="Количество экземпляров"
+                             Minimum="1"
+                             Maximum="5"
+                             Increment="1"
+                             Value="{Binding Copies}" />
+                </Grid>
+
+                <Label Text="Способ получения"
+                       Style="{StaticResource FieldLabel}" />
+                <Border Style="{StaticResource EntryBorder}">
+                    <Picker Title="Выберите способ получения"
+                            SemanticProperties.Description="Способ получения"
+                            ItemsSource="{Binding DeliveryMethods}"
+                            SelectedItem="{Binding DeliveryMethod}"
+                            IsEnabled="{Binding IsDeliveryMethodEnabled}" />
+                </Border>
+
+                <VerticalStackLayout Spacing="8"
+                                     IsVisible="{Binding IsPostalDelivery}">
+                    <Label Text="Почтовый адрес"
+                           Style="{StaticResource FieldLabel}" />
+                    <Border Style="{StaticResource EntryBorder}">
+                        <Entry Text="{Binding PostalAddress}"
+                               SemanticProperties.Description="Почтовый адрес"
+                               Placeholder="Индекс, регион, город, улица, дом, квартира"
+                               ClearButtonVisibility="WhileEditing" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="8"
+                                     IsVisible="{Binding IsEmailDelivery}">
+                    <Label Text="Адрес в домене @mauniver.ru"
+                           Style="{StaticResource FieldLabel}" />
+                    <Border Style="{StaticResource EntryBorder}">
+                        <Entry Text="{Binding UniversityEmail}"
+                               SemanticProperties.Description="Адрес в домене mauniver.ru"
+                               Keyboard="Email"
+                               Placeholder="name@mauniver.ru"
+                               ClearButtonVisibility="WhileEditing" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <Label Text="Комментарий"
+                       Style="{StaticResource FieldLabel}" />
+                <Border Style="{StaticResource EntryBorder}"
+                        Padding="8">
+                    <Editor Text="{Binding Comment}"
+                            SemanticProperties.Description="Комментарий"
+                            Placeholder="Необязательное уточнение"
+                            MinimumHeightRequest="96"
+                            AutoSize="TextChanges" />
+                </Border>
+            </VerticalStackLayout>
+
+            <Grid ColumnDefinitions="auto,*"
+                  ColumnSpacing="10">
+                <CheckBox IsChecked="{Binding IsConsentGranted}"
+                          SemanticProperties.Description="Согласие на обработку персональных данных"
+                          Color="{DynamicResource Primary}"
+                          VerticalOptions="Start" />
+                <Label Grid.Column="1"
+                       Text="Даю согласие на обработку персональных данных в соответствии с Федеральным законом № 152-ФЗ"
+                       AutomationProperties.IsInAccessibleTree="False"
+                       Style="{StaticResource SectionSubtitle}"
+                       VerticalTextAlignment="Center" />
+            </Grid>
+
+            <Grid>
+                <Button Text="Отправить заявку"
+                        Command="{Binding SubmitCommand}"
+                        HorizontalOptions="Fill">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button"
+                                     Binding="{Binding IsBusy}"
+                                     Value="True">
+                            <Setter Property="IsEnabled" Value="False" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+                <ActivityIndicator IsVisible="{Binding IsBusy}"
+                                   IsRunning="{Binding IsBusy}"
+                                   SemanticProperties.Description="Отправка заявки"
+                                   HorizontalOptions="End"
+                                   Margin="0,0,18,0"
+                                   WidthRequest="22"
+                                   HeightRequest="22" />
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

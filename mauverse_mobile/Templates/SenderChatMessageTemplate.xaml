@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Border xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+        xmlns:dto="clr-namespace:mau.DTOModels"
+        x:Class="mau.Templates.SenderChatMessageTemplate"
+        x:DataType="dto:MessageDTO"
+        Margin="16,0,16,10"
+        Padding="12,10"
+        StrokeThickness="0"
+        StrokeShape="RoundRectangle 8"
+        BackgroundColor="{DynamicResource PrimaryLight}"
+        HorizontalOptions="Start">
+    <Grid RowDefinitions="auto,auto"
+          ColumnDefinitions="*,auto"
+          MaximumWidthRequest="300"
+          MinimumWidthRequest="125">
+        <Label Text="{Binding FullnameFrom}"
+               Margin="0,0,5,0"
+               FontSize="14"
+               HorizontalOptions="Start"
+               HorizontalTextAlignment="Start"
+               VerticalOptions="Center"
+               VerticalTextAlignment="Center" />
+        <Label Grid.Column="1"
+               Text="{Binding TimeCreateString}"
+               FontFamily="MontserratMedium"
+               FontSize="11"
+               TextColor="{DynamicResource TextSecondary}"
+               HorizontalOptions="End"
+               HorizontalTextAlignment="End"
+               VerticalTextAlignment="Center" />
+        <Label Grid.Row="1"
+               Grid.ColumnSpan="2"
+               Margin="0,5,0,0"
+               Text="{Binding Text}"
+               FontSize="13"
+               TextColor="{DynamicResource TextPrimary}"
+               HorizontalOptions="Fill"
+               HorizontalTextAlignment="Start"
+               VerticalOptions="Fill" />
+    </Grid>
+</Border>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewmodel="clr-namespace:mau.ViewModel.News"
+             xmlns:fonts="clr-namespace:mau.Resources.Fonts"
+             xmlns:controls="clr-namespace:mau.Controls"
+             xmlns:dto="clr-namespace:mau.DTOModels"
+             x:Class="mau.Templates.CardTemplate">
+    <DataTemplate x:Key="NewsItemTemplate" x:DataType="dto:RssDTO">
+        <Border Padding="0"
+                controls:LiquidGlass.UsesLiquidGlass="True"
+                Margin="0,0,0,10"
+                BackgroundColor="{DynamicResource Surface}"
+                Stroke="{DynamicResource BorderSubtle}"
+                StrokeThickness="1"
+                SemanticProperties.Description="{Binding Title}"
+                SemanticProperties.Hint="Открыть новость">
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding GetFullInfoCommand, Source={RelativeSource AncestorType={x:Type viewmodel:NewsViewModel}}, x:DataType={x:Type viewmodel:NewsViewModel}}"
+                                      CommandParameter="{Binding .}" />
+            </Border.GestureRecognizers>
+            <Grid RowDefinitions="176,Auto">
+                <Image Source="{Binding Image}"
+                       Aspect="AspectFill"
+                       HeightRequest="176"
+                       HorizontalOptions="Fill"
+                       VerticalOptions="Fill"
+                       BackgroundColor="{DynamicResource SurfaceMuted}"
+                       AutomationProperties.IsInAccessibleTree="False"
+                       MinimumHeightRequest="176" />
+                <Grid Grid.Row="1"
+                      ColumnDefinitions="*,24"
+                      Padding="14,12,12,14"
+                      ColumnSpacing="8">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="{Binding Publish}"
+                               Style="{StaticResource Eyebrow}"
+                               MaxLines="1"
+                               LineBreakMode="TailTruncation" />
+                        <Label Text="{Binding Title}"
+                               FontFamily="MontserratSemiBold"
+                               FontSize="15"
+                               TextColor="{DynamicResource TextPrimary}"
+                               LineHeight="1.2"
+                               MaxLines="3"
+                               LineBreakMode="TailTruncation" />
+                    </VerticalStackLayout>
+                    <Label Grid.Column="1"
+                           Text="{x:Static fonts:FluentUI.chevron_right_20_regular}"
+                           FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                           FontSize="20"
+                           TextColor="{DynamicResource TextMuted}"
+                           HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center" />
+                </Grid>
+            </Grid>
+        </Border>
+    </DataTemplate>
+</ResourceDictionary>

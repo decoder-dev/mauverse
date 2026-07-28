@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:fonts="clr-namespace:mau.Resources.Fonts"
+             xmlns:models="clr-namespace:mau.Models"
+             xmlns:controls="clr-namespace:mau.Controls"
+             xmlns:viewmodel="clr-namespace:mau.ViewModel.Services"
+             x:Class="mau.OnlineFormsPage"
+             x:DataType="viewmodel:OnlineFormsViewModel"
+             Title="Онлайн-формы"
+             BackgroundColor="{DynamicResource Background}">
+    <ContentPage.Resources>
+        <DataTemplate x:Key="OnlineFormTemplate"
+                      x:DataType="models:StudentOnlineForm">
+            <Border Margin="0,0,0,8"
+                    controls:LiquidGlass.UsesLiquidGlass="True"
+                    Padding="14"
+                    BackgroundColor="{DynamicResource Surface}"
+                    Stroke="{DynamicResource BorderSubtle}"
+                    StrokeThickness="1"
+                    SemanticProperties.Description="{Binding Title}"
+                    SemanticProperties.Hint="Открыть форму">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer
+                        Command="{Binding Path=OpenFormCommand, Source={RelativeSource AncestorType={x:Type viewmodel:OnlineFormsViewModel}}, x:DataType={x:Type viewmodel:OnlineFormsViewModel}}"
+                        CommandParameter="{Binding .}" />
+                </Border.GestureRecognizers>
+                <Grid ColumnDefinitions="44,*,24"
+                      ColumnSpacing="12"
+                      RowDefinitions="auto,auto"
+                      RowSpacing="3">
+                    <Border Grid.RowSpan="2"
+                            WidthRequest="44"
+                            HeightRequest="44"
+                            Padding="0"
+                            BackgroundColor="{DynamicResource PrimaryLight}"
+                            VerticalOptions="Center">
+                        <Label Text="{Binding Glyph}"
+                               FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                               FontSize="23"
+                               TextColor="{DynamicResource Primary}"
+                               HorizontalTextAlignment="Center"
+                               VerticalTextAlignment="Center" />
+                    </Border>
+                    <Label Grid.Column="1"
+                           Text="{Binding Title}"
+                           FontFamily="MontserratSemiBold"
+                           FontSize="14"
+                           TextColor="{DynamicResource TextPrimary}"
+                           MaxLines="2" />
+                    <Label Grid.Row="1"
+                           Grid.Column="1"
+                           Text="{Binding Description}"
+                           FontSize="12"
+                           TextColor="{DynamicResource TextSecondary}"
+                           MaxLines="2" />
+                    <Label Grid.RowSpan="2"
+                           Grid.Column="2"
+                           Text="{x:Static fonts:FluentUI.chevron_right_20_regular}"
+                           FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                           FontSize="20"
+                           TextColor="{DynamicResource TextMuted}"
+                           HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center" />
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16,16,16,28"
+                             Spacing="20"
+                             MaximumWidthRequest="720">
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Официальные формы Студенческого офиса МАУ"
+                       Style="{StaticResource SectionSubtitle}" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Справки"
+                       Style="{StaticResource SectionTitle}" />
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding CertificateForms}"
+                                     BindableLayout.ItemTemplate="{StaticResource OnlineFormTemplate}" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Документы и оплата"
+                       Style="{StaticResource SectionTitle}" />
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding OtherApplications}"
+                                     BindableLayout.ItemTemplate="{StaticResource OnlineFormTemplate}" />
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

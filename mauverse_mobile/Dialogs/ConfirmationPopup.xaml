@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:fonts="clr-namespace:mau.Resources.Fonts"
+               xmlns:viewmodel="clr-namespace:mau.ViewModel.Dialogs"
+               xmlns:controls="clr-namespace:mau.Controls"
+               x:Class="mau.Dialogs.ConfirmationPopup"
+               x:TypeArguments="x:Boolean"
+               x:DataType="viewmodel:ConfirmationViewModel"
+               BackgroundColor="Transparent">
+    <Border Padding="22"
+            controls:LiquidGlass.UsesLiquidGlass="True"
+            BackgroundColor="{DynamicResource Surface}"
+            Stroke="{DynamicResource BorderSubtle}"
+            StrokeThickness="1"
+            SemanticProperties.Description="Подтверждение выхода">
+        <Border.Shadow>
+            <Shadow Brush="{StaticResource Black}"
+                    Offset="0,8"
+                    Radius="20"
+                    Opacity="0.24" />
+        </Border.Shadow>
+
+        <Grid RowDefinitions="auto,*,auto"
+              RowSpacing="18">
+            <Grid ColumnDefinitions="48,*"
+                  ColumnSpacing="14">
+                <Border WidthRequest="48"
+                        HeightRequest="48"
+                        Padding="0"
+                        BackgroundColor="{DynamicResource ErrorLight}"
+                        StrokeThickness="0"
+                        VerticalOptions="Start">
+                    <Label Text="{x:Static fonts:FluentUI.sign_out_24_regular}"
+                           FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                           FontSize="24"
+                           TextColor="{AppThemeBinding Light={StaticResource Error}, Dark={StaticResource ErrorDarkForeground}}"
+                           HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center" />
+                </Border>
+
+                <VerticalStackLayout Grid.Column="1"
+                                     Spacing="6"
+                                     VerticalOptions="Center">
+                    <Label Text="Выйти из аккаунта?"
+                           FontFamily="MontserratBold"
+                           FontSize="19"
+                           TextColor="{DynamicResource TextPrimary}" />
+                    <Label Text="Сессия и сохраненные данные будут удалены с этого устройства."
+                           FontSize="13"
+                           LineHeight="1.25"
+                           TextColor="{DynamicResource TextSecondary}" />
+                </VerticalStackLayout>
+            </Grid>
+
+            <Grid Grid.Row="2"
+                  ColumnDefinitions="*,*"
+                  ColumnSpacing="10">
+                <Button Text="Отмена"
+                        Style="{StaticResource SecondaryButton}"
+                        Command="{Binding CancelCommand}" />
+                <Button Grid.Column="1"
+                        Text="Выйти"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Error}, Dark={StaticResource ErrorDarkForeground}}"
+                        TextColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource PrimaryDarkText}}"
+                        Command="{Binding ConfirmCommand}" />
+            </Grid>
+        </Grid>
+    </Border>
+</toolkit:Popup>

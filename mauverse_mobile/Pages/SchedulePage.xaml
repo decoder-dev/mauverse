@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Name="PageRoot"
+             x:Class="mau.SchedulePage"
+             Title="Расписание"
+             xmlns:models="clr-namespace:mau.Models"
+             xmlns:viewmodel="clr-namespace:mau.ViewModel.Schedules"
+             xmlns:fonts="clr-namespace:mau.Resources.Fonts"
+             xmlns:s="clr-namespace:System;assembly=mscorlib"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:DataType="viewmodel:ScheduleViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{DynamicResource Background}">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                        Command="{Binding LoadDataCommand}"
+                                        EventName="Appearing" />
+        <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                        Command="{Binding CancelPendingOperationsCommand}"
+                                        EventName="Disappearing" />
+    </ContentPage.Behaviors>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Templates/ScheduleTemplate.xaml"/>
+                <ResourceDictionary Source="/Templates/SearchListTemplate.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <Grid Padding="16,18,16,16" RowDefinitions="auto,auto,auto,auto,*" RowSpacing="10">
+        <Grid ColumnDefinitions="*,auto" ColumnSpacing="12" Margin="0,0,0,4">
+            <VerticalStackLayout Spacing="3" VerticalOptions="Center">
+                <Label Text="Расписание" Style="{StaticResource PageTitle}" />
+                <Label Text="Две недели занятий и личные заметки"
+                       Style="{StaticResource SectionSubtitle}" />
+            </VerticalStackLayout>
+            <Border Grid.Column="1"
+                    Style="{StaticResource IconButton}"
+                    SemanticProperties.Description="Обновить расписание">
+                <Label Text="{x:Static fonts:FluentUI.arrow_sync_20_regular}"
+                       FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                       FontSize="20"
+                       TextColor="{DynamicResource Primary}"
+                       HorizontalTextAlignment="Center"
+                       VerticalTextAlignment="Center" />
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding RefreshCommand}" />
+                </Border.GestureRecognizers>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="1" Style="{StaticResource SurfacePanel}" Padding="0">
+            <Grid RowDefinitions="auto,auto">
+                <Grid Padding="16,8,8,8" ColumnDefinitions="*,auto" ColumnSpacing="12">
+                    <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                        <Label Text="Фильтры расписания" Style="{StaticResource SectionTitle}" />
+                        <Label Text="Подгруппа, аудитория и преподаватель"
+                               Style="{StaticResource SectionSubtitle}" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="1"
+                            Text="{Binding ShowLabel}"
+                            Style="{StaticResource SecondaryButton}"
+                            FontSize="12"
+                            Padding="12,0"
+                            Command="{Binding ShowFiltersCommand}" />
+                </Grid>
+
+                <VerticalStackLayout Grid.Row="1"
+                                     Padding="16,0,16,12"
+                                     Spacing="0"
+                                     IsVisible="{Binding FiltersIsVisible}">
+                    <CollectionView ItemsSource="{Binding Subgroups}"
+                                    MinimumHeightRequest="52"
+                                    ItemSizingStrategy="MeasureFirstItem"
+                                    HorizontalScrollBarVisibility="Never"
+                                    BackgroundColor="Transparent"
+                                    SelectionMode="Single"
+                                    IsVisible="{Binding IsHaveSubgroups}"
+                                    SelectedItem="{Binding SelectedSubgroup}"
+                                    SelectionChangedCommand="{Binding FilterBySubgroupCommand}">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout Orientation="Horizontal" ItemSpacing="6" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:SubGroup">
+                                <Border Style="{StaticResource FilterButtons}">
+                                    <Label x:Name="FilterLabel"
+                                           Text="{Binding Name}"
+                                           TextColor="{DynamicResource TextSecondary}"
+                                           FontFamily="MontserratSemiBold"
+                                           FontSize="12" />
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Border Style="{StaticResource EntryBorder}">
+                        <SearchBar Placeholder="Аудитория"
+                                   Text="{Binding RoomName}">
+                            <SearchBar.Behaviors>
+                                <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                                                EventName="TextChanged"
+                                                                Command="{Binding RoomFilterChangedCommand}" />
+                            </SearchBar.Behaviors>
+                        </SearchBar>
+                    </Border>
+                    <ListView ZIndex="10"
+                              MaximumHeightRequest="160"
+                              IsVisible="{Binding RoomFilterListIsVisible}"
+                              ItemsSource="{Binding RoomsList}"
+                              SelectedItem="{Binding SelectedRoom}"
+                              ItemTemplate="{StaticResource ListItemTemplate}">
+                        <ListView.Behaviors>
+                            <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                                            EventName="ItemSelected"
+                                                            Command="{Binding FilterDataCommand}" />
+                        </ListView.Behaviors>
+                    </ListView>
+
+                    <Border Style="{StaticResource EntryBorder}">
+                        <SearchBar Placeholder="ФИО преподавателя"
+                                   Text="{Binding TeacherName}">
+                            <SearchBar.Behaviors>
+                                <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                                                EventName="TextChanged"
+                                                                Command="{Binding TeacherFilterChangedCommand}" />
+                            </SearchBar.Behaviors>
+                        </SearchBar>
+                    </Border>
+                    <ListView MaximumHeightRequest="160"
+                              IsVisible="{Binding TeacherFilterListIsVisible}"
+                              ItemsSource="{Binding TeacherList}"
+                              SelectedItem="{Binding TeacherName}"
+                              ItemTemplate="{StaticResource ListItemTemplate}">
+                        <ListView.Behaviors>
+                            <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                                            EventName="ItemSelected"
+                                                            Command="{Binding FilterDataCommand}" />
+                        </ListView.Behaviors>
+                    </ListView>
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+
+        <CollectionView Grid.Row="2"
+                        ItemsSource="{Binding Days}"
+                        ItemSizingStrategy="MeasureFirstItem"
+                        ItemsLayout="HorizontalList"
+                        MinimumHeightRequest="66"
+                        HorizontalScrollBarVisibility="Never"
+                        SelectionMode="Single"
+                        SelectionChangedCommand="{Binding SelectDayCommand}"
+                        SelectedItem="{Binding SelectedDay}"
+                        ItemTemplate="{StaticResource DateButtonTemplate}" />
+
+        <Grid Grid.Row="3" ColumnDefinitions="auto,*,auto" ColumnSpacing="8" Padding="4,2">
+            <Border HeightRequest="8"
+                    WidthRequest="8"
+                    BackgroundColor="{StaticResource Success}"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 4"
+                    VerticalOptions="Center" />
+            <Label Grid.Column="1"
+                   Text="Нет занятий"
+                   Style="{StaticResource SectionSubtitle}"
+                   VerticalTextAlignment="Center" />
+            <Label Grid.Column="2"
+                   Text="{Binding CurrentScheduleLabel}"
+                   FontFamily="MontserratSemiBold"
+                   FontSize="14"
+                   TextColor="{DynamicResource TextPrimary}"
+                   VerticalTextAlignment="Center" />
+        </Grid>
+
+        <Grid Grid.Row="4">
+            <Border Style="{StaticResource SurfacePanel}"
+                    Margin="0,6,0,0"
+                    VerticalOptions="Start"
+                    IsVisible="{Binding ScheduleFrameIsVisible}">
+                <Label Text="В этот день занятий нет"
+                       Style="{StaticResource EmptyStateTitle}" />
+            </Border>
+            <CollectionView ItemsSource="{Binding Schedules}"
+                            ItemTemplate="{StaticResource ScheduleDataTemplate}" />
+            <ActivityIndicator IsVisible="{Binding IsScheduleBusy}"
+                               IsRunning="{Binding IsScheduleBusy}"
+                               SemanticProperties.Description="Загрузка расписания"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Start"
+                               Margin="0,24,0,0"
+                               ZIndex="2" />
+        </Grid>
+    </Grid>
+</ContentPage>

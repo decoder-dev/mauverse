@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Name="PageRoot"
+             x:Class="mau.TelephonePage"
+             Title="{Binding TitleLabel}"
+             xmlns:viewmodel="clr-namespace:mau.ViewModel.Services"
+             xmlns:converters="clr-namespace:mau.Utils.Converters"
+             xmlns:fonts="clr-namespace:mau.Resources.Fonts"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             Background="{DynamicResource Background}"
+             x:DataType="viewmodel:TelephoneViewModel">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                        Command="{Binding LoadAllData}"
+                                        EventName="Appearing" />
+        <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                        Command="{Binding CancelPendingOperationsCommand}"
+                                        EventName="Disappearing" />
+    </ContentPage.Behaviors>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:PageInfoConverter x:Key="PageInfoConverter" />
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Templates/TelephoneInfoTemplate.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <Grid Padding="16,12" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <VerticalStackLayout Spacing="4">
+            <Label Text="Подразделения" Style="{StaticResource SectionTitle}" />
+            <Label Text="{Binding SubtitleLabel}"
+                   Style="{StaticResource SectionSubtitle}" />
+        </VerticalStackLayout>
+        <Grid Grid.Row="1"
+              RowDefinitions="*"
+              toolkit:StateContainer.CurrentState="{Binding CurrentState}"
+              toolkit:StateContainer.CanStateChange="{Binding CanStateChange}">
+            <toolkit:StateContainer.StateViews>
+                <VerticalStackLayout toolkit:StateView.StateKey="Loading"
+                                     VerticalOptions="Center"
+                                     Spacing="10">
+                    <ActivityIndicator IsRunning="True"
+                                       SemanticProperties.Description="Загрузка контактов"/>
+                    <Label HorizontalTextAlignment="Center"
+                           Text="Загрузка контактов"
+                           Style="{StaticResource SectionSubtitle}" />
+                </VerticalStackLayout>
+                <CollectionView toolkit:StateView.StateKey="Success"
+                        ItemsSource="{Binding DeptInfos}"
+                        SelectedItem="{Binding SelectedDept}"
+                        SelectionMode="None"
+                        ItemTemplate="{StaticResource PaginatedTelephoneTemplate}"/>
+                <Border toolkit:StateView.StateKey="Empty"
+                        Style="{StaticResource SurfacePanel}"
+                        VerticalOptions="Start">
+                    <Label Text="Контакты не найдены"
+                           Style="{StaticResource EmptyStateTitle}" />
+                </Border>
+            </toolkit:StateContainer.StateViews>
+        </Grid>
+        <Grid Grid.Row="2"
+              ColumnDefinitions="48,*,48"
+              MinimumHeightRequest="48">
+            <ImageButton Command="{Binding PreviousPage}"
+                         SemanticProperties.Description="Предыдущая страница"
+                         BackgroundColor="Transparent">
+                <ImageButton.Source>
+                    <FontImageSource Glyph="{x:Static fonts:FluentUI.chevron_left_24_regular}"
+                                     FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                                     Color="{DynamicResource Primary}"
+                                     Size="24"/>
+                </ImageButton.Source>
+            </ImageButton>
+            <Label Grid.Column="1"
+                   HorizontalTextAlignment="Center"
+                   VerticalTextAlignment="Center"
+                   FontFamily="MontserratSemiBold">
+                <Label.Text>
+                    <MultiBinding Converter="{StaticResource PageInfoConverter}">
+                        <Binding Path="Page" />
+                        <Binding Path="TotalPages" />
+                    </MultiBinding>
+                </Label.Text>
+            </Label>
+            <ImageButton Grid.Column="2"
+                         Command="{Binding NextPage}"
+                         SemanticProperties.Description="Следующая страница"
+                         BackgroundColor="Transparent">
+                <ImageButton.Source>
+                    <FontImageSource Glyph="{x:Static fonts:FluentUI.chevron_right_24_regular}"
+                                     FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                                     Color="{DynamicResource Primary}"
+                                     Size="24"/>
+                </ImageButton.Source>
+            </ImageButton>
+        </Grid>
+    </Grid>
+</ContentPage>

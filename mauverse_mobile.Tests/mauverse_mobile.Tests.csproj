@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Mauverse.Mobile.Tests</AssemblyName>
+    <RootNamespace>Mauverse.Mobile.Tests</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\mauverse_mobile\Models\BrowserRequest.cs"
+             Link="Production\BrowserRequest.cs" />
+    <Compile Include="..\mauverse_mobile\Utils\Services\BrowserDestinationRegistry.cs"
+             Link="Production\BrowserDestinationRegistry.cs" />
+    <Compile Include="..\mauverse_mobile\Utils\Services\ThemePalette.cs"
+             Link="Production\ThemePalette.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\mauverse_mobile\Platforms\Android\Resources\raw\isrg_root_x1.pem"
+          Link="Tls\isrg_root_x1.pem"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\mauverse_mobile\Platforms\Android\Resources\raw\lets_encrypt_r13.pem"
+          Link="Tls\lets_encrypt_r13.pem"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\mauverse_mobile\Platforms\Android\Resources\xml\network_security_config.xml"
+          Link="Tls\network_security_config.xml"
+          CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>
