@@ -10,8 +10,14 @@ final class SessionStore: ObservableObject {
     private let storageKey = "mauverse.native.session"
 
     init() {
-        if let data = UserDefaults.standard.data(forKey: storageKey) {
+        if let data = KeychainStore.read(account: storageKey) {
             user = try? JSONDecoder().decode(UserDTO.self, from: data)
+        } else if let legacy = UserDefaults.standard.data(forKey: storageKey) {
+            user = try? JSONDecoder().decode(UserDTO.self, from: legacy)
+            if user != nil {
+                KeychainStore.write(legacy, account: storageKey)
+                UserDefaults.standard.removeObject(forKey: storageKey)
+            }
         }
     }
 
@@ -47,11 +53,12 @@ final class SessionStore: ObservableObject {
 
     func signOut() {
         user = nil
+        KeychainStore.delete(account: storageKey)
         UserDefaults.standard.removeObject(forKey: storageKey)
     }
 
     private func persist() {
         guard let user, let data = try? JSONEncoder().encode(user) else { return }
-        UserDefaults.standard.set(data, forKey: storageKey)
+        KeychainStore.write(data, account: storageKey)
     }
 }

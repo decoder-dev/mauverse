@@ -83,6 +83,96 @@ final class APIClient {
     }
 }
 
+final class ScheduleAPIClient {
+    static let shared = ScheduleAPIClient()
+    private let baseURL = URL(string: "https://api-schedule.mauniver.ru/")!
+    private let session: URLSession
+
+    private init() {
+        let configuration = URLSessionConfiguration.default
+        configuration.timeoutIntervalForRequest = 30
+        configuration.waitsForConnectivity = true
+        session = URLSession(configuration: configuration)
+    }
+
+    func schedule(uid: String, start: String, end: String) async throws -> [ScheduleItem] {
+        let response: ScheduleResponse = try await get(
+            "groups/\(escaped(uid))/schedule/\(start)/\(end)"
+        )
+        return response.timetable.map(\.appItem)
+    }
+
+    func groups() async throws -> [ScheduleGroup] {
+        let faculties: ScheduleFacultyResponse = try await get("faculties")
+        var result: [ScheduleGroup] = []
+        for faculty in faculties.courses {
+            let response: ScheduleGroupsResponse = try await get(
+                "faculties/\(faculty.facId)/groups/main"
+            )
+            result.append(contentsOf: response.groups)
+        }
+        return result.sorted {
+            $0.group.localizedStandardCompare($1.group) == .orderedAscending
+        }
+    }
+
+    func findGroup(named name: String) async throws -> ScheduleGroup? {
+        let normalized = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        return try await groups().first {
+            $0.group.compare(normalized, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedSame
+        }
+    }
+
+    func teachers(matching name: String) async throws -> [ScheduleTeacher] {
+        let query = [URLQueryItem(name: "name", value: name)]
+        let response: ScheduleTeachersResponse = try await get("teachers/search", query: query)
+        return response.teachers
+    }
+
+    private func get<Response: Decodable>(
+        _ path: String,
+        query: [URLQueryItem] = []
+    ) async throws -> Response {
+        guard let token = Bundle.main.object(forInfoDictionaryKey: "MAUverseScheduleToken") as? String,
+              !token.isEmpty,
+              !token.contains("$(") else {
+            throw APIError.server("Токен API расписания не настроен")
+        }
+        var components = URLComponents(
+            url: baseURL.appendingPathComponent(path),
+            resolvingAgainstBaseURL: false
+        )!
+        components.queryItems = query.isEmpty ? nil : query
+        var request = URLRequest(url: components.url!)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        let (data, response) = try await session.data(for: request)
+        guard let http = response as? HTTPURLResponse else { throw APIError.invalidResponse }
+        guard (200..<300).contains(http.statusCode) else {
+            let message: String
+            switch http.statusCode {
+            case 401, 403: message = "Токен API расписания недействителен"
+            case 404: message = "Данные расписания не найдены"
+            case 422: message = "Сервер не принял параметры запроса"
+            default: message = "Ошибка API расписания: \(http.statusCode)"
+            }
+            throw APIError.server(message)
+        }
+        do {
+            let decoder = JSONDecoder()
+            return try decoder.decode(Response.self, from: data)
+        } catch {
+            throw APIError.server("Новый API вернул неизвестный формат данных")
+        }
+    }
+
+    private func escaped(_ value: String) -> String {
+        value.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? value
+    }
+}
+
 struct LoginRequest: Encodable { let username: String; let password: String }
 struct GroupRequest: Encodable { let groupName: String }
 struct DepartmentRequest: Encodable { let departmentId: Int; let name: String }

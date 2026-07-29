@@ -66,7 +66,7 @@ struct ProfileView: View {
                     .buttonStyle(.plain)
                     .mauGlass(radius: 19)
 
-                    Text("MAUverse 1.8.5 (20)")
+                    Text("MAUverse 1.8.6 (21)")
                         .font(.caption)
                         .foregroundStyle(MauTheme.muted)
                 }
@@ -103,6 +103,8 @@ private struct ProfileEditor: View {
     @Environment(\.dismiss) private var dismiss
     @State private var group = ""
     @State private var creditBook = ""
+    @State private var isSaving = false
+    @State private var errorMessage: String?
 
     var body: some View {
         NavigationStack {
@@ -110,6 +112,11 @@ private struct ProfileEditor: View {
                 Section("Расписание") {
                     TextField("Учебная группа", text: $group)
                         .textInputAutocapitalization(.characters)
+                    if let errorMessage {
+                        Text(errorMessage)
+                            .font(.footnote)
+                            .foregroundStyle(.red)
+                    }
                 }
                 Section("Задолженности") {
                     TextField("Номер зачётной книжки", text: $creditBook)
@@ -128,13 +135,8 @@ private struct ProfileEditor: View {
                     Button("Отмена") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Сохранить") {
-                        session.update {
-                            $0.groupName = group.trimmingCharacters(in: .whitespacesAndNewlines)
-                            $0.creditBook = creditBook.trimmingCharacters(in: .whitespacesAndNewlines)
-                        }
-                        dismiss()
-                    }
+                    Button(isSaving ? "Проверяем…" : "Сохранить") { save() }
+                        .disabled(isSaving)
                 }
             }
             .onAppear {
@@ -143,16 +145,60 @@ private struct ProfileEditor: View {
             }
         }
     }
+
+    private func save() {
+        isSaving = true
+        errorMessage = nil
+        Task {
+            do {
+                let normalized = group.trimmingCharacters(in: .whitespacesAndNewlines)
+                let resolved = normalized.isEmpty
+                    ? nil
+                    : try await ScheduleAPIClient.shared.findGroup(named: normalized)
+                if !normalized.isEmpty, resolved == nil {
+                    throw APIError.server("Группа не найдена в актуальном расписании")
+                }
+                session.update {
+                    $0.groupName = resolved?.group ?? normalized
+                    $0.groupId = resolved?.groupId
+                    $0.scheduleGroupUID = resolved?.uid
+                    $0.speciality = resolved?.speciality ?? $0.speciality
+                    $0.creditBook = creditBook.trimmingCharacters(in: .whitespacesAndNewlines)
+                }
+                dismiss()
+            } catch {
+                errorMessage = error.localizedDescription
+            }
+            isSaving = false
+        }
+    }
 }
 
 private struct SettingsView: View {
     @State private var cleared = false
+    @AppStorage("mauverse.appearance") private var appearance = AppTheme.system.rawValue
 
     var body: some View {
         ZStack {
             MauBackground()
             ScrollView {
                 VStack(spacing: 15) {
+                    VStack(alignment: .leading, spacing: 13) {
+                        Label("Оформление", systemImage: "circle.lefthalf.filled").font(.headline)
+                        Picker("Тема", selection: $appearance) {
+                            ForEach(AppTheme.allCases) { theme in
+                                Text(theme.title).tag(theme.rawValue)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        Text("В тёмной теме используется белый текст, в светлой — чёрный.")
+                            .font(.footnote)
+                            .foregroundStyle(MauTheme.muted)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(20)
+                    .mauGlass()
+
                     VStack(alignment: .leading, spacing: 13) {
                         Label("Кэш приложения", systemImage: "internaldrive.fill").font(.headline)
                         Text("Изображения новостей и веб-страниц очищаются системой автоматически.")
@@ -171,7 +217,7 @@ private struct SettingsView: View {
                         Label("О приложении", systemImage: "info.circle.fill").font(.headline)
                         Text("Нативное приложение Мурманского арктического университета.")
                             .font(.subheadline).foregroundStyle(MauTheme.muted)
-                        Text("Версия 1.8.5 • сборка 20").font(.caption)
+                        Text("Версия 1.8.6 • сборка 21").font(.caption)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(20)

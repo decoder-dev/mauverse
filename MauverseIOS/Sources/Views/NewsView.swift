@@ -44,7 +44,7 @@ struct NewsView: View {
                                 .foregroundStyle(model.filter == filter ? .white : MauTheme.ink)
                                 .padding(.horizontal, 15)
                                 .padding(.vertical, 10)
-                                .background(model.filter == filter ? AnyShapeStyle(MauTheme.blue.gradient) : AnyShapeStyle(Color.white.opacity(0.7)),
+                                .background(model.filter == filter ? AnyShapeStyle(MauTheme.blue.gradient) : AnyShapeStyle(MauTheme.card.opacity(0.78)),
                                             in: Capsule())
                                 .buttonStyle(.plain)
                             }
@@ -112,7 +112,7 @@ private struct NewsCard: View {
                 }
                 .padding(18)
             }
-            .background(Color.white.opacity(0.68))
+            .background(MauTheme.card.opacity(0.72))
             .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         }
         .buttonStyle(.plain)

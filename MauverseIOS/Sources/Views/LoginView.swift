@@ -42,7 +42,7 @@ struct LoginView: View {
                             .submitLabel(.next)
                             .onSubmit { focused = .password }
                             .padding(18)
-                            .background(Color.white.opacity(0.68), in: RoundedRectangle(cornerRadius: 18))
+                            .background(MauTheme.card.opacity(0.78), in: RoundedRectangle(cornerRadius: 18))
 
                         SecureField("Пароль", text: $password)
                             .textContentType(.password)
@@ -50,7 +50,7 @@ struct LoginView: View {
                             .submitLabel(.go)
                             .onSubmit { signIn() }
                             .padding(18)
-                            .background(Color.white.opacity(0.68), in: RoundedRectangle(cornerRadius: 18))
+                            .background(MauTheme.card.opacity(0.78), in: RoundedRectangle(cornerRadius: 18))
 
                         if let error = session.errorMessage {
                             Text(error)
@@ -93,4 +93,3 @@ struct LoginView: View {
         Task { await session.signIn(username: username, password: password) }
     }
 }
-
