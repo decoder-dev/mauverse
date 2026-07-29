@@ -69,8 +69,14 @@ struct ScheduleView: View {
                     HStack(alignment: .top) {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Расписание")
-                                .font(.system(size: 34, weight: .bold, design: .rounded))
-                            Text("Занятия на ближайшие две недели")
+                                .font(.system(size: 36, weight: .bold, design: .rounded))
+                            Text(model.selectedDate.formatted(
+                                .dateTime
+                                    .locale(Locale(identifier: "ru_RU"))
+                                    .weekday(.wide)
+                                    .day()
+                                    .month(.wide)
+                            ))
                                 .font(.subheadline)
                                 .foregroundStyle(MauTheme.muted)
                         }
@@ -97,7 +103,7 @@ struct ScheduleView: View {
                         Spacer()
                     }
                     .padding(17)
-                    .mauGlass(radius: 22)
+                    .mauSurface(radius: 22)
 
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 10) {
@@ -110,8 +116,14 @@ struct ScheduleView: View {
                     }
 
                     if model.isLoading {
-                        LoadingOverlay(title: "Загружаем расписание")
-                            .frame(maxWidth: .infinity)
+                        VStack(spacing: 12) {
+                            ForEach(0..<3, id: \.self) { _ in
+                                RoundedRectangle(cornerRadius: 22)
+                                    .fill(MauTheme.card.opacity(0.75))
+                                    .frame(height: 112)
+                                    .overlay { ProgressView().opacity(0.45) }
+                            }
+                        }
                     } else if let error = model.error {
                         EmptyState(icon: "wifi.exclamationmark", title: "Не удалось загрузить", message: error)
                     } else if model.items(for: model.selectedDate).isEmpty {
@@ -158,13 +170,19 @@ private struct DateChip: View {
         }
         .foregroundStyle(selected ? .white : MauTheme.ink)
         .frame(width: 58, height: 68)
-        .background(selected ? AnyShapeStyle(MauTheme.blue.gradient) : AnyShapeStyle(MauTheme.card.opacity(0.82)),
+        .background(selected ? AnyShapeStyle(MauTheme.heroGradient) : AnyShapeStyle(MauTheme.card.opacity(0.82)),
                     in: RoundedRectangle(cornerRadius: 19, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 19, style: .continuous)
+                .stroke(selected ? Color.white.opacity(0.22) : Color.primary.opacity(0.06), lineWidth: 0.75)
+        }
+        .shadow(color: selected ? MauTheme.blue.opacity(0.22) : .clear, radius: 10, y: 5)
     }
 }
 
 private struct LessonCard: View {
     let item: ScheduleItem
+    private var kind: LessonKind { LessonKind(value: item.pairType) }
 
     var body: some View {
         HStack(alignment: .top, spacing: 15) {
@@ -174,13 +192,29 @@ private struct LessonCard: View {
             }
             .frame(width: 52)
 
-            RoundedRectangle(cornerRadius: 2)
-                .fill(MauTheme.blue)
-                .frame(width: 4, height: 72)
+            VStack(spacing: 0) {
+                Circle()
+                    .fill(kind.color)
+                    .frame(width: 12, height: 12)
+                    .overlay(Circle().stroke(kind.color.opacity(0.22), lineWidth: 6))
+                Rectangle()
+                    .fill(kind.color.opacity(0.2))
+                    .frame(width: 2, height: 64)
+            }
+            .padding(.top, 4)
 
             VStack(alignment: .leading, spacing: 6) {
-                Text(item.name ?? "Занятие")
-                    .font(.headline)
+                HStack(alignment: .top) {
+                    Text(item.name ?? "Занятие")
+                        .font(.headline)
+                    Spacer(minLength: 8)
+                    Text(kind.title)
+                        .font(.caption2.bold())
+                        .foregroundStyle(kind.color)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 5)
+                        .background(kind.color.opacity(0.11), in: Capsule())
+                }
                 if let teacher = item.teacher, !teacher.isEmpty {
                     Label(teacher, systemImage: "person.fill")
                         .font(.caption)
@@ -200,6 +234,31 @@ private struct LessonCard: View {
             Spacer()
         }
         .padding(17)
-        .mauGlass(radius: 22)
+        .mauSurface(radius: 22)
+    }
+}
+
+private struct LessonKind {
+    let title: String
+    let color: Color
+
+    init(value: String?) {
+        let normalized = value?.lowercased() ?? ""
+        if normalized.contains("экзам") || normalized.contains("зач") {
+            title = value ?? "Контроль"
+            color = .red
+        } else if normalized.contains("лабо") {
+            title = value ?? "Лабораторная"
+            color = MauTheme.violet
+        } else if normalized.contains("практ") {
+            title = value ?? "Практика"
+            color = .orange
+        } else if normalized.contains("консульт") {
+            title = value ?? "Консультация"
+            color = .teal
+        } else {
+            title = value?.isEmpty == false ? value! : "Лекция"
+            color = MauTheme.blue
+        }
     }
 }

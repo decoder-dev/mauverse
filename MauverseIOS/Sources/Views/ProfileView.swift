@@ -10,18 +10,38 @@ struct ProfileView: View {
             MauBackground()
             ScrollView {
                 VStack(spacing: 22) {
-                    VStack(spacing: 12) {
-                        Image(systemName: "person.crop.circle.fill")
-                            .font(.system(size: 86))
-                            .symbolRenderingMode(.hierarchical)
-                            .foregroundStyle(MauTheme.blue)
+                    VStack(spacing: 13) {
+                        ZStack {
+                            Circle().fill(.white.opacity(0.16))
+                            Image(systemName: "person.fill")
+                                .font(.system(size: 42, weight: .medium))
+                                .foregroundStyle(.white)
+                        }
+                        .frame(width: 86, height: 86)
+                        .overlay(Circle().stroke(.white.opacity(0.25), lineWidth: 1))
+
                         Text(session.user?.displayName ?? "Пользователь")
-                            .font(.title2.bold())
+                            .font(.system(size: 25, weight: .bold, design: .rounded))
                             .multilineTextAlignment(.center)
                         Text(session.user?.username ?? "")
                             .font(.subheadline)
-                            .foregroundStyle(MauTheme.muted)
+                            .foregroundStyle(.white.opacity(0.72))
+                        HStack(spacing: 8) {
+                            Label("Сессия в Keychain", systemImage: "lock.fill")
+                            if let group = session.user?.groupName, !group.isEmpty {
+                                Text("•")
+                                Text(group)
+                            }
+                        }
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.82))
                     }
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 26)
+                    .padding(.horizontal, 20)
+                    .background(MauTheme.heroGradient, in: RoundedRectangle(cornerRadius: MauRadius.hero, style: .continuous))
+                    .shadow(color: MauTheme.blue.opacity(0.2), radius: 20, y: 10)
 
                     VStack(alignment: .leading, spacing: 18) {
                         Label("Учебные данные", systemImage: "graduationcap.fill")
@@ -34,39 +54,25 @@ struct ProfileView: View {
                         ProfileRow(label: "Зачётная книжка", value: session.user?.creditBook)
                     }
                     .padding(20)
-                    .mauGlass()
+                    .mauSurface()
 
-                    Button { showingEditor = true } label: {
-                        Label("Изменить учебные данные", systemImage: "pencil")
-                            .fontWeight(.semibold)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                    }
-                    .buttonStyle(.plain)
-                    .foregroundStyle(MauTheme.blue)
-                    .mauGlass(radius: 19)
-
-                    NavigationLink(destination: SettingsView()) {
-                        HStack {
-                            Label("Настройки", systemImage: "gearshape.fill")
-                            Spacer()
-                            Image(systemName: "chevron.right")
+                    VStack(spacing: 0) {
+                        Button { showingEditor = true } label: {
+                            ProfileActionRow(title: "Учебные данные", icon: "pencil", color: MauTheme.blue)
                         }
-                        .padding(17)
+                        Divider().padding(.leading, 58)
+                        NavigationLink(destination: SettingsView()) {
+                            ProfileActionRow(title: "Настройки", icon: "gearshape.fill", color: MauTheme.violet)
+                        }
+                        Divider().padding(.leading, 58)
+                        Button(role: .destructive) { showingLogout = true } label: {
+                            ProfileActionRow(title: "Выйти из аккаунта", icon: "rectangle.portrait.and.arrow.right", color: .red)
+                        }
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(MauTheme.ink)
-                    .mauGlass(radius: 19)
+                    .mauSurface()
 
-                    Button(role: .destructive) { showingLogout = true } label: {
-                        Label("Выйти", systemImage: "rectangle.portrait.and.arrow.right")
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                    }
-                    .buttonStyle(.plain)
-                    .mauGlass(radius: 19)
-
-                    Text("MAUverse 1.8.8 (23)")
+                    Text("MAUverse 1.9.0 (24)")
                         .font(.caption)
                         .foregroundStyle(MauTheme.muted)
                 }
@@ -80,6 +86,31 @@ struct ProfileView: View {
         .confirmationDialog("Выйти из аккаунта?", isPresented: $showingLogout, titleVisibility: .visible) {
             Button("Выйти", role: .destructive) { session.signOut() }
         }
+    }
+}
+
+private struct ProfileActionRow: View {
+    let title: String
+    let icon: String
+    let color: Color
+
+    var body: some View {
+        HStack(spacing: 14) {
+            Image(systemName: icon)
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(color)
+                .frame(width: 34, height: 34)
+                .background(color.opacity(0.11), in: RoundedRectangle(cornerRadius: 10))
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(title.contains("Выйти") ? .red : MauTheme.ink)
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.caption.bold())
+                .foregroundStyle(MauTheme.muted)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 13)
     }
 }
 
@@ -197,7 +228,7 @@ private struct SettingsView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(20)
-                    .mauGlass()
+                    .mauSurface()
 
                     VStack(alignment: .leading, spacing: 13) {
                         Label("Кэш приложения", systemImage: "internaldrive.fill").font(.headline)
@@ -211,17 +242,17 @@ private struct SettingsView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(20)
-                    .mauGlass()
+                    .mauSurface()
 
                     VStack(alignment: .leading, spacing: 12) {
                         Label("О приложении", systemImage: "info.circle.fill").font(.headline)
                         Text("Нативное приложение Мурманского арктического университета.")
                             .font(.subheadline).foregroundStyle(MauTheme.muted)
-                        Text("Версия 1.8.8 • сборка 23").font(.caption)
+                        Text("Версия 1.9.0 • сборка 24").font(.caption)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(20)
-                    .mauGlass()
+                    .mauSurface()
                 }
                 .padding(20)
             }

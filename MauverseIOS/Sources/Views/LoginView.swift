@@ -13,21 +13,25 @@ struct LoginView: View {
             MauBackground()
             ScrollView {
                 VStack(spacing: 26) {
-                    Spacer(minLength: 70)
+                    Spacer(minLength: 54)
                     VStack(spacing: 14) {
                         ZStack {
-                            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                                .fill(MauTheme.blue.gradient)
-                            Image(systemName: "sparkles")
-                                .font(.system(size: 44, weight: .medium))
+                            RoundedRectangle(cornerRadius: 30, style: .continuous)
+                                .fill(MauTheme.heroGradient)
+                            Image(systemName: "snowflake")
+                                .font(.system(size: 45, weight: .medium))
                                 .foregroundStyle(.white)
                         }
-                        .frame(width: 92, height: 92)
+                        .frame(width: 96, height: 96)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 30, style: .continuous)
+                                .stroke(.white.opacity(0.24), lineWidth: 1)
+                        }
                         .shadow(color: MauTheme.blue.opacity(0.28), radius: 28, y: 14)
 
                         Text("MAUverse")
-                            .font(.system(size: 38, weight: .bold, design: .rounded))
-                        Text("Вся университетская жизнь в одном месте")
+                            .font(.system(size: 40, weight: .bold, design: .rounded))
+                        Text("Цифровая среда Арктического университета")
                             .font(.subheadline)
                             .foregroundStyle(MauTheme.muted)
                             .multilineTextAlignment(.center)
@@ -70,11 +74,12 @@ struct LoginView: View {
                         }
                         .buttonStyle(.plain)
                         .foregroundStyle(.white)
-                        .background(MauTheme.blue.gradient, in: RoundedRectangle(cornerRadius: 18))
+                        .background(MauTheme.heroGradient, in: RoundedRectangle(cornerRadius: 18))
+                        .shadow(color: MauTheme.blue.opacity(0.22), radius: 14, y: 7)
                         .disabled(session.isBusy)
                     }
                     .padding(20)
-                    .mauGlass(radius: 28)
+                    .mauSurface(radius: 28)
 
                     Text("Используйте данные от электронной информационно-образовательной среды МАУ")
                         .font(.caption)
