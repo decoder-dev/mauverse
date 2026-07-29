@@ -1,7 +1,8 @@
 import Foundation
 
-final class OfficialNewsService {
+actor OfficialNewsService {
     static let shared = OfficialNewsService()
+    private var cache: [NewsFilter: [NewsItem]] = [:]
 
     private init() {}
 
@@ -22,16 +23,26 @@ final class OfficialNewsService {
             throw APIError.invalidResponse
         }
         do {
-            return try await fetch(url: url, cachePolicy: .reloadRevalidatingCacheData)
-        } catch let error as URLError where Self.isTransient(error.code) {
-            return try await fetch(url: url, cachePolicy: .returnCacheDataElseLoad)
+            let loaded: [NewsItem]
+            do {
+                loaded = try await fetch(url: url, cachePolicy: .reloadRevalidatingCacheData)
+            } catch let error as URLError where Self.isTransient(error.code) {
+                loaded = try await fetch(url: url, cachePolicy: .returnCacheDataElseLoad)
+            }
+            if !loaded.isEmpty { cache[filter] = loaded }
+            return loaded
+        } catch {
+            if let cached = cache[filter], !cached.isEmpty {
+                return cached
+            }
+            throw error
         }
     }
 
     private func fetch(url: URL, cachePolicy: URLRequest.CachePolicy) async throws -> [NewsItem] {
         var request = URLRequest(url: url, cachePolicy: cachePolicy, timeoutInterval: 30)
         request.timeoutInterval = 30
-        request.setValue("MAUverse/1.9.1 (iOS)", forHTTPHeaderField: "User-Agent")
+        request.setValue("MAUverse/1.9.2 (iOS)", forHTTPHeaderField: "User-Agent")
         request.setValue("application/rss+xml, application/xml, text/xml", forHTTPHeaderField: "Accept")
 
         let (data, response) = try await URLSession.shared.data(for: request)

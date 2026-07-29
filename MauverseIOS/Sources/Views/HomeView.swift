@@ -27,7 +27,10 @@ final class HomeViewModel: ObservableObject {
                     start: formatter.string(from: start),
                     end: formatter.string(from: end)
                 ) {
-                    nextLesson = lessons.sorted(by: Self.isEarlier).first
+                    nextLesson = lessons
+                        .filter { Self.lessonDate($0) >= Date().addingTimeInterval(-60 * 15) }
+                        .sorted(by: Self.isEarlier)
+                        .first
                 }
             }
         }
@@ -36,6 +39,13 @@ final class HomeViewModel: ObservableObject {
 
     private static func isEarlier(_ lhs: ScheduleItem, _ rhs: ScheduleItem) -> Bool {
         "\(lhs.date ?? "") \(lhs.startTime ?? "")" < "\(rhs.date ?? "") \(rhs.startTime ?? "")"
+    }
+
+    private static func lessonDate(_ item: ScheduleItem) -> Date {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd HH:mm"
+        return formatter.date(from: "\(item.date ?? "") \(item.startTime ?? "00:00")") ?? .distantFuture
     }
 }
 
@@ -88,7 +98,7 @@ struct HomeView: View {
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 14)
-                .padding(.bottom, 24)
+                .padding(.bottom, 96)
             }
             .refreshable { await model.load(user: session.user) }
         }

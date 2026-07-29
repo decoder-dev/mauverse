@@ -120,7 +120,7 @@ struct ServicesView: View {
                     }
                 }
                 .padding(20)
-                .padding(.bottom, 12)
+                .padding(.bottom, 96)
             }
         }
         .navigationBarTitleDisplayMode(.inline)
