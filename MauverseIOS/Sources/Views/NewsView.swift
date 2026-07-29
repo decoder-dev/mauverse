@@ -6,16 +6,36 @@ final class NewsViewModel: ObservableObject {
     @Published var filter: NewsFilter = .all
     @Published var isLoading = false
     @Published var error: String?
+    private var activeRequest = UUID()
 
     func load() async {
-        isLoading = true
+        let request = UUID()
+        activeRequest = request
+        let requestedFilter = filter
+        isLoading = items.isEmpty
         error = nil
-        defer { isLoading = false }
         do {
-            items = try await OfficialNewsService.shared.load(filter: filter)
+            let loaded = try await OfficialNewsService.shared.load(filter: requestedFilter)
+            guard activeRequest == request, filter == requestedFilter else { return }
+            items = loaded
         } catch {
-            self.error = error.localizedDescription
+            guard activeRequest == request else { return }
+            if (error as? URLError)?.code != .cancelled, items.isEmpty {
+                self.error = Self.friendlyMessage(for: error)
+            }
         }
+        if activeRequest == request { isLoading = false }
+    }
+
+    private static func friendlyMessage(for error: Error) -> String {
+        if let urlError = error as? URLError {
+            return switch urlError.code {
+            case .notConnectedToInternet: "Проверьте подключение к интернету"
+            case .timedOut: "Сайт МАУ отвечает слишком долго. Попробуйте ещё раз"
+            default: "Не удалось обновить ленту. Потяните экран ещё раз"
+            }
+        }
+        return error.localizedDescription
     }
 }
 
@@ -42,7 +62,7 @@ struct NewsView: View {
                                     model.filter = filter
                                     Task { await model.load() }
                                 }
-                                .font(.subheadline.weight(.semibold))
+                                .font(.system(size: 14, weight: .semibold))
                                 .foregroundStyle(model.filter == filter ? .white : MauTheme.ink)
                                 .padding(.horizontal, 15)
                                 .padding(.vertical, 10)
@@ -120,10 +140,11 @@ private struct NewsCard: View {
                     .tracking(0.7)
                     .foregroundStyle(MauTheme.blue)
                 Text(item.title ?? "Новость")
-                    .font(.subheadline.bold())
+                    .font(.system(size: 15, weight: .semibold))
                     .multilineTextAlignment(.leading)
                     .foregroundStyle(MauTheme.ink)
-                    .lineLimit(4)
+                    .lineLimit(3)
+                    .minimumScaleFactor(0.9)
                 Spacer(minLength: 0)
                 if let date = item.publish {
                     Text(date)
@@ -160,7 +181,11 @@ private struct HeroNewsCard: View {
             if let source = item.image, let url = URL(string: source) {
                 AsyncImage(url: url) { phase in
                     if case .success(let image) = phase {
-                        image.resizable().scaledToFill()
+                        image
+                            .resizable()
+                            .scaledToFill()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .clipped()
                     } else {
                         MauTheme.heroGradient
                     }
@@ -189,13 +214,14 @@ private struct HeroNewsCard: View {
                     }
                 }
                 Text(item.title ?? "Новости университета")
-                    .font(.system(size: 23, weight: .bold, design: .rounded))
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.leading)
-                    .lineLimit(4)
+                    .lineLimit(3)
+                    .minimumScaleFactor(0.86)
                 if let description = item.description {
                     Text(description.strippingHTML)
-                        .font(.subheadline)
+                        .font(.system(size: 13, weight: .regular))
                         .foregroundStyle(.white.opacity(0.75))
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
@@ -203,6 +229,7 @@ private struct HeroNewsCard: View {
             }
             .padding(20)
         }
+        .frame(maxWidth: .infinity)
         .frame(height: 330)
         .clipShape(RoundedRectangle(cornerRadius: MauRadius.hero, style: .continuous))
         .shadow(color: .black.opacity(0.12), radius: 18, y: 10)

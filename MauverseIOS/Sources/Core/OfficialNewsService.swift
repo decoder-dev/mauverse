@@ -21,9 +21,17 @@ final class OfficialNewsService {
         guard let url = URL(string: "https://mauniver.ru/\(path)") else {
             throw APIError.invalidResponse
         }
-        var request = URLRequest(url: url)
+        do {
+            return try await fetch(url: url, cachePolicy: .reloadRevalidatingCacheData)
+        } catch let error as URLError where Self.isTransient(error.code) {
+            return try await fetch(url: url, cachePolicy: .returnCacheDataElseLoad)
+        }
+    }
+
+    private func fetch(url: URL, cachePolicy: URLRequest.CachePolicy) async throws -> [NewsItem] {
+        var request = URLRequest(url: url, cachePolicy: cachePolicy, timeoutInterval: 30)
         request.timeoutInterval = 30
-        request.setValue("MAUverse/1.9.0 (iOS)", forHTTPHeaderField: "User-Agent")
+        request.setValue("MAUverse/1.9.1 (iOS)", forHTTPHeaderField: "User-Agent")
         request.setValue("application/rss+xml, application/xml, text/xml", forHTTPHeaderField: "Accept")
 
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -36,6 +44,15 @@ final class OfficialNewsService {
 
         let parser = RSSNewsParser()
         return try parser.parse(data)
+    }
+
+    private static func isTransient(_ code: URLError.Code) -> Bool {
+        return switch code {
+        case .timedOut, .networkConnectionLost, .cannotConnectToHost, .dnsLookupFailed:
+            true
+        default:
+            false
+        }
     }
 }
 
