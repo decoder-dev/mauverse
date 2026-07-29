@@ -15,6 +15,7 @@ struct UserDTO: Codable, Equatable {
     var creditBook: String?
     var groupId: Int?
     var subGroupId: Int?
+    var scheduleGroupUID: String?
     var groupName: String?
     var speciality: String?
     var token: String?
@@ -41,6 +42,96 @@ struct ScheduleItem: Codable, Identifiable, Hashable {
 
     var stableID: String {
         externalId ?? "\(id ?? 0)-\(date ?? "")-\(startTime ?? "")-\(name ?? "")"
+    }
+}
+
+struct ScheduleResponse: Decodable {
+    let update: String?
+    let success: Bool?
+    let timetable: [ScheduleAPIItem]
+}
+
+struct ScheduleAPIItem: Decodable {
+    let id: Int?
+    let date: String?
+    let slot: String?
+    let dayOfWeek: String?
+    let type: String?
+    let disciplines: String?
+    let room: String?
+    let teacher: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id, date, slot, type, disciplines, room, teacher
+        case dayOfWeek = "day_of_week"
+    }
+
+    var appItem: ScheduleItem {
+        let times = (slot ?? "").components(separatedBy: " - ")
+        return ScheduleItem(
+            id: id,
+            name: disciplines,
+            teacher: teacher,
+            room: room,
+            pairType: type,
+            startTime: times.first,
+            endTime: times.count > 1 ? times[1] : nil,
+            date: date,
+            externalId: nil
+        )
+    }
+}
+
+struct ScheduleFacultyResponse: Decodable {
+    let success: Bool?
+    let courses: [ScheduleFaculty]
+}
+
+struct ScheduleFaculty: Decodable, Identifiable {
+    let facId: Int
+    let facultee: String
+    var id: Int { facId }
+
+    enum CodingKeys: String, CodingKey {
+        case facId = "fac_id"
+        case facultee
+    }
+}
+
+struct ScheduleGroupsResponse: Decodable {
+    let success: Bool?
+    let groups: [ScheduleGroup]
+}
+
+struct ScheduleGroup: Decodable, Identifiable, Hashable {
+    let groupId: Int
+    let group: String
+    let speciality: String?
+    let uid: String
+    var id: Int { groupId }
+
+    enum CodingKeys: String, CodingKey {
+        case groupId = "group_id"
+        case group, speciality
+        case uid = "UID"
+    }
+}
+
+struct ScheduleTeachersResponse: Decodable {
+    let success: Bool?
+    let teachers: [ScheduleTeacher]
+}
+
+struct ScheduleTeacher: Decodable, Identifiable {
+    let teacherId: Int
+    let teacher: String
+    let uid: String
+    var id: Int { teacherId }
+
+    enum CodingKeys: String, CodingKey {
+        case teacherId = "teacher_id"
+        case teacher
+        case uid = "UID"
     }
 }
 

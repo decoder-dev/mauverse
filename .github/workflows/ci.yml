@@ -180,6 +180,8 @@ jobs:
     name: Native SwiftUI iPhone Release (unsigned)
     runs-on: macos-26
     timeout-minutes: 35
+    env:
+      MAUVERSE_SCHEDULE_TOKEN: ${{ secrets.MAUVERSE_SCHEDULE_TOKEN }}
     steps:
       - name: Check out sources
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
@@ -212,6 +214,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          test -n "$MAUVERSE_SCHEDULE_TOKEN"
           xcodebuild \
             -project MauverseIOS/MAUverse.xcodeproj \
             -scheme MAUverse \
@@ -223,6 +226,7 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             DEVELOPMENT_TEAM="" \
+            MAUVERSE_SCHEDULE_TOKEN="$MAUVERSE_SCHEDULE_TOKEN" \
             clean build
 
       - name: Verify and package unsigned application

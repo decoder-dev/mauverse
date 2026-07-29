@@ -311,7 +311,18 @@ private final class TeachersModel: ObservableObject {
         error = nil
         defer { isLoading = false }
         do {
-            teachers = try await APIClient.shared.post("get_teachers", body: TeacherRequest(name: text), user: user)
+            teachers = try await ScheduleAPIClient.shared.teachers(matching: text).map {
+                Teacher(
+                    id: $0.teacherId,
+                    teacherId: $0.teacherId,
+                    name: $0.teacher,
+                    fullName: $0.teacher,
+                    email: nil,
+                    phone: nil,
+                    post: "Преподаватель МАУ",
+                    extras: $0.uid
+                )
+            }
         } catch { self.error = error.localizedDescription }
     }
 }

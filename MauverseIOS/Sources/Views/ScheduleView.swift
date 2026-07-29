@@ -11,8 +11,8 @@ final class ScheduleViewModel: ObservableObject {
         Calendar.current.date(byAdding: .day, value: $0, to: Calendar.current.startOfDay(for: Date()))
     }
 
-    func load(user: UserDTO?) async {
-        guard let user else { return }
+    func load(user: UserDTO?) async -> ScheduleGroup? {
+        guard let user else { return nil }
         isLoading = true
         error = nil
         defer { isLoading = false }
@@ -20,19 +20,24 @@ final class ScheduleViewModel: ObservableObject {
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyy-MM-dd"
         do {
-            let response: [ScheduleItem] = try await APIClient.shared.post(
-                "get_schedule",
-                body: ScheduleRequest(
-                    startDate: formatter.string(from: dates.first ?? Date()),
-                    endDate: formatter.string(from: dates.last ?? Date()),
-                    groupId: user.groupId,
-                    subgroupId: user.subGroupId
-                ),
-                user: user
+            var resolvedGroup: ScheduleGroup?
+            var uid = user.scheduleGroupUID
+            if uid?.isEmpty != false, let groupName = user.groupName, !groupName.isEmpty {
+                resolvedGroup = try await ScheduleAPIClient.shared.findGroup(named: groupName)
+                uid = resolvedGroup?.uid
+            }
+            guard let uid, !uid.isEmpty else {
+                throw APIError.server("Выберите существующую учебную группу в профиле")
+            }
+            items = try await ScheduleAPIClient.shared.schedule(
+                uid: uid,
+                start: formatter.string(from: dates.first ?? Date()),
+                end: formatter.string(from: dates.last ?? Date())
             )
-            items = response
+            return resolvedGroup
         } catch {
             self.error = error.localizedDescription
+            return nil
         }
     }
 
@@ -70,7 +75,7 @@ struct ScheduleView: View {
                                 .foregroundStyle(MauTheme.muted)
                         }
                         Spacer()
-                        Button { Task { await model.load(user: session.user) } } label: {
+                        Button { Task { await reload() } } label: {
                             Image(systemName: "arrow.clockwise")
                                 .font(.headline)
                                 .frame(width: 44, height: 44)
@@ -122,10 +127,21 @@ struct ScheduleView: View {
                 .padding(20)
                 .padding(.bottom, 12)
             }
-            .refreshable { await model.load(user: session.user) }
+            .refreshable { await reload() }
         }
         .navigationBarTitleDisplayMode(.inline)
-        .task { if model.items.isEmpty { await model.load(user: session.user) } }
+        .task { if model.items.isEmpty { await reload() } }
+    }
+
+    private func reload() async {
+        if let group = await model.load(user: session.user) {
+            session.update {
+                $0.scheduleGroupUID = group.uid
+                $0.groupId = group.groupId
+                $0.groupName = group.group
+                $0.speciality = group.speciality
+            }
+        }
     }
 }
 
@@ -142,7 +158,7 @@ private struct DateChip: View {
         }
         .foregroundStyle(selected ? .white : MauTheme.ink)
         .frame(width: 58, height: 68)
-        .background(selected ? AnyShapeStyle(MauTheme.blue.gradient) : AnyShapeStyle(Color.white.opacity(0.72)),
+        .background(selected ? AnyShapeStyle(MauTheme.blue.gradient) : AnyShapeStyle(MauTheme.card.opacity(0.82)),
                     in: RoundedRectangle(cornerRadius: 19, style: .continuous))
     }
 }
@@ -187,4 +203,3 @@ private struct LessonCard: View {
         .mauGlass(radius: 22)
     }
 }
-

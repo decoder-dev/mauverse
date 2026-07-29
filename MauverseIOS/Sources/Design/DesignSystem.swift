@@ -1,10 +1,33 @@
 import SwiftUI
 
+enum AppTheme: String, CaseIterable, Identifiable {
+    case system
+    case light
+    case dark
+
+    var id: String { rawValue }
+    var title: String {
+        return switch self {
+        case .system: "Как на iPhone"
+        case .light: "Светлая"
+        case .dark: "Тёмная"
+        }
+    }
+    var colorScheme: ColorScheme? {
+        return switch self {
+        case .system: nil
+        case .light: .light
+        case .dark: .dark
+        }
+    }
+}
+
 enum MauTheme {
     static let blue = Color(red: 0.16, green: 0.43, blue: 0.95)
-    static let ink = Color(red: 0.08, green: 0.10, blue: 0.16)
-    static let muted = Color(red: 0.42, green: 0.46, blue: 0.54)
-    static let canvas = Color(red: 0.965, green: 0.97, blue: 0.985)
+    static let ink = Color(uiColor: .label)
+    static let muted = Color(uiColor: .secondaryLabel)
+    static let canvas = Color(uiColor: .systemBackground)
+    static let card = Color(uiColor: .secondarySystemBackground)
     static let lavender = Color(red: 0.88, green: 0.90, blue: 1.0)
 }
 
@@ -113,4 +136,3 @@ struct EmptyState: View {
         .mauGlass()
     }
 }
-
