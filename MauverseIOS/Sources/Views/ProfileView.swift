@@ -66,7 +66,7 @@ struct ProfileView: View {
                     .buttonStyle(.plain)
                     .mauGlass(radius: 19)
 
-                    Text("MAUverse 1.8.7 (22)")
+                    Text("MAUverse 1.8.8 (23)")
                         .font(.caption)
                         .foregroundStyle(MauTheme.muted)
                 }
@@ -217,7 +217,7 @@ private struct SettingsView: View {
                         Label("О приложении", systemImage: "info.circle.fill").font(.headline)
                         Text("Нативное приложение Мурманского арктического университета.")
                             .font(.subheadline).foregroundStyle(MauTheme.muted)
-                        Text("Версия 1.8.7 • сборка 22").font(.caption)
+                        Text("Версия 1.8.8 • сборка 23").font(.caption)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(20)
