@@ -68,7 +68,21 @@ struct HomeView: View {
                     quickActions
 
                     if let news = model.featuredNews {
-                        MauSectionHeader(title: "Главное в МАУ", action: "Все новости")
+                        HStack(alignment: .firstTextBaseline) {
+                            Text("Главное в МАУ")
+                                .font(.title3.bold())
+                                .foregroundStyle(MauTheme.ink)
+                            Spacer()
+                            NavigationLink(destination: NewsView()) {
+                                HStack(spacing: 4) {
+                                    Text("Все новости")
+                                    Image(systemName: "chevron.right")
+                                        .font(.caption.bold())
+                                }
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(MauTheme.blue)
+                            }
+                        }
                         FeaturedNewsCard(item: news)
                     }
                 }
@@ -285,7 +299,11 @@ private struct FeaturedNewsCard: View {
         ZStack(alignment: .bottomLeading) {
             AsyncImage(url: URL(string: item.image ?? "")) { phase in
                 if case .success(let image) = phase {
-                    image.resizable().scaledToFill()
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .clipped()
                 } else {
                     MauTheme.heroGradient
                 }
@@ -306,6 +324,7 @@ private struct FeaturedNewsCard: View {
             }
             .padding(20)
         }
+        .frame(maxWidth: .infinity)
         .frame(height: 250)
         .clipShape(RoundedRectangle(cornerRadius: MauRadius.hero, style: .continuous))
     }
