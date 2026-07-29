@@ -78,7 +78,10 @@ final class APIClient {
         let data: Data
         let response: URLResponse
         do {
-            (data, response) = try await data(for: request, retryOnTransient: retryOnTransient)
+            (data, response) = try await performRequest(
+                request,
+                retryOnTransient: retryOnTransient
+            )
         } catch let error as URLError {
             throw APIError.network(Self.networkMessage(for: error))
         }
@@ -100,8 +103,8 @@ final class APIClient {
         }
     }
 
-    private func data(
-        for request: URLRequest,
+    private func performRequest(
+        _ request: URLRequest,
         retryOnTransient: Bool
     ) async throws -> (Data, URLResponse) {
         let attempts = retryOnTransient ? 2 : 1
