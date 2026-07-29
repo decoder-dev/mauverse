@@ -8,6 +8,7 @@ final class SessionStore: ObservableObject {
     @Published var errorMessage: String?
 
     private let storageKey = "mauverse.native.session"
+    private var sessionObserver: NSObjectProtocol?
 
     init() {
         if let data = KeychainStore.read(account: storageKey) {
@@ -18,6 +19,22 @@ final class SessionStore: ObservableObject {
                 KeychainStore.write(legacy, account: storageKey)
                 UserDefaults.standard.removeObject(forKey: storageKey)
             }
+        }
+        sessionObserver = NotificationCenter.default.addObserver(
+            forName: .mauverseSessionExpired,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.signOut()
+                self?.errorMessage = "Сессия истекла. Войдите в аккаунт повторно"
+            }
+        }
+    }
+
+    deinit {
+        if let sessionObserver {
+            NotificationCenter.default.removeObserver(sessionObserver)
         }
     }
 

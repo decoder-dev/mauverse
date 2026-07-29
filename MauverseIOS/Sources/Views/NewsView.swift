@@ -13,10 +13,7 @@ final class NewsViewModel: ObservableObject {
         error = nil
         defer { isLoading = false }
         do {
-            items = try await APIClient.shared.get(
-                "news",
-                query: [URLQueryItem(name: "news_type", value: "\(filter.rawValue)")]
-            )
+            items = try await OfficialNewsService.shared.load(filter: filter)
         } catch {
             self.error = error.localizedDescription
         }
@@ -54,7 +51,7 @@ struct NewsView: View {
                     if model.isLoading {
                         LoadingOverlay(title: "Загружаем новости").frame(maxWidth: .infinity)
                     } else if let error = model.error {
-                        EmptyState(icon: "wifi.exclamationmark", title: "Нет соединения", message: error)
+                        EmptyState(icon: "wifi.exclamationmark", title: "Новости недоступны", message: error)
                     } else if model.items.isEmpty {
                         EmptyState(icon: "newspaper", title: "Новостей пока нет", message: "Попробуйте выбрать другую категорию")
                     } else {
