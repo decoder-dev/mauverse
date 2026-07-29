@@ -113,10 +113,7 @@ private struct WebServiceView: View {
 
     var body: some View {
         if let destination = URL(string: url) {
-            SafariView(url: destination)
-                .ignoresSafeArea()
-                .navigationTitle(title)
-                .navigationBarTitleDisplayMode(.inline)
+            InAppBrowserView(url: destination, title: title)
         } else {
             EmptyState(icon: "link.badge.plus", title: "Ссылка недоступна", message: url)
         }
@@ -206,25 +203,27 @@ private struct CampusSection: View {
     var body: some View {
         Section(title) {
             ForEach(campuses) { campus in
-                Button {
-                    let query = "Мурманск, \(campus.address)"
-                    let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? query
-                    if let url = URL(string: "https://2gis.ru/murmansk/search/\(encoded)") {
-                        UIApplication.shared.open(url)
-                    }
-                } label: {
-                    HStack {
-                        Text(campus.code)
-                            .font(.headline)
-                            .foregroundStyle(MauTheme.blue)
-                            .frame(width: 54, alignment: .leading)
-                        Text(campus.address).foregroundStyle(MauTheme.ink)
-                        Spacer()
-                        Image(systemName: "location.fill").foregroundStyle(MauTheme.blue)
+                if let url = mapURL(for: campus) {
+                    NavigationLink(destination: InAppBrowserView(url: url, title: "Корпус \(campus.code)")) {
+                        HStack {
+                            Text(campus.code)
+                                .font(.headline)
+                                .foregroundStyle(MauTheme.blue)
+                                .frame(width: 54, alignment: .leading)
+                            Text(campus.address).foregroundStyle(MauTheme.ink)
+                            Spacer()
+                            Image(systemName: "location.fill").foregroundStyle(MauTheme.blue)
+                        }
                     }
                 }
             }
         }
+    }
+
+    private func mapURL(for campus: Campus) -> URL? {
+        let query = "Мурманск, \(campus.address)"
+        let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? query
+        return URL(string: "https://2gis.ru/murmansk/search/\(encoded)")
     }
 }
 

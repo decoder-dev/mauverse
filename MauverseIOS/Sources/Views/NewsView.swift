@@ -1,5 +1,4 @@
 import SwiftUI
-import SafariServices
 
 @MainActor
 final class NewsViewModel: ObservableObject {
@@ -73,11 +72,20 @@ struct NewsView: View {
 private struct NewsCard: View {
     let item: NewsItem
 
+    @ViewBuilder
     var body: some View {
-        Button {
-            guard let value = item.link, let url = URL(string: value) else { return }
-            UIApplication.shared.open(url)
-        } label: {
+        if let value = item.link, let url = URL(string: value) {
+            NavigationLink(destination: InAppBrowserView(url: url, title: item.title ?? "Новости МАУ")) {
+                content
+            }
+            .buttonStyle(.plain)
+            .mauGlass(radius: 24)
+        } else {
+            content.mauGlass(radius: 24)
+        }
+    }
+
+    private var content: some View {
             VStack(alignment: .leading, spacing: 0) {
                 if let source = item.image, let url = URL(string: source) {
                     AsyncImage(url: url) { phase in
@@ -111,9 +119,6 @@ private struct NewsCard: View {
             }
             .background(MauTheme.card.opacity(0.72))
             .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-        }
-        .buttonStyle(.plain)
-        .mauGlass(radius: 24)
     }
 }
 
@@ -123,12 +128,4 @@ private extension String {
             .replacingOccurrences(of: "&nbsp;", with: " ")
             .replacingOccurrences(of: "&amp;", with: "&")
     }
-}
-
-struct SafariView: UIViewControllerRepresentable {
-    let url: URL
-    func makeUIViewController(context: Context) -> SFSafariViewController {
-        SFSafariViewController(url: url)
-    }
-    func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
 }
