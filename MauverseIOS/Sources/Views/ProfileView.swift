@@ -72,12 +72,12 @@ struct ProfileView: View {
                     .buttonStyle(.plain)
                     .mauSurface()
 
-                    Text("MAUverse 1.9.1 (25)")
+                    Text("MAUverse 1.9.2 (26)")
                         .font(.caption)
                         .foregroundStyle(MauTheme.muted)
                 }
                 .padding(20)
-                .padding(.bottom, 12)
+                .padding(.bottom, 96)
             }
         }
         .navigationTitle("Профиль")
@@ -248,7 +248,27 @@ private struct SettingsView: View {
                         Label("О приложении", systemImage: "info.circle.fill").font(.headline)
                         Text("Нативное приложение Мурманского арктического университета.")
                             .font(.subheadline).foregroundStyle(MauTheme.muted)
-                        Text("Версия 1.9.1 • сборка 25").font(.caption)
+                        Divider()
+                        HStack {
+                            Text("Разработчик")
+                                .foregroundStyle(MauTheme.muted)
+                            Spacer()
+                            NavigationLink(
+                                destination: InAppBrowserView(
+                                    url: URL(string: "https://github.com/decoder-dev")!,
+                                    title: "decoder-dev"
+                                )
+                            ) {
+                                HStack(spacing: 5) {
+                                    Text("decoder-dev")
+                                    Image(systemName: "arrow.up.right")
+                                        .font(.caption2.bold())
+                                }
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(MauTheme.blue)
+                            }
+                        }
+                        Text("Версия 1.9.2 • сборка 26").font(.caption)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(20)

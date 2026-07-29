@@ -7,17 +7,22 @@ final class NewsViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var error: String?
     private var activeRequest = UUID()
+    private var loadedFilter: NewsFilter?
 
     func load() async {
         let request = UUID()
         activeRequest = request
         let requestedFilter = filter
+        if loadedFilter != requestedFilter {
+            items = []
+        }
         isLoading = items.isEmpty
         error = nil
         do {
             let loaded = try await OfficialNewsService.shared.load(filter: requestedFilter)
             guard activeRequest == request, filter == requestedFilter else { return }
             items = loaded
+            loadedFilter = requestedFilter
         } catch {
             guard activeRequest == request else { return }
             if (error as? URLError)?.code != .cancelled, items.isEmpty {
@@ -94,7 +99,7 @@ struct NewsView: View {
                     }
                 }
                 .padding(20)
-                .padding(.bottom, 12)
+                .padding(.bottom, 96)
             }
             .refreshable { await model.load() }
         }
@@ -177,52 +182,54 @@ private struct HeroNewsCard: View {
     }
 
     private var content: some View {
-        ZStack(alignment: .bottomLeading) {
+        VStack(alignment: .leading, spacing: 0) {
             if let source = item.image, let url = URL(string: source) {
                 AsyncImage(url: url) { phase in
                     if case .success(let image) = phase {
                         image
                             .resizable()
                             .scaledToFill()
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .clipped()
                     } else {
                         MauTheme.heroGradient
+                            .overlay {
+                                Image(systemName: "newspaper.fill")
+                                    .font(.system(size: 38))
+                                    .foregroundStyle(.white.opacity(0.72))
+                            }
                     }
                 }
+                .frame(maxWidth: .infinity)
+                .frame(height: 205)
+                .clipped()
             } else {
                 MauTheme.heroGradient
+                    .frame(height: 205)
             }
-
-            LinearGradient(
-                colors: [.clear, .black.opacity(0.2), .black.opacity(0.92)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
 
             VStack(alignment: .leading, spacing: 9) {
                 HStack {
                     Text(category.uppercased())
                         .font(.caption2.bold())
                         .tracking(0.8)
-                        .foregroundStyle(MauTheme.cyan)
+                        .foregroundStyle(MauTheme.blue)
                     Spacer()
                     if let date = item.publish {
                         Text(date)
                             .font(.caption2)
-                            .foregroundStyle(.white.opacity(0.7))
+                            .foregroundStyle(MauTheme.muted)
+                            .lineLimit(1)
                     }
                 }
                 Text(item.title ?? "Новости университета")
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .font(.system(size: 19, weight: .bold, design: .rounded))
+                    .foregroundStyle(MauTheme.ink)
                     .multilineTextAlignment(.leading)
-                    .lineLimit(3)
-                    .minimumScaleFactor(0.86)
+                    .lineLimit(4)
+                    .fixedSize(horizontal: false, vertical: true)
                 if let description = item.description {
                     Text(description.strippingHTML)
                         .font(.system(size: 13, weight: .regular))
-                        .foregroundStyle(.white.opacity(0.75))
+                        .foregroundStyle(MauTheme.muted)
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
                 }
@@ -230,8 +237,12 @@ private struct HeroNewsCard: View {
             .padding(20)
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 330)
+        .background(MauTheme.card.opacity(0.82))
         .clipShape(RoundedRectangle(cornerRadius: MauRadius.hero, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: MauRadius.hero, style: .continuous)
+                .stroke(Color.primary.opacity(0.07), lineWidth: 0.75)
+        }
         .shadow(color: .black.opacity(0.12), radius: 18, y: 10)
     }
 }
