@@ -1,5 +1,4 @@
 import Foundation
-import FoundationXML
 
 final class OfficialNewsService {
     static let shared = OfficialNewsService()
