@@ -23,7 +23,7 @@ final class InAppBrowserController: NSObject, ObservableObject, WKNavigationDele
 
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .default()
-        configuration.applicationNameForUserAgent = "MAUverse/1.8.8"
+        configuration.applicationNameForUserAgent = "MAUverse/1.9.0"
         configuration.defaultWebpagePreferences.allowsContentJavaScript = true
         configuration.allowsInlineMediaPlayback = true
         webView = WKWebView(frame: .zero, configuration: configuration)

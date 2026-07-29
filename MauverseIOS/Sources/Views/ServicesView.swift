@@ -39,6 +39,34 @@ enum MauService: String, CaseIterable, Identifiable {
         case .debts: .red
         }
     }
+
+    var subtitle: String {
+        return switch self {
+        case .eios: "Курсы и задания"
+        case .forms: "Справки и обращения"
+        case .messenger: "Сообщения в ЭИОС"
+        case .campus: "Корпуса и маршруты"
+        case .debts: "Проверка успеваемости"
+        case .digital: "Онлайн-ресурсы"
+        case .teachers: "Поиск по имени"
+        case .departments: "Телефоны и кабинеты"
+        }
+    }
+}
+
+private enum ServiceCategory: String, CaseIterable, Identifiable {
+    case study = "Учёба"
+    case communication = "Коммуникации"
+    case university = "Университет"
+    var id: String { rawValue }
+
+    var services: [MauService] {
+        return switch self {
+        case .study: [.eios, .forms, .debts]
+        case .communication: [.messenger, .teachers, .departments]
+        case .university: [.campus, .digital]
+        }
+    }
 }
 
 struct ServicesView: View {
@@ -49,27 +77,45 @@ struct ServicesView: View {
             MauBackground()
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("Сервисы").font(.system(size: 34, weight: .bold, design: .rounded))
-                    Text("Полезные инструменты для учёбы и жизни в университете")
-                        .font(.subheadline)
-                        .foregroundStyle(MauTheme.muted)
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Сервисы").font(.system(size: 36, weight: .bold, design: .rounded))
+                        Text("Учёба и университет — в одном месте")
+                            .font(.subheadline)
+                            .foregroundStyle(MauTheme.muted)
+                    }
 
-                    LazyVGrid(columns: columns, spacing: 13) {
-                        ForEach(MauService.allCases) { service in
-                            NavigationLink(destination: ServiceDestination(service: service)) {
-                                VStack(alignment: .leading, spacing: 18) {
-                                    IconTile(systemName: service.icon, color: service.color)
-                                    Text(service.title)
-                                        .font(.subheadline.weight(.semibold))
-                                        .foregroundStyle(MauTheme.ink)
-                                        .multilineTextAlignment(.leading)
-                                        .frame(maxWidth: .infinity, minHeight: 38, alignment: .topLeading)
+                    ForEach(ServiceCategory.allCases) { category in
+                        MauSectionHeader(title: category.rawValue)
+                        LazyVGrid(columns: columns, spacing: 13) {
+                            ForEach(category.services) { service in
+                                NavigationLink(destination: ServiceDestination(service: service)) {
+                                    VStack(alignment: .leading, spacing: 16) {
+                                        HStack {
+                                            IconTile(systemName: service.icon, color: service.color)
+                                            Spacer()
+                                            Image(systemName: "arrow.up.right")
+                                                .font(.caption.bold())
+                                                .foregroundStyle(MauTheme.muted)
+                                        }
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(service.title)
+                                                .font(.subheadline.weight(.semibold))
+                                                .foregroundStyle(MauTheme.ink)
+                                                .multilineTextAlignment(.leading)
+                                                .lineLimit(2)
+                                            Text(service.subtitle)
+                                                .font(.caption2)
+                                                .foregroundStyle(MauTheme.muted)
+                                                .lineLimit(1)
+                                        }
+                                        .frame(maxWidth: .infinity, minHeight: 42, alignment: .topLeading)
+                                    }
+                                    .padding(16)
+                                    .frame(maxWidth: .infinity, minHeight: 135, alignment: .topLeading)
                                 }
-                                .padding(17)
-                                .frame(maxWidth: .infinity, minHeight: 132, alignment: .topLeading)
+                                .buttonStyle(.plain)
+                                .mauSurface(radius: 23)
                             }
-                            .buttonStyle(.plain)
-                            .mauGlass(radius: 23)
                         }
                     }
                 }

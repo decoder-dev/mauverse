@@ -23,7 +23,7 @@ final class OfficialNewsService {
         }
         var request = URLRequest(url: url)
         request.timeoutInterval = 30
-        request.setValue("MAUverse/1.8.7 (iOS)", forHTTPHeaderField: "User-Agent")
+        request.setValue("MAUverse/1.9.0 (iOS)", forHTTPHeaderField: "User-Agent")
         request.setValue("application/rss+xml, application/xml, text/xml", forHTTPHeaderField: "Accept")
 
         let (data, response) = try await URLSession.shared.data(for: request)

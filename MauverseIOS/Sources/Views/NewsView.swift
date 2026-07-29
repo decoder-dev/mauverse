@@ -27,7 +27,13 @@ struct NewsView: View {
             MauBackground()
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
-                    Text("Новости").font(.system(size: 34, weight: .bold, design: .rounded))
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Новости")
+                            .font(.system(size: 36, weight: .bold, design: .rounded))
+                        Text("Главное в жизни университета")
+                            .font(.subheadline)
+                            .foregroundStyle(MauTheme.muted)
+                    }
 
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 9) {
@@ -48,14 +54,22 @@ struct NewsView: View {
                     }
 
                     if model.isLoading {
-                        LoadingOverlay(title: "Загружаем новости").frame(maxWidth: .infinity)
+                        VStack(spacing: 16) {
+                            SkeletonCard()
+                            SkeletonCard()
+                        }
                     } else if let error = model.error {
                         EmptyState(icon: "wifi.exclamationmark", title: "Новости недоступны", message: error)
                     } else if model.items.isEmpty {
                         EmptyState(icon: "newspaper", title: "Новостей пока нет", message: "Попробуйте выбрать другую категорию")
                     } else {
-                        LazyVStack(spacing: 16) {
-                            ForEach(model.items) { NewsCard(item: $0) }
+                        LazyVStack(spacing: 14) {
+                            if let first = model.items.first {
+                                HeroNewsCard(item: first, category: model.filter.title)
+                            }
+                            ForEach(Array(model.items.dropFirst())) {
+                                NewsCard(item: $0, category: model.filter.title)
+                            }
                         }
                     }
                 }
@@ -71,6 +85,7 @@ struct NewsView: View {
 
 private struct NewsCard: View {
     let item: NewsItem
+    let category: String
 
     @ViewBuilder
     var body: some View {
@@ -86,39 +101,111 @@ private struct NewsCard: View {
     }
 
     private var content: some View {
-            VStack(alignment: .leading, spacing: 0) {
-                if let source = item.image, let url = URL(string: source) {
-                    AsyncImage(url: url) { phase in
-                        if case .success(let image) = phase {
-                            image.resizable().scaledToFill()
-                        } else {
-                            LinearGradient(colors: [MauTheme.lavender, .white], startPoint: .topLeading, endPoint: .bottomTrailing)
-                                .overlay(Image(systemName: "photo").font(.largeTitle).foregroundStyle(MauTheme.blue))
-                        }
-                    }
-                    .frame(height: 180)
-                    .clipped()
-                }
-                VStack(alignment: .leading, spacing: 9) {
-                    if let date = item.publish {
-                        Text(date).font(.caption).foregroundStyle(MauTheme.blue)
-                    }
-                    Text(item.title ?? "Новость")
-                        .font(.headline)
-                        .multilineTextAlignment(.leading)
-                        .foregroundStyle(MauTheme.ink)
-                    if let description = item.description {
-                        Text(description.strippingHTML)
-                            .font(.subheadline)
-                            .foregroundStyle(MauTheme.muted)
-                            .lineLimit(3)
-                            .multilineTextAlignment(.leading)
+        HStack(spacing: 0) {
+            if let source = item.image, let url = URL(string: source) {
+                AsyncImage(url: url) { phase in
+                    if case .success(let image) = phase {
+                        image.resizable().scaledToFill()
+                    } else {
+                        MauTheme.heroGradient
+                            .overlay(Image(systemName: "photo").foregroundStyle(.white.opacity(0.7)))
                     }
                 }
-                .padding(18)
+                .frame(width: 120, height: 138)
+                .clipped()
             }
-            .background(MauTheme.card.opacity(0.72))
-            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+            VStack(alignment: .leading, spacing: 7) {
+                Text(category.uppercased())
+                    .font(.system(size: 9, weight: .bold))
+                    .tracking(0.7)
+                    .foregroundStyle(MauTheme.blue)
+                Text(item.title ?? "Новость")
+                    .font(.subheadline.bold())
+                    .multilineTextAlignment(.leading)
+                    .foregroundStyle(MauTheme.ink)
+                    .lineLimit(4)
+                Spacer(minLength: 0)
+                if let date = item.publish {
+                    Text(date)
+                        .font(.caption2)
+                        .foregroundStyle(MauTheme.muted)
+                }
+            }
+            .frame(maxWidth: .infinity, minHeight: 106, alignment: .topLeading)
+            .padding(16)
+        }
+        .background(MauTheme.card.opacity(0.74))
+        .clipShape(RoundedRectangle(cornerRadius: MauRadius.card, style: .continuous))
+    }
+}
+
+private struct HeroNewsCard: View {
+    let item: NewsItem
+    let category: String
+
+    @ViewBuilder
+    var body: some View {
+        if let value = item.link, let url = URL(string: value) {
+            NavigationLink(destination: InAppBrowserView(url: url, title: item.title ?? "Новости МАУ")) {
+                content
+            }
+            .buttonStyle(.plain)
+        } else {
+            content
+        }
+    }
+
+    private var content: some View {
+        ZStack(alignment: .bottomLeading) {
+            if let source = item.image, let url = URL(string: source) {
+                AsyncImage(url: url) { phase in
+                    if case .success(let image) = phase {
+                        image.resizable().scaledToFill()
+                    } else {
+                        MauTheme.heroGradient
+                    }
+                }
+            } else {
+                MauTheme.heroGradient
+            }
+
+            LinearGradient(
+                colors: [.clear, .black.opacity(0.2), .black.opacity(0.92)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+
+            VStack(alignment: .leading, spacing: 9) {
+                HStack {
+                    Text(category.uppercased())
+                        .font(.caption2.bold())
+                        .tracking(0.8)
+                        .foregroundStyle(MauTheme.cyan)
+                    Spacer()
+                    if let date = item.publish {
+                        Text(date)
+                            .font(.caption2)
+                            .foregroundStyle(.white.opacity(0.7))
+                    }
+                }
+                Text(item.title ?? "Новости университета")
+                    .font(.system(size: 23, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(4)
+                if let description = item.description {
+                    Text(description.strippingHTML)
+                        .font(.subheadline)
+                        .foregroundStyle(.white.opacity(0.75))
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                }
+            }
+            .padding(20)
+        }
+        .frame(height: 330)
+        .clipShape(RoundedRectangle(cornerRadius: MauRadius.hero, style: .continuous))
+        .shadow(color: .black.opacity(0.12), radius: 18, y: 10)
     }
 }
 
