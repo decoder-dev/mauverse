@@ -5,40 +5,61 @@ final class HomeViewModel: ObservableObject {
     @Published var nextLesson: ScheduleItem?
     @Published var featuredNews: NewsItem?
     @Published var isLoading = false
+    @Published var lessonError: String?
+    @Published var newsError: String?
+    private var activeRequest = UUID()
 
     func load(user: UserDTO?) async {
+        let request = UUID()
+        activeRequest = request
         isLoading = true
-        defer { isLoading = false }
+        lessonError = nil
+        newsError = nil
+        defer {
+            if activeRequest == request { isLoading = false }
+        }
 
-        async let newsTask = try? OfficialNewsService.shared.load(filter: .all)
+        let newsTask = Task { try await OfficialNewsService.shared.load(filter: .all) }
         if let user {
-            var uid = user.scheduleGroupUID
-            if uid?.isEmpty != false, let name = user.groupName, !name.isEmpty {
-                uid = try? await ScheduleAPIClient.shared.findGroup(named: name)?.uid
-            }
-            if let uid {
-                let formatter = DateFormatter()
-                formatter.locale = Locale(identifier: "en_US_POSIX")
-                formatter.dateFormat = "yyyy-MM-dd"
-                let start = Date()
-                let end = Calendar.current.date(byAdding: .day, value: 14, to: start) ?? start
-                if let lessons = try? await ScheduleAPIClient.shared.schedule(
+            do {
+                var uid = user.scheduleGroupUID
+                if uid?.isEmpty != false, let name = user.groupName, !name.isEmpty {
+                    uid = try await ScheduleAPIClient.shared.findGroup(named: name)?.uid
+                }
+                if let uid, !uid.isEmpty {
+                    let formatter = DateFormatter()
+                    formatter.locale = Locale(identifier: "en_US_POSIX")
+                    formatter.dateFormat = "yyyy-MM-dd"
+                    let start = Date()
+                    let end = Calendar.current.date(byAdding: .day, value: 14, to: start) ?? start
+                    let lessons = try await ScheduleAPIClient.shared.schedule(
                     uid: uid,
                     start: formatter.string(from: start),
                     end: formatter.string(from: end)
-                ) {
+                    )
+                    guard activeRequest == request else { return }
                     nextLesson = lessons
                         .filter { Self.lessonDate($0) >= Date().addingTimeInterval(-60 * 15) }
                         .sorted(by: Self.isEarlier)
                         .first
                 }
+            } catch {
+                guard activeRequest == request else { return }
+                lessonError = error.localizedDescription
             }
         }
-        featuredNews = await newsTask?.first
+        do {
+            let loadedNews = try await newsTask.value.first
+            guard activeRequest == request else { return }
+            featuredNews = loadedNews
+        } catch {
+            guard activeRequest == request else { return }
+            newsError = error.localizedDescription
+        }
     }
 
     private static func isEarlier(_ lhs: ScheduleItem, _ rhs: ScheduleItem) -> Bool {
-        "\(lhs.date ?? "") \(lhs.startTime ?? "")" < "\(rhs.date ?? "") \(rhs.startTime ?? "")"
+        lessonDate(lhs) < lessonDate(rhs)
     }
 
     private static func lessonDate(_ item: ScheduleItem) -> Date {
@@ -70,6 +91,12 @@ struct HomeView: View {
                         missingGroupCard
                     } else if model.isLoading {
                         lessonSkeleton
+                    } else if let error = model.lessonError {
+                        HomeDataErrorCard(
+                            title: "Расписание недоступно",
+                            message: error,
+                            icon: "calendar.badge.exclamationmark"
+                        )
                     } else {
                         NextLessonCard(item: model.nextLesson, group: session.user?.groupName)
                     }
@@ -94,6 +121,12 @@ struct HomeView: View {
                             }
                         }
                         FeaturedNewsCard(item: news)
+                    } else if let error = model.newsError {
+                        HomeDataErrorCard(
+                            title: "Новости не обновились",
+                            message: error,
+                            icon: "newspaper"
+                        )
                     }
                 }
                 .padding(.horizontal, 20)
@@ -192,6 +225,28 @@ struct HomeView: View {
         case 12..<18: "Добрый день,"
         default: "Добрый вечер,"
         }
+    }
+}
+
+private struct HomeDataErrorCard: View {
+    let title: String
+    let message: String
+    let icon: String
+
+    var body: some View {
+        HStack(spacing: 14) {
+            IconTile(systemName: icon, color: .orange)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title).font(.headline)
+                Text(message)
+                    .font(.caption)
+                    .foregroundStyle(MauTheme.muted)
+                    .lineLimit(2)
+            }
+            Spacer()
+        }
+        .padding(17)
+        .mauSurface(radius: 22)
     }
 }
 

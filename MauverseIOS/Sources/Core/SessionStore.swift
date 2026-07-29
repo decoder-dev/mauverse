@@ -39,7 +39,8 @@ final class SessionStore: ObservableObject {
     }
 
     func signIn(username: String, password: String) async {
-        guard !username.isEmpty, !password.isEmpty else {
+        let normalizedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !normalizedUsername.isEmpty, !password.isEmpty else {
             errorMessage = "Введите логин и пароль"
             return
         }
@@ -47,12 +48,20 @@ final class SessionStore: ObservableObject {
         errorMessage = nil
         defer { isBusy = false }
         do {
-            let authenticated: UserDTO = try await APIClient.shared.post(
+            var authenticated: UserDTO = try await APIClient.shared.post(
                 "auth",
-                body: LoginRequest(username: username, password: password)
+                body: LoginRequest(username: normalizedUsername, password: password)
             )
-            if let error = authenticated.error ?? authenticated.detail {
-                throw APIError.server(error)
+            guard authenticated.token?.isEmpty == false else {
+                throw APIError.server(
+                    authenticated.detail
+                    ?? authenticated.error
+                    ?? "Сервер не вернул токен авторизации"
+                )
+            }
+            authenticated.username = authenticated.username ?? normalizedUsername
+            if authenticated.scheduleGroupUID?.isEmpty != false {
+                authenticated.scheduleGroupUID = authenticated.groupId
             }
             user = authenticated
             persist()

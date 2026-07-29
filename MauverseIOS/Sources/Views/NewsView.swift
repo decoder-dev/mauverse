@@ -84,7 +84,11 @@ struct NewsView: View {
                             SkeletonCard()
                         }
                     } else if let error = model.error {
-                        EmptyState(icon: "wifi.exclamationmark", title: "Новости недоступны", message: error)
+                        VStack(spacing: 12) {
+                            EmptyState(icon: "wifi.exclamationmark", title: "Новости недоступны", message: error)
+                            Button("Повторить") { Task { await model.load() } }
+                                .buttonStyle(.borderedProminent)
+                        }
                     } else if model.items.isEmpty {
                         EmptyState(icon: "newspaper", title: "Новостей пока нет", message: "Попробуйте выбрать другую категорию")
                     } else {

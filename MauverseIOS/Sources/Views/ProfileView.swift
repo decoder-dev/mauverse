@@ -1,4 +1,5 @@
 import SwiftUI
+import WebKit
 
 struct ProfileView: View {
     @EnvironmentObject private var session: SessionStore
@@ -72,7 +73,7 @@ struct ProfileView: View {
                     .buttonStyle(.plain)
                     .mauSurface()
 
-                    Text("MAUverse 1.9.2 (26)")
+                    Text("MAUverse 1.10.0 (27)")
                         .font(.caption)
                         .foregroundStyle(MauTheme.muted)
                 }
@@ -191,7 +192,7 @@ private struct ProfileEditor: View {
                 }
                 session.update {
                     $0.groupName = resolved?.group ?? normalized
-                    $0.groupId = resolved?.groupId
+                    $0.groupId = resolved.map { String($0.groupId) }
                     $0.scheduleGroupUID = resolved?.uid
                     $0.speciality = resolved?.speciality ?? $0.speciality
                     $0.creditBook = creditBook.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -235,8 +236,7 @@ private struct SettingsView: View {
                         Text("Изображения новостей и веб-страниц очищаются системой автоматически.")
                             .font(.subheadline).foregroundStyle(MauTheme.muted)
                         Button(cleared ? "Готово" : "Очистить временные данные") {
-                            URLCache.shared.removeAllCachedResponses()
-                            cleared = true
+                            clearCaches()
                         }
                         .buttonStyle(.borderedProminent)
                     }
@@ -268,15 +268,34 @@ private struct SettingsView: View {
                                 .foregroundStyle(MauTheme.blue)
                             }
                         }
-                        Text("Версия 1.9.2 • сборка 26").font(.caption)
+                        Text("Версия 1.10.0 • сборка 27").font(.caption)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(20)
                     .mauSurface()
                 }
                 .padding(20)
+                .padding(.bottom, 30)
             }
         }
         .navigationTitle("Настройки")
+        .toolbar(.hidden, for: .tabBar)
+    }
+
+    private func clearCaches() {
+        URLCache.shared.removeAllCachedResponses()
+        let dataStore = WKWebsiteDataStore.default()
+        dataStore.fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+            dataStore.removeData(
+                ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
+                for: records
+            ) {
+                Task { @MainActor in cleared = true }
+            }
+        }
+        Task {
+            await OfficialNewsService.shared.clearCache()
+            await ScheduleAPIClient.shared.clearCache()
+        }
     }
 }

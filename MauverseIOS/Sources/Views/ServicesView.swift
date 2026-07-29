@@ -168,9 +168,54 @@ private struct WebServiceView: View {
 
 private struct FormsView: View {
     private let forms = [
-        ("Справка об обучении", "doc.badge.plus"),
-        ("Выписка об успеваемости", "list.clipboard.fill"),
-        ("Обращение в деканат", "envelope.fill")
+        OnlineFormLink(
+            title: "Справка об обучении",
+            subtitle: "Отправить заявку внутри приложения",
+            icon: "doc.badge.plus",
+            url: nil
+        ),
+        OnlineFormLink(
+            title: "Справка для перевода",
+            subtitle: "Перечень дисциплин и оценок",
+            icon: "doc.text.fill",
+            url: "https://mauniver.ru/services/student/perevod/"
+        ),
+        OnlineFormLink(
+            title: "Справка о стипендии",
+            subtitle: "Выплаты за выбранный период",
+            icon: "banknote.fill",
+            url: "https://mauniver.ru/services/student/spravka/"
+        ),
+        OnlineFormLink(
+            title: "Архивная справка",
+            subtitle: "Для выпускников и бывших студентов",
+            icon: "archivebox.fill",
+            url: "https://mauniver.ru/services/student/archive/"
+        ),
+        OnlineFormLink(
+            title: "Справка-вызов",
+            subtitle: "Для предоставления работодателю",
+            icon: "briefcase.fill",
+            url: "https://mauniver.ru/services/student/vyzov/"
+        ),
+        OnlineFormLink(
+            title: "Справка для налоговой",
+            subtitle: "Для социального налогового вычета",
+            icon: "checkmark.seal.fill",
+            url: "https://mauniver.ru/services/student/nalog/"
+        ),
+        OnlineFormLink(
+            title: "Дубликат диплома",
+            subtitle: "Заявление на повторную выдачу",
+            icon: "doc.on.doc.fill",
+            url: "https://mauniver.ru/services/student/diplom/"
+        ),
+        OnlineFormLink(
+            title: "Счёт за обучение",
+            subtitle: "Платные образовательные услуги",
+            icon: "creditcard.fill",
+            url: "https://mauniver.ru/services/student/application/"
+        )
     ]
 
     var body: some View {
@@ -178,17 +223,26 @@ private struct FormsView: View {
             MauBackground()
             ScrollView {
                 VStack(spacing: 13) {
-                    ForEach(forms, id: \.0) { form in
-                        HStack(spacing: 14) {
-                            IconTile(systemName: form.1)
-                            Text(form.0).font(.headline)
-                            Spacer()
-                            Image(systemName: "chevron.right").foregroundStyle(MauTheme.muted)
+                    ForEach(forms) { form in
+                        NavigationLink(destination: destination(for: form)) {
+                            HStack(spacing: 14) {
+                                IconTile(systemName: form.icon)
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text(form.title).font(.headline)
+                                    Text(form.subtitle)
+                                        .font(.caption)
+                                        .foregroundStyle(MauTheme.muted)
+                                }
+                                Spacer()
+                                Image(systemName: "chevron.right").foregroundStyle(MauTheme.muted)
+                            }
+                            .foregroundStyle(MauTheme.ink)
+                            .padding(17)
                         }
-                        .padding(17)
+                        .buttonStyle(.plain)
                         .mauGlass(radius: 22)
                     }
-                    Text("Отправка формы откроется после выбора типа документа в ЭИОС.")
+                    Text("Все страницы открываются во внутреннем браузере MAUverse.")
                         .font(.footnote)
                         .foregroundStyle(MauTheme.muted)
                         .padding()
@@ -198,6 +252,232 @@ private struct FormsView: View {
         }
         .navigationTitle("Онлайн-формы")
         .navigationBarTitleDisplayMode(.large)
+        .toolbar(.hidden, for: .tabBar)
+    }
+
+    @ViewBuilder
+    private func destination(for form: OnlineFormLink) -> some View {
+        if let value = form.url, let url = URL(string: value) {
+            InAppBrowserView(url: url, title: form.title)
+        } else {
+            CertificateRequestView()
+        }
+    }
+}
+
+private struct OnlineFormLink: Identifiable {
+    let title: String
+    let subtitle: String
+    let icon: String
+    let url: String?
+    var id: String { title }
+}
+
+private struct CertificateRequestView: View {
+    @EnvironmentObject private var session: SessionStore
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var fullName = ""
+    @State private var email = ""
+    @State private var phone = ""
+    @State private var birthDate = Date(timeIntervalSince1970: 946_684_800)
+    @State private var institute = ""
+    @State private var studyForm = ""
+    @State private var funding = ""
+    @State private var certificateType = ""
+    @State private var copies = 1
+    @State private var delivery = ""
+    @State private var postalAddress = ""
+    @State private var universityEmail = ""
+    @State private var comment = ""
+    @State private var consent = false
+    @State private var isSending = false
+    @State private var errorMessage: String?
+    @State private var sent = false
+
+    private let institutes = [
+        "Морская академия",
+        "Институт прикладных арктических технологий",
+        "Естественно-технологический институт",
+        "Институт педагогики и психологии",
+        "Институт креативных индустрий и предпринимательства",
+        "Институт интеллектуальных систем и цифровых технологий",
+        "Институт гуманитарных и социальных наук",
+        "Медико-биологический институт",
+        "Юридический факультет",
+        "Факультет физической культуры и спорта"
+    ]
+    private let studyForms = ["Очная", "Заочная", "Очно-заочная"]
+    private let fundingSources = ["Бюджет", "Договор"]
+    private let certificateTypes = [
+        "Простая, с печатью Студенческого офиса",
+        "Гербовая, с гербовой печатью Университета",
+        "Электронная, с электронной подписью"
+    ]
+    private let deliveryMethods = [
+        "Лично: Спортивная, 13, кабинет 203В",
+        "Лично: Егорова, 16, кабинет 112",
+        "Почта России",
+        "Электронная почта в домене @mauniver.ru"
+    ]
+
+    private var isPostalDelivery: Bool { delivery == deliveryMethods[2] }
+    private var isEmailDelivery: Bool { delivery == deliveryMethods[3] }
+
+    var body: some View {
+        Form {
+            Section("Контактные данные") {
+                TextField("ФИО как в паспорте", text: $fullName)
+                    .textContentType(.name)
+                TextField("Контактный e-mail", text: $email)
+                    .keyboardType(.emailAddress)
+                    .textInputAutocapitalization(.never)
+                TextField("Телефон", text: $phone)
+                    .keyboardType(.phonePad)
+                DatePicker(
+                    "Дата рождения",
+                    selection: $birthDate,
+                    in: Date(timeIntervalSince1970: -1_262_304_000)...Date(),
+                    displayedComponents: .date
+                )
+            }
+
+            Section("Учебные данные") {
+                selectionPicker("Факультет или институт", selection: $institute, values: institutes)
+                selectionPicker("Форма обучения", selection: $studyForm, values: studyForms)
+                selectionPicker("Источник финансирования", selection: $funding, values: fundingSources)
+            }
+
+            Section("Документ") {
+                selectionPicker("Вид справки", selection: $certificateType, values: certificateTypes)
+                    .onChange(of: certificateType) { _, value in
+                        if value == certificateTypes[2] { delivery = deliveryMethods[3] }
+                    }
+                Stepper("Количество экземпляров: \(copies)", value: $copies, in: 1...5)
+                selectionPicker("Способ получения", selection: $delivery, values: deliveryMethods)
+                    .disabled(certificateType == certificateTypes[2])
+                if isPostalDelivery {
+                    TextField("Полный почтовый адрес", text: $postalAddress, axis: .vertical)
+                        .lineLimit(2...4)
+                }
+                if isEmailDelivery {
+                    TextField("Адрес @mauniver.ru", text: $universityEmail)
+                        .keyboardType(.emailAddress)
+                        .textInputAutocapitalization(.never)
+                }
+                TextField("Комментарий (необязательно)", text: $comment, axis: .vertical)
+                    .lineLimit(2...5)
+            }
+
+            Section {
+                Toggle("Согласие на обработку персональных данных", isOn: $consent)
+                if let errorMessage {
+                    Text(errorMessage).font(.footnote).foregroundStyle(.red)
+                }
+                Button {
+                    Task { await submit() }
+                } label: {
+                    HStack {
+                        Spacer()
+                        if isSending { ProgressView() }
+                        Text(isSending ? "Отправляем…" : "Отправить заявку")
+                            .fontWeight(.semibold)
+                        Spacer()
+                    }
+                }
+                .disabled(isSending)
+            }
+        }
+        .navigationTitle("Заказ справки")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
+        .onAppear {
+            if fullName.isEmpty { fullName = session.user?.displayName ?? "" }
+        }
+        .alert("Заявка отправлена", isPresented: $sent) {
+            Button("Готово") { dismiss() }
+        } message: {
+            Text("Студенческий офис получил вашу заявку.")
+        }
+    }
+
+    private func selectionPicker(
+        _ title: String,
+        selection: Binding<String>,
+        values: [String]
+    ) -> some View {
+        Picker(title, selection: selection) {
+            Text("Не выбрано").tag("")
+            ForEach(values, id: \.self) { Text($0).tag($0) }
+        }
+    }
+
+    @MainActor
+    private func submit() async {
+        errorMessage = validate()
+        guard errorMessage == nil else { return }
+        isSending = true
+        defer { isSending = false }
+
+        var fields = [
+            StudentFormField(title: "ФИО (как в паспорте)", value: fullName.trimmed),
+            StudentFormField(title: "E-mail", value: email.trimmed),
+            StudentFormField(title: "Телефон", value: phone.trimmed),
+            StudentFormField(
+                title: "Дата рождения",
+                value: birthDate.formatted(.dateTime.locale(Locale(identifier: "ru_RU")).day().month().year())
+            ),
+            StudentFormField(title: "Факультет / институт", value: institute),
+            StudentFormField(title: "Форма обучения", value: studyForm),
+            StudentFormField(title: "Источник финансирования", value: funding),
+            StudentFormField(title: "Вид справки", value: certificateType),
+            StudentFormField(title: "Количество справок", value: String(copies)),
+            StudentFormField(title: "Способ получения документа", value: delivery)
+        ]
+        if isPostalDelivery {
+            fields.append(StudentFormField(title: "Почтовый адрес", value: postalAddress.trimmed))
+        }
+        if isEmailDelivery {
+            fields.append(StudentFormField(
+                title: "Электронный адрес в домене @mauniver.ru",
+                value: universityEmail.trimmed
+            ))
+        }
+        if !comment.trimmed.isEmpty {
+            fields.append(StudentFormField(title: "Комментарий", value: comment.trimmed))
+        }
+
+        do {
+            let response: SuccessResponse = try await APIClient.shared.post(
+                "send_order",
+                body: StudentFormRequest(sender: email.trimmed, username: fullName.trimmed, text: fields),
+                user: session.user
+            )
+            guard response.success == true else {
+                throw APIError.server(response.detail ?? response.error ?? "Сервер не подтвердил отправку")
+            }
+            sent = true
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    private func validate() -> String? {
+        if fullName.trimmed.split(separator: " ").count < 2 { return "Укажите полное ФИО" }
+        if !email.trimmed.isEmail { return "Проверьте контактный e-mail" }
+        if !(10...15).contains(phone.filter(\.isNumber).count) { return "Проверьте номер телефона" }
+        if institute.isEmpty { return "Выберите факультет или институт" }
+        if studyForm.isEmpty { return "Выберите форму обучения" }
+        if funding.isEmpty { return "Выберите источник финансирования" }
+        if certificateType.isEmpty { return "Выберите вид справки" }
+        if delivery.isEmpty { return "Выберите способ получения" }
+        if isPostalDelivery && postalAddress.trimmed.isEmpty { return "Укажите почтовый адрес" }
+        if isEmailDelivery && !universityEmail.trimmed.lowercased().hasSuffix("@mauniver.ru") {
+            return "Укажите корректный адрес @mauniver.ru"
+        }
+        if comment.count > 2_000 { return "Комментарий не должен превышать 2000 символов" }
+        if !consent { return "Подтвердите согласие на обработку данных" }
+        return nil
     }
 }
 
@@ -240,6 +520,7 @@ private struct CampusView: View {
             .scrollContentBackground(.hidden)
         }
         .navigationTitle("Корпуса")
+        .toolbar(.hidden, for: .tabBar)
     }
 }
 
@@ -280,19 +561,41 @@ private final class DebtsModel: ObservableObject {
     @Published var error: String?
 
     func load(user: UserDTO?) async {
-        guard let user, let creditBook = user.creditBook, !creditBook.isEmpty else {
+        guard let user,
+              let creditBook = user.creditBook?.trimmed,
+              !creditBook.isEmpty else {
             error = "Укажите номер зачётной книжки в профиле"
+            semesters = []
             return
         }
         isLoading = true
         error = nil
         defer { isLoading = false }
         do {
-            semesters = try await APIClient.shared.post(
+            let response: SemesterResponse = try await APIClient.shared.post(
                 "get_semesters",
                 body: DebtRequest(creditBook: creditBook),
-                user: user
+                user: user,
+                retryOnTransient: true
             )
+            if let message = response.error ?? response.detail {
+                throw APIError.server(message)
+            }
+            var loaded = response.semesters ?? []
+            for index in loaded.indices {
+                guard let number = loaded[index].semesterNumber else { continue }
+                let debts: DebtResponse = try await APIClient.shared.post(
+                    "get_debts",
+                    body: DebtRequest(creditBook: creditBook, semesterNumber: number),
+                    user: user,
+                    retryOnTransient: true
+                )
+                if let message = debts.error ?? debts.detail {
+                    throw APIError.server(message)
+                }
+                loaded[index].debts = debts.debts ?? []
+            }
+            semesters = loaded
         } catch { self.error = error.localizedDescription }
     }
 }
@@ -309,7 +612,11 @@ private struct DebtsView: View {
                     if model.isLoading {
                         LoadingOverlay(title: "Проверяем задолженности")
                     } else if let error = model.error {
-                        EmptyState(icon: "exclamationmark.circle", title: "Нет данных", message: error)
+                        VStack(spacing: 12) {
+                            EmptyState(icon: "exclamationmark.circle", title: "Нет данных", message: error)
+                            Button("Повторить") { Task { await model.load(user: session.user) } }
+                                .buttonStyle(.borderedProminent)
+                        }
                     } else if model.semesters.isEmpty {
                         EmptyState(icon: "checkmark.seal.fill", title: "Задолженностей нет", message: "Данные по указанной зачётной книжке не найдены")
                     } else {
@@ -337,9 +644,12 @@ private struct DebtsView: View {
                     }
                 }
                 .padding(20)
+                .padding(.bottom, 30)
             }
+            .refreshable { await model.load(user: session.user) }
         }
         .navigationTitle("Задолженности")
+        .toolbar(.hidden, for: .tabBar)
         .task { await model.load(user: session.user) }
     }
 }
@@ -349,14 +659,24 @@ private final class TeachersModel: ObservableObject {
     @Published var teachers: [Teacher] = []
     @Published var isLoading = false
     @Published var error: String?
+    private var activeRequest = UUID()
 
     func search(_ text: String, user: UserDTO?) async {
-        guard !text.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+        let request = UUID()
+        activeRequest = request
+        let query = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard query.count >= 2 else {
+            teachers = []
+            error = "Введите минимум две буквы фамилии"
+            return
+        }
         isLoading = true
         error = nil
-        defer { isLoading = false }
+        defer {
+            if activeRequest == request { isLoading = false }
+        }
         do {
-            teachers = try await ScheduleAPIClient.shared.teachers(matching: text).map {
+            let loaded = try await ScheduleAPIClient.shared.teachers(matching: query).map {
                 Teacher(
                     id: $0.teacherId,
                     teacherId: $0.teacherId,
@@ -368,7 +688,12 @@ private final class TeachersModel: ObservableObject {
                     extras: $0.uid
                 )
             }
-        } catch { self.error = error.localizedDescription }
+            guard activeRequest == request else { return }
+            teachers = loaded
+        } catch {
+            guard activeRequest == request else { return }
+            self.error = error.localizedDescription
+        }
     }
 }
 
@@ -384,15 +709,27 @@ private struct TeacherContactsView: View {
                 HStack {
                     TextField("Фамилия преподавателя", text: $query)
                         .textInputAutocapitalization(.words)
+                        .submitLabel(.search)
+                        .onSubmit { Task { await model.search(query, user: session.user) } }
                     Button { Task { await model.search(query, user: session.user) } } label: {
                         Image(systemName: "magnifyingglass").font(.headline)
                     }
+                    .disabled(model.isLoading)
                 }
                 .padding(16)
                 .mauGlass(radius: 20)
 
                 if model.isLoading { LoadingOverlay(title: "Ищем") }
                 else if let error = model.error { EmptyState(icon: "wifi.exclamationmark", title: "Ошибка", message: error) }
+                else if query.isEmpty {
+                    EmptyState(
+                        icon: "person.text.rectangle",
+                        title: "Найдите преподавателя",
+                        message: "Введите фамилию или часть имени"
+                    )
+                } else if model.teachers.isEmpty {
+                    EmptyState(icon: "person.slash", title: "Ничего не найдено", message: "Уточните запрос")
+                }
                 else {
                     ScrollView {
                         LazyVStack(spacing: 12) {
@@ -406,11 +743,13 @@ private struct TeacherContactsView: View {
                             }
                         }
                     }
+                    .scrollDismissesKeyboard(.interactively)
                 }
             }
             .padding(20)
         }
         .navigationTitle("Преподаватели")
+        .toolbar(.hidden, for: .tabBar)
     }
 }
 
@@ -418,21 +757,44 @@ private struct TeacherContactsView: View {
 private final class DepartmentsModel: ObservableObject {
     @Published var departments: [Department] = []
     @Published var contacts: [Telephone] = []
+    @Published var isLoading = false
+    @Published var isLoadingContacts = false
     @Published var error: String?
+    private var activeContactsRequest = UUID()
 
     func load(user: UserDTO?) async {
-        do { departments = try await APIClient.shared.get("get_depts_json", user: user) }
+        isLoading = true
+        error = nil
+        defer { isLoading = false }
+        do {
+            let loaded: [Department] = try await APIClient.shared.get("get_depts_json", user: user)
+            departments = loaded.filter { $0.id != nil && $0.name?.trimmed.isEmpty == false }
+        }
         catch { self.error = error.localizedDescription }
     }
 
     func contacts(for department: Department, user: UserDTO?) async {
+        let request = UUID()
+        activeContactsRequest = request
+        contacts = []
+        error = nil
+        isLoadingContacts = true
+        defer {
+            if activeContactsRequest == request { isLoadingContacts = false }
+        }
         do {
-            contacts = try await APIClient.shared.post(
+            let loaded: [Telephone] = try await APIClient.shared.post(
                 "get_contacts_json",
                 body: DepartmentRequest(departmentId: department.id ?? 0, name: department.name ?? ""),
-                user: user
+                user: user,
+                retryOnTransient: true
             )
-        } catch { self.error = error.localizedDescription }
+            guard activeContactsRequest == request else { return }
+            contacts = loaded
+        } catch {
+            guard activeContactsRequest == request else { return }
+            self.error = error.localizedDescription
+        }
     }
 }
 
@@ -444,34 +806,67 @@ private struct DepartmentsView: View {
     var body: some View {
         ZStack {
             MauBackground()
-            List(model.departments) { department in
-                Button {
-                    selected = department
-                    Task { await model.contacts(for: department, user: session.user) }
-                } label: {
-                    HStack {
-                        Text(department.name ?? "Подразделение").foregroundStyle(MauTheme.ink)
-                        Spacer()
-                        Image(systemName: "chevron.right").foregroundStyle(MauTheme.muted)
+            if model.isLoading && model.departments.isEmpty {
+                LoadingOverlay(title: "Загружаем подразделения")
+            } else if let error = model.error, model.departments.isEmpty {
+                VStack(spacing: 12) {
+                    EmptyState(icon: "wifi.exclamationmark", title: "Ошибка загрузки", message: error)
+                    Button("Повторить") { Task { await model.load(user: session.user) } }
+                        .buttonStyle(.borderedProminent)
+                }
+                .padding(20)
+            } else if model.departments.isEmpty {
+                EmptyState(
+                    icon: "building.2",
+                    title: "Подразделения не найдены",
+                    message: "Справочник МАУ пока пуст"
+                )
+                .padding(20)
+            } else {
+                List(model.departments) { department in
+                    Button {
+                        selected = department
+                        Task { await model.contacts(for: department, user: session.user) }
+                    } label: {
+                        HStack {
+                            Text(department.name ?? "Подразделение").foregroundStyle(MauTheme.ink)
+                            Spacer()
+                            Image(systemName: "chevron.right").foregroundStyle(MauTheme.muted)
+                        }
                     }
                 }
+                .refreshable { await model.load(user: session.user) }
+                .scrollContentBackground(.hidden)
             }
-            .scrollContentBackground(.hidden)
         }
         .navigationTitle("Подразделения")
+        .toolbar(.hidden, for: .tabBar)
         .task { await model.load(user: session.user) }
         .sheet(item: $selected) { department in
             NavigationStack {
                 ScrollView {
                     LazyVStack(spacing: 12) {
-                        if let error = model.error {
+                        if model.isLoadingContacts {
+                            LoadingOverlay(title: "Загружаем контакты")
+                        } else if let error = model.error {
                             EmptyState(icon: "wifi.exclamationmark", title: "Ошибка", message: error)
+                            Button("Повторить") {
+                                Task { await model.contacts(for: department, user: session.user) }
+                            }
+                            .buttonStyle(.borderedProminent)
+                        } else if model.contacts.isEmpty {
+                            EmptyState(
+                                icon: "phone.down",
+                                title: "Контакты не найдены",
+                                message: "У подразделения пока нет опубликованных контактов"
+                            )
                         }
                         ForEach(model.contacts) { contact in
                             ContactCard(
                                 title: contact.person ?? contact.title ?? "Контакт",
                                 subtitle: [contact.building2, contact.room].compactMap { $0 }.joined(separator: ", "),
                                 phone: contact.phone,
+                                phone2: contact.phone2,
                                 email: contact.depEmail
                             )
                         }
@@ -490,6 +885,7 @@ private struct ContactCard: View {
     let title: String
     let subtitle: String?
     let phone: String?
+    var phone2: String? = nil
     let email: String?
 
     var body: some View {
@@ -499,12 +895,17 @@ private struct ContactCard: View {
                 Text(subtitle).font(.caption).foregroundStyle(MauTheme.muted)
             }
             HStack {
-                if let phone, !phone.isEmpty {
-                    Link(destination: URL(string: "tel:\(phone.filter { $0.isNumber || $0 == "+" })")!) {
+                if let phone, let destination = phoneURL(phone) {
+                    Link(destination: destination) {
                         Label(phone, systemImage: "phone.fill")
                     }
                 }
-                if let email, let url = URL(string: "mailto:\(email)") {
+                if let phone2, let destination = phoneURL(phone2) {
+                    Link(destination: destination) {
+                        Label(phone2, systemImage: "phone.fill")
+                    }
+                }
+                if let email, let url = URL(string: "mailto:\(email.trimmed)") {
                     Link(destination: url) { Image(systemName: "envelope.fill") }
                 }
             }
@@ -514,5 +915,20 @@ private struct ContactCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(17)
         .mauGlass(radius: 22)
+    }
+
+    private func phoneURL(_ value: String) -> URL? {
+        let normalized = value.filter { $0.isNumber || $0 == "+" }
+        guard normalized.filter(\.isNumber).count >= 5 else { return nil }
+        return URL(string: "tel:\(normalized)")
+    }
+}
+
+private extension String {
+    var trimmed: String { trimmingCharacters(in: .whitespacesAndNewlines) }
+
+    var isEmail: Bool {
+        let parts = trimmed.split(separator: "@", omittingEmptySubsequences: false)
+        return parts.count == 2 && !parts[0].isEmpty && parts[1].contains(".")
     }
 }
