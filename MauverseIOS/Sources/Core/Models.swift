@@ -132,7 +132,7 @@ enum NewsFilter: Int, CaseIterable, Identifiable {
     case all = 0, departments, sport, students, science, international, events, other
     var id: Int { rawValue }
     var title: String {
-        switch self {
+        return switch self {
         case .all: "Все"
         case .departments: "Подразделения"
         case .sport: "Спорт"
@@ -144,4 +144,3 @@ enum NewsFilter: Int, CaseIterable, Identifiable {
         }
     }
 }
-

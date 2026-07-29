@@ -5,7 +5,7 @@ enum APIError: LocalizedError {
     case server(String)
 
     var errorDescription: String? {
-        switch self {
+        return switch self {
         case .invalidResponse: "Сервер вернул некорректный ответ"
         case .server(let message): message
         }
@@ -94,4 +94,3 @@ struct ScheduleRequest: Encodable {
     let groupId: Int?
     let subgroupId: Int?
 }
-

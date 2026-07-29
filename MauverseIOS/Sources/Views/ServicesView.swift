@@ -5,7 +5,7 @@ enum MauService: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 
     var title: String {
-        switch self {
+        return switch self {
         case .eios: "ЭИОС"
         case .forms: "Онлайн-формы"
         case .messenger: "Мессенджер ЭИОС"
@@ -18,7 +18,7 @@ enum MauService: String, CaseIterable, Identifiable {
     }
 
     var icon: String {
-        switch self {
+        return switch self {
         case .eios: "graduationcap.fill"
         case .forms: "doc.text.fill"
         case .messenger: "message.fill"
@@ -31,7 +31,7 @@ enum MauService: String, CaseIterable, Identifiable {
     }
 
     var color: Color {
-        switch self {
+        return switch self {
         case .eios, .teachers: MauTheme.blue
         case .forms, .departments: .purple
         case .messenger, .digital: .teal
@@ -460,4 +460,3 @@ private struct ContactCard: View {
         .mauGlass(radius: 22)
     }
 }
-
