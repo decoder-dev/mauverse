@@ -6,16 +6,25 @@ final class ScheduleViewModel: ObservableObject {
     @Published var selectedDate = Calendar.current.startOfDay(for: Date())
     @Published var isLoading = false
     @Published var error: String?
+    private var activeRequest = UUID()
 
     let dates: [Date] = (0..<14).compactMap {
         Calendar.current.date(byAdding: .day, value: $0, to: Calendar.current.startOfDay(for: Date()))
     }
 
     func load(user: UserDTO?) async -> ScheduleGroup? {
-        guard let user else { return nil }
+        let request = UUID()
+        activeRequest = request
+        guard let user else {
+            error = "Необходимо войти в аккаунт"
+            items = []
+            return nil
+        }
         isLoading = true
         error = nil
-        defer { isLoading = false }
+        defer {
+            if activeRequest == request { isLoading = false }
+        }
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyy-MM-dd"
@@ -29,13 +38,16 @@ final class ScheduleViewModel: ObservableObject {
             guard let uid, !uid.isEmpty else {
                 throw APIError.server("Выберите существующую учебную группу в профиле")
             }
-            items = try await ScheduleAPIClient.shared.schedule(
+            let loaded = try await ScheduleAPIClient.shared.schedule(
                 uid: uid,
                 start: formatter.string(from: dates.first ?? Date()),
                 end: formatter.string(from: dates.last ?? Date())
             )
+            guard activeRequest == request else { return nil }
+            items = loaded
             return resolvedGroup
         } catch {
+            guard activeRequest == request else { return nil }
             self.error = error.localizedDescription
             return nil
         }
@@ -88,6 +100,7 @@ struct ScheduleView: View {
                         }
                         .buttonStyle(.plain)
                         .mauGlass(radius: 16)
+                        .disabled(model.isLoading)
                     }
 
                     HStack(spacing: 12) {
@@ -125,7 +138,11 @@ struct ScheduleView: View {
                             }
                         }
                     } else if let error = model.error {
-                        EmptyState(icon: "wifi.exclamationmark", title: "Не удалось загрузить", message: error)
+                        VStack(spacing: 12) {
+                            EmptyState(icon: "wifi.exclamationmark", title: "Не удалось загрузить", message: error)
+                            Button("Повторить") { Task { await reload() } }
+                                .buttonStyle(.borderedProminent)
+                        }
                     } else if model.items(for: model.selectedDate).isEmpty {
                         EmptyState(icon: "cup.and.saucer.fill", title: "Занятий нет", message: "На выбранную дату расписание пустое")
                     } else {
@@ -149,7 +166,7 @@ struct ScheduleView: View {
         if let group = await model.load(user: session.user) {
             session.update {
                 $0.scheduleGroupUID = group.uid
-                $0.groupId = group.groupId
+                $0.groupId = String(group.groupId)
                 $0.groupName = group.group
                 $0.speciality = group.speciality
             }
