@@ -12,6 +12,10 @@ enum APIError: LocalizedError {
     }
 }
 
+extension Notification.Name {
+    static let mauverseSessionExpired = Notification.Name("mauverse.session.expired")
+}
+
 struct EmptyBody: Encodable {}
 
 final class APIClient {
@@ -65,6 +69,10 @@ final class APIClient {
     private func execute<Response: Decodable>(_ request: URLRequest) async throws -> Response {
         let (data, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse else { throw APIError.invalidResponse }
+        if http.statusCode == 401 || http.statusCode == 403 {
+            NotificationCenter.default.post(name: .mauverseSessionExpired, object: nil)
+            throw APIError.server("Сессия истекла. Войдите в аккаунт повторно")
+        }
         guard (200..<300).contains(http.statusCode) else {
             let detail = (try? decoder.decode(APIMessage.self, from: data))
             throw APIError.server(detail?.detail ?? detail?.error ?? "Ошибка сервера: \(http.statusCode)")
