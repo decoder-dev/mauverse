@@ -158,13 +158,29 @@ jobs:
           -p:MauverseScheduleToken="$MAUVERSE_SCHEDULE_TOKEN"
           -maxcpucount:1
 
+      - name: Package unsigned APK
+        env:
+          MAUVERSE_SCHEDULE_TOKEN: ${{ secrets.MAUVERSE_SCHEDULE_TOKEN }}
+        run: >-
+          dotnet build mau.csproj
+          --target:PackageForAndroid
+          --configuration Release
+          --framework net10.0-android
+          --runtime android-arm64
+          --no-restore
+          --warnaserror
+          -p:AndroidPackageFormats=apk
+          -p:ContinuousIntegrationBuild=true
+          -p:MauverseScheduleToken="$MAUVERSE_SCHEDULE_TOKEN"
+          -maxcpucount:1
+
       - name: Create unsigned artifact checksums
         shell: bash
         run: |
           mapfile -t artifacts < <(find bin/Release/net10.0-android \
-            -type f \( -name '*.aab' -o \( -name '*.apk' ! -name '*-Signed.apk' \) \) \
+            -type f \( -name '*.aab' -o -name '*.apk' \) ! -name '*-Signed.*' \
             -print | sort)
-          test "${#artifacts[@]}" -ge 2
+          test "${#artifacts[@]}" -eq 2
           sha256sum "${artifacts[@]}" > bin/Release/net10.0-android/checksums.txt
 
       - name: Upload unsigned CI artifact
@@ -175,6 +191,7 @@ jobs:
             mauverse_mobile/bin/Release/net10.0-android/**/*.apk
             !mauverse_mobile/bin/Release/net10.0-android/**/*-Signed.apk
             mauverse_mobile/bin/Release/net10.0-android/**/*.aab
+            !mauverse_mobile/bin/Release/net10.0-android/**/*-Signed.aab
             mauverse_mobile/bin/Release/net10.0-android/checksums.txt
           if-no-files-found: error
           retention-days: 14
