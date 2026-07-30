@@ -158,6 +158,15 @@ jobs:
           -p:MauverseScheduleToken="$MAUVERSE_SCHEDULE_TOKEN"
           -maxcpucount:1
 
+      - name: Stage unsigned AAB
+        shell: bash
+        run: |
+          mapfile -t bundles < <(find bin/Release/net10.0-android \
+            -type f -name '*.aab' ! -name '*-Signed.aab' -print)
+          test "${#bundles[@]}" -eq 1
+          mkdir -p artifacts/android
+          cp "${bundles[0]}" artifacts/android/mauverse-android-arm64-unsigned.aab
+
       - name: Package unsigned APK
         env:
           MAUVERSE_SCHEDULE_TOKEN: ${{ secrets.MAUVERSE_SCHEDULE_TOKEN }}
@@ -174,25 +183,28 @@ jobs:
           -p:MauverseScheduleToken="$MAUVERSE_SCHEDULE_TOKEN"
           -maxcpucount:1
 
+      - name: Stage unsigned APK
+        shell: bash
+        run: |
+          mapfile -t packages < <(find bin/Release/net10.0-android \
+            -type f -name '*.apk' ! -name '*-Signed.apk' -print)
+          test "${#packages[@]}" -eq 1
+          cp "${packages[0]}" artifacts/android/mauverse-android-arm64-unsigned.apk
+
       - name: Create unsigned artifact checksums
         shell: bash
         run: |
-          mapfile -t artifacts < <(find bin/Release/net10.0-android \
-            -type f \( -name '*.aab' -o -name '*.apk' \) ! -name '*-Signed.*' \
+          mapfile -t artifacts < <(find artifacts/android \
+            -type f \( -name '*.aab' -o -name '*.apk' \) \
             -print | sort)
           test "${#artifacts[@]}" -eq 2
-          sha256sum "${artifacts[@]}" > bin/Release/net10.0-android/checksums.txt
+          sha256sum "${artifacts[@]}" > artifacts/android/checksums-android.txt
 
       - name: Upload unsigned CI artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: mauverce-android-release-unsigned
-          path: |
-            mauverse_mobile/bin/Release/net10.0-android/**/*.apk
-            !mauverse_mobile/bin/Release/net10.0-android/**/*-Signed.apk
-            mauverse_mobile/bin/Release/net10.0-android/**/*.aab
-            !mauverse_mobile/bin/Release/net10.0-android/**/*-Signed.aab
-            mauverse_mobile/bin/Release/net10.0-android/checksums.txt
+          path: mauverse_mobile/artifacts/android/
           if-no-files-found: error
           retention-days: 14
           compression-level: 0
