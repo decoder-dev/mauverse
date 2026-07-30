@@ -18,8 +18,6 @@ extension Notification.Name {
     static let mauverseSessionExpired = Notification.Name("mauverse.session.expired")
 }
 
-struct EmptyBody: Encodable {}
-
 final class APIClient {
     static let shared = APIClient()
     private let baseURL = URL(string: "https://app.mauniver.ru/dev/mauverse/")!
@@ -56,6 +54,17 @@ final class APIClient {
         let encoder = JSONEncoder()
         encoder.keyEncodingStrategy = .convertToSnakeCase
         request.httpBody = try encoder.encode(body)
+        addHeaders(to: &request, user: user)
+        return try await execute(request, retryOnTransient: retryOnTransient)
+    }
+
+    func post<Response: Decodable>(
+        _ path: String,
+        user: UserDTO? = nil,
+        retryOnTransient: Bool = false
+    ) async throws -> Response {
+        var request = URLRequest(url: baseURL.appendingPathComponent(path))
+        request.httpMethod = "POST"
         addHeaders(to: &request, user: user)
         return try await execute(request, retryOnTransient: retryOnTransient)
     }

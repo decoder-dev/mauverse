@@ -24,8 +24,27 @@ struct UserDTO: Codable, Equatable {
     var detail: String?
 
     var displayName: String {
-        let value = fullName ?? firstName ?? username ?? "Студент"
+        let value = fullName ?? firstName ?? "Студент"
         return value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Студент" : value
+    }
+
+    var greetingName: String {
+        let login = username?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let directName = firstName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if !directName.isEmpty, directName.caseInsensitiveCompare(login) != .orderedSame {
+            return directName.split(whereSeparator: \.isWhitespace).first.map(String.init) ?? "Студент"
+        }
+
+        let normalizedFullName = fullName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        guard !normalizedFullName.isEmpty,
+              normalizedFullName.caseInsensitiveCompare(login) != .orderedSame else {
+            return "Студент"
+        }
+        let parts = normalizedFullName.split(whereSeparator: \.isWhitespace)
+        // Russian passport-style ФИО is normally «Фамилия Имя Отчество».
+        // Moodle's two-part display name is normally «Имя Фамилия».
+        let index = parts.count >= 3 ? 1 : 0
+        return parts.indices.contains(index) ? String(parts[index]) : "Студент"
     }
 
     enum CodingKeys: String, CodingKey {
@@ -406,6 +425,53 @@ struct SuccessResponse: Codable {
     var success: Bool?
     var error: String?
     var detail: String?
+}
+
+struct MoodleNotification: Codable, Identifiable, Hashable {
+    var id: Int
+    var subject: String?
+    var smallMessage: String?
+    var contextURLName: String?
+    var contextURL: String?
+    var userFromFullName: String?
+    var timeCreated: Int?
+    var timeCreatedString: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id, subject
+        case smallMessage = "smallmessage"
+        case contextURLName = "contexturlname"
+        case contextURL = "contexturl"
+        case userFromFullName = "userfromfullname"
+        case timeCreated = "timecreated"
+        case timeCreatedString = "timecreatedstring"
+    }
+
+    var title: String {
+        [contextURLName, subject, smallMessage].compactMap { value in
+            let text = value?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            return text.isEmpty ? nil : text
+        }.first ?? "Уведомление ЭИОС"
+    }
+
+    var subtitle: String {
+        let text = subject?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if !text.isEmpty, text != title { return text }
+        let sender = userFromFullName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return sender.isEmpty ? "Электронная образовательная среда" : sender
+    }
+
+    var destination: URL? {
+        guard let contextURL, let url = URL(string: contextURL),
+              url.scheme?.lowercased() == "https",
+              url.host?.lowercased().hasSuffix("mauniver.ru") == true else { return nil }
+        return url
+    }
+}
+
+struct NotificationRequest: Encodable {
+    let token: String
+    let userId: Int
 }
 
 struct Teacher: Codable, Identifiable, Hashable {

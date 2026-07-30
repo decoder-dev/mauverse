@@ -136,7 +136,7 @@ private struct ServiceDestination: View {
         case .eios:
             WebServiceView(title: service.title, url: "https://eios.mauniver.ru/moodle/")
         case .digital:
-            WebServiceView(title: service.title, url: "https://www.mauniver.ru/services/student/")
+            WebServiceView(title: service.title, url: "https://mauniver.ru/services/")
         case .messenger:
             WebServiceView(title: service.title, url: "https://eios.mauniver.ru/moodle/message/index.php")
         case .forms:
@@ -170,9 +170,9 @@ private struct FormsView: View {
     private let forms = [
         OnlineFormLink(
             title: "Справка об обучении",
-            subtitle: "Отправить заявку внутри приложения",
+            subtitle: "Обычная, гербовая или электронная",
             icon: "doc.badge.plus",
-            url: nil
+            url: "https://mauniver.ru/services/student/"
         ),
         OnlineFormLink(
             title: "Справка для перевода",
@@ -191,6 +191,12 @@ private struct FormsView: View {
             subtitle: "Для выпускников и бывших студентов",
             icon: "archivebox.fill",
             url: "https://mauniver.ru/services/student/archive/"
+        ),
+        OnlineFormLink(
+            title: "Архивная справка для отчисленных",
+            subtitle: "С перечнем дисциплин и оценок",
+            icon: "doc.on.doc.fill",
+            url: "https://mauniver.ru/services/student/archive-expl/"
         ),
         OnlineFormLink(
             title: "Справка-вызов",
@@ -215,6 +221,66 @@ private struct FormsView: View {
             subtitle: "Платные образовательные услуги",
             icon: "creditcard.fill",
             url: "https://mauniver.ru/services/student/application/"
+        ),
+        OnlineFormLink(
+            title: "Онлайн-сервисы ММРК",
+            subtitle: "Справки и заявления колледжа",
+            icon: "building.columns.fill",
+            url: "https://mauniver.ru/structure/branches/mmrc/online/"
+        ),
+        OnlineFormLink(
+            title: "Справочная студенческого офиса",
+            subtitle: "Задать вопрос об учебном процессе",
+            icon: "questionmark.bubble.fill",
+            url: "https://mauniver.ru/services/virtual/"
+        ),
+        OnlineFormLink(
+            title: "Справочная библиотеки",
+            subtitle: "Получить помощь библиотекаря",
+            icon: "books.vertical.fill",
+            url: "https://mauniver.ru/structure/divs/library/guide/"
+        ),
+        OnlineFormLink(
+            title: "Виртуальная приёмная ректора",
+            subtitle: "Направить официальное обращение",
+            icon: "envelope.badge.fill",
+            url: "https://mauniver.ru/rector/reception/"
+        ),
+        OnlineFormLink(
+            title: "Вопрос приёмной комиссии",
+            subtitle: "Обращение по вопросам поступления",
+            icon: "person.crop.circle.badge.questionmark",
+            url: "https://mauniver.ru/abit/reception/"
+        ),
+        OnlineFormLink(
+            title: "Стать волонтёром МАУ",
+            subtitle: "Присоединиться к волонтёрскому движению",
+            icon: "heart.fill",
+            url: "https://mauniver.ru/student/community/volunteer/"
+        ),
+        OnlineFormLink(
+            title: "Поддержка молодых семей",
+            subtitle: "Направить обращение и документы",
+            icon: "figure.2.and.child.holdinghands",
+            url: "https://mauniver.ru/services/student/material/"
+        ),
+        OnlineFormLink(
+            title: "Поддержка участников СВО",
+            subtitle: "Единое окно поддержки студентов",
+            icon: "shield.fill",
+            url: "https://mauniver.ru/services/student/support-svo/"
+        ),
+        OnlineFormLink(
+            title: "Обратная связь «Моё образование»",
+            subtitle: "Исправление данных в ГИС СЦОС",
+            icon: "graduationcap.fill",
+            url: "https://mauniver.ru/services/student/gis-scos/"
+        ),
+        OnlineFormLink(
+            title: "Все официальные формы",
+            subtitle: "Актуальный каталог онлайн-сервисов МАУ",
+            icon: "safari.fill",
+            url: "https://mauniver.ru/services/student/"
         )
     ]
 
@@ -260,7 +326,7 @@ private struct FormsView: View {
         if let value = form.url, let url = URL(string: value) {
             InAppBrowserView(url: url, title: form.title)
         } else {
-            CertificateRequestView()
+            EmptyState(icon: "link.badge.plus", title: "Ссылка недоступна", message: form.title)
         }
     }
 }

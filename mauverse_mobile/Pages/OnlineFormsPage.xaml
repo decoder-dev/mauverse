@@ -84,7 +84,7 @@
             </VerticalStackLayout>
 
             <VerticalStackLayout Spacing="8">
-                <Label Text="Документы и оплата"
+                <Label Text="Документы и обращения"
                        Style="{StaticResource SectionTitle}" />
                 <VerticalStackLayout BindableLayout.ItemsSource="{Binding OtherApplications}"
                                      BindableLayout.ItemTemplate="{StaticResource OnlineFormTemplate}" />

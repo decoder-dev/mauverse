@@ -30,6 +30,9 @@ final class SessionStore: ObservableObject {
                 self?.errorMessage = "Сессия истекла. Войдите в аккаунт повторно"
             }
         }
+        if user != nil {
+            Task { await refreshProfile() }
+        }
     }
 
     deinit {
@@ -65,6 +68,7 @@ final class SessionStore: ObservableObject {
             }
             user = authenticated
             persist()
+            await refreshProfile()
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -81,6 +85,33 @@ final class SessionStore: ObservableObject {
         user = nil
         KeychainStore.delete(account: storageKey)
         UserDefaults.standard.removeObject(forKey: storageKey)
+    }
+
+    func refreshProfile() async {
+        guard let current = user else { return }
+        do {
+            let profile: UserDTO = try await APIClient.shared.post(
+                "get_user_info",
+                user: current,
+                retryOnTransient: true
+            )
+            guard user?.username == current.username else { return }
+            var merged = current
+            merged.userId = profile.userId ?? current.userId
+            merged.firstName = profile.firstName ?? current.firstName
+            merged.fullName = profile.fullName ?? current.fullName
+            merged.role = profile.role ?? current.role
+            merged.creditBook = profile.creditBook ?? current.creditBook
+            merged.groupId = profile.groupId ?? current.groupId
+            merged.groupName = profile.groupName ?? current.groupName
+            merged.speciality = profile.speciality ?? current.speciality
+            merged.scheduleGroupUID = profile.scheduleGroupUID ?? current.scheduleGroupUID
+            user = merged
+            persist()
+        } catch {
+            // Keep the saved profile available offline. A real 401 response
+            // independently invalidates the session in APIClient.
+        }
     }
 
     private func persist() {

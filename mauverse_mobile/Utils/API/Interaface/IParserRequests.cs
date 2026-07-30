@@ -11,6 +11,7 @@ public interface IParserRequests
         CancellationToken cancellationToken = default);
     Task<IEnumerable<RssDTO>> GetNewsAsync(
         RssData type,
+        bool forceRefresh = false,
         CancellationToken cancellationToken = default);
     Task<UniversityInfo> GetTeacherInfoAsync(
         string teacher,

@@ -56,7 +56,7 @@ actor OfficialNewsService {
     private func fetch(url: URL, cachePolicy: URLRequest.CachePolicy) async throws -> [NewsItem] {
         var request = URLRequest(url: url, cachePolicy: cachePolicy, timeoutInterval: 30)
         request.timeoutInterval = 30
-        request.setValue("MAUverse/1.10.0 (iOS)", forHTTPHeaderField: "User-Agent")
+        request.setValue("MAUverse/1.11.0 (iOS)", forHTTPHeaderField: "User-Agent")
         request.setValue("application/rss+xml, application/xml, text/xml", forHTTPHeaderField: "Accept")
 
         let (data, response) = try await URLSession.shared.data(for: request)

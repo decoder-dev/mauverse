@@ -16,9 +16,10 @@
 
     <ApplicationTitle>MAUverse</ApplicationTitle>
     <ApplicationId>com.pmi4freal.mauverse3</ApplicationId>
-    <ApplicationDisplayVersion>1.8.5</ApplicationDisplayVersion>
-    <ApplicationVersion>20</ApplicationVersion>
+    <ApplicationDisplayVersion>1.11.0</ApplicationDisplayVersion>
+    <ApplicationVersion>28</ApplicationVersion>
     <MauverseApiBaseUrl Condition="'$(MauverseApiBaseUrl)' == ''">https://app.mauniver.ru/dev/mauverse/</MauverseApiBaseUrl>
+    <MauverseScheduleToken Condition="'$(MauverseScheduleToken)' == ''"></MauverseScheduleToken>
 
     <WindowsPackageType>None</WindowsPackageType>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
@@ -32,6 +33,10 @@
     <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
       <_Parameter1>MauverseApiBaseUrl</_Parameter1>
       <_Parameter2>$(MauverseApiBaseUrl)</_Parameter2>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>MauverseScheduleToken</_Parameter1>
+      <_Parameter2>$(MauverseScheduleToken)</_Parameter2>
     </AssemblyAttribute>
   </ItemGroup>
 

@@ -45,7 +45,7 @@ public partial class SettingsViewModel : BaseViewModel
         "Performance",
         "CA1822:Mark members as static",
         Justification = "The instance member is part of the compiled XAML binding contract.")]
-    public string AppCreditsLabel => "Сделано УИТ с любовью к студентам";
+    public string AppCreditsLabel => "Разработчик: decoder-dev";
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage(
         "Performance",
