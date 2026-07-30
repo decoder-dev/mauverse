@@ -35,11 +35,15 @@ namespace mau.Utils.API
                 token => _apiService.GetAsync<List<DeptInfoDTO>>("/get_depts_json", token),
                 cancellationToken);
 
-        public async Task<IEnumerable<RssDTO>> GetNewsAsync(RssData type, CancellationToken cancellationToken = default) =>
+        public async Task<IEnumerable<RssDTO>> GetNewsAsync(
+            RssData type,
+            bool forceRefresh = false,
+            CancellationToken cancellationToken = default) =>
             await GetListAsync(
                 $"news-{(int)type}",
                 token => _apiService.GetAsync<List<RssDTO>>($"/news?news_type={(int)type}", token),
-                cancellationToken);
+                cancellationToken,
+                forceRefresh);
 
         public async Task<IEnumerable<Room>> GetRoomsAsync(string room, CancellationToken cancellationToken = default)
         {
@@ -109,16 +113,21 @@ namespace mau.Utils.API
         private async Task<List<T>> GetListAsync<T>(
             string key,
             Func<CancellationToken, Task<List<T>>> fetch,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken,
+            bool forceRefresh = false)
         {
-            if (_memoryCache.TryGetValue(key, out List<T>? memoryValue) && memoryValue is not null)
+            if (!forceRefresh &&
+                _memoryCache.TryGetValue(key, out List<T>? memoryValue) &&
+                memoryValue is not null)
                 return memoryValue;
 
             var requestLock = _requestLocks.GetOrAdd(key, static _ => new SemaphoreSlim(1, 1));
             await requestLock.WaitAsync(cancellationToken);
             try
             {
-                if (_memoryCache.TryGetValue(key, out memoryValue) && memoryValue is not null)
+                if (!forceRefresh &&
+                    _memoryCache.TryGetValue(key, out memoryValue) &&
+                    memoryValue is not null)
                     return memoryValue;
 
                 Exception? requestError = null;

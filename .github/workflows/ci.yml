@@ -104,6 +104,7 @@ jobs:
     timeout-minutes: 45
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+      MAUVERSE_SCHEDULE_TOKEN: ${{ secrets.MAUVERSE_SCHEDULE_TOKEN }}
     defaults:
       run:
         working-directory: mauverse_mobile
@@ -144,6 +145,8 @@ jobs:
         run: dotnet test ../mauverse_mobile.Tests/mauverse_mobile.Tests.csproj --configuration Release --no-restore --warnaserror
 
       - name: Build Release configuration
+        env:
+          MAUVERSE_SCHEDULE_TOKEN: ${{ secrets.MAUVERSE_SCHEDULE_TOKEN }}
         run: >-
           dotnet build mau.csproj
           --configuration Release
@@ -152,6 +155,7 @@ jobs:
           --no-restore
           --warnaserror
           -p:ContinuousIntegrationBuild=true
+          -p:MauverseScheduleToken="$MAUVERSE_SCHEDULE_TOKEN"
           -maxcpucount:1
 
       - name: Create unsigned artifact checksums

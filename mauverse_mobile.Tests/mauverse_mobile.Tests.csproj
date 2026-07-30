@@ -25,6 +25,8 @@
              Link="Production\BrowserDestinationRegistry.cs" />
     <Compile Include="..\mauverse_mobile\Utils\Services\ThemePalette.cs"
              Link="Production\ThemePalette.cs" />
+    <Compile Include="..\mauverse_mobile\Utils\UserGreeting.cs"
+             Link="Production\UserGreeting.cs" />
   </ItemGroup>
 
   <ItemGroup>

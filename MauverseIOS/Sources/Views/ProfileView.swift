@@ -73,7 +73,7 @@ struct ProfileView: View {
                     .buttonStyle(.plain)
                     .mauSurface()
 
-                    Text("MAUverse 1.10.0 (27)")
+                    Text("MAUverse 1.11.0 (28)")
                         .font(.caption)
                         .foregroundStyle(MauTheme.muted)
                 }
@@ -268,7 +268,7 @@ private struct SettingsView: View {
                                 .foregroundStyle(MauTheme.blue)
                             }
                         }
-                        Text("Версия 1.10.0 • сборка 27").font(.caption)
+                        Text("Версия 1.11.0 • сборка 28").font(.caption)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(20)

@@ -4,6 +4,7 @@ import SwiftUI
 final class HomeViewModel: ObservableObject {
     @Published var nextLesson: ScheduleItem?
     @Published var featuredNews: NewsItem?
+    @Published var notifications: [MoodleNotification] = []
     @Published var isLoading = false
     @Published var lessonError: String?
     @Published var newsError: String?
@@ -20,6 +21,15 @@ final class HomeViewModel: ObservableObject {
         }
 
         let newsTask = Task { try await OfficialNewsService.shared.load(filter: .all) }
+        let notificationTask = Task { () throws -> [MoodleNotification] in
+            guard let token = user?.token, !token.isEmpty, let userId = user?.userId else { return [] }
+            return try await APIClient.shared.post(
+                "get_notifications",
+                body: NotificationRequest(token: token, userId: userId),
+                user: user,
+                retryOnTransient: true
+            )
+        }
         if let user {
             do {
                 var uid = user.scheduleGroupUID
@@ -56,6 +66,9 @@ final class HomeViewModel: ObservableObject {
             guard activeRequest == request else { return }
             newsError = error.localizedDescription
         }
+        if let loaded = try? await notificationTask.value, activeRequest == request {
+            notifications = Array(loaded.prefix(8))
+        }
     }
 
     private static func isEarlier(_ lhs: ScheduleItem, _ rhs: ScheduleItem) -> Bool {
@@ -75,9 +88,7 @@ struct HomeView: View {
     @StateObject private var model = HomeViewModel()
 
     private var firstName: String {
-        session.user?.firstName?.split(separator: " ").first.map(String.init)
-        ?? session.user?.displayName.split(separator: " ").first.map(String.init)
-        ?? "Студент"
+        session.user?.greetingName ?? "Студент"
     }
 
     var body: some View {
@@ -103,6 +114,17 @@ struct HomeView: View {
 
                     MauSectionHeader(title: "Быстрый доступ")
                     quickActions
+
+                    if !model.notifications.isEmpty {
+                        MauSectionHeader(title: "Обновления ЭИОС")
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            LazyHStack(spacing: 12) {
+                                ForEach(model.notifications) { notification in
+                                    MoodleNotificationCard(notification: notification)
+                                }
+                            }
+                        }
+                    }
 
                     if let news = model.featuredNews {
                         HStack(alignment: .firstTextBaseline) {
@@ -225,6 +247,50 @@ struct HomeView: View {
         case 12..<18: "Добрый день,"
         default: "Добрый вечер,"
         }
+    }
+}
+
+private struct MoodleNotificationCard: View {
+    let notification: MoodleNotification
+
+    var body: some View {
+        Group {
+            if let destination = notification.destination {
+                NavigationLink {
+                    InAppBrowserView(url: destination, title: notification.title)
+                } label: {
+                    content
+                }
+            } else {
+                content
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var content: some View {
+        VStack(alignment: .leading, spacing: 9) {
+            Label("ЭИОС", systemImage: "bell.badge.fill")
+                .font(.caption.bold())
+                .foregroundStyle(MauTheme.blue)
+            Text(notification.title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(MauTheme.ink)
+                .lineLimit(3)
+            Text(notification.subtitle)
+                .font(.caption)
+                .foregroundStyle(MauTheme.muted)
+                .lineLimit(2)
+            Spacer(minLength: 0)
+            if let value = notification.timeCreatedString, !value.isEmpty {
+                Text(value)
+                    .font(.caption2)
+                    .foregroundStyle(MauTheme.muted)
+            }
+        }
+        .padding(16)
+        .frame(width: 272, height: 164, alignment: .topLeading)
+        .mauSurface(radius: 22)
     }
 }
 

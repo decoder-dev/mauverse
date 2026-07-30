@@ -40,6 +40,8 @@ namespace mau.ViewModel.News
         public bool IsLoading => CurrentState == States.Loading;
         public bool HasContent => CurrentState == States.Success;
         public bool IsEmpty => CurrentState == States.Empty;
+        public bool IsRefreshing => _isRefreshing;
+        bool _isRefreshing;
 
         public NewsViewModel(
             DbConnect context,
@@ -61,18 +63,34 @@ namespace mau.ViewModel.News
         [RelayCommand]
         async Task FilterData()
         {
-            await LoadNews(SelectedButton?.FilterType ?? RssData.Default);
+            await LoadNews(SelectedButton?.FilterType ?? RssData.Default, forceRefresh: false);
         }
 
         [RelayCommand]
         async Task LoadData()
         {
-            await LoadNews(RssData.Default);
+            await LoadNews(SelectedButton?.FilterType ?? RssData.Default, forceRefresh: false);
         }
 
-        async Task LoadNews(RssData filterType)
+        [RelayCommand]
+        async Task Refresh()
         {
-            if (_loadedFilter == filterType)
+            _isRefreshing = true;
+            OnPropertyChanged(nameof(IsRefreshing));
+            try
+            {
+                await LoadNews(SelectedButton?.FilterType ?? RssData.Default, forceRefresh: true);
+            }
+            finally
+            {
+                _isRefreshing = false;
+                OnPropertyChanged(nameof(IsRefreshing));
+            }
+        }
+
+        async Task LoadNews(RssData filterType, bool forceRefresh)
+        {
+            if (!forceRefresh && _loadedFilter == filterType)
                 return;
 
             if (_loadTask is not null && _loadingFilter == filterType)
@@ -85,7 +103,7 @@ namespace mau.ViewModel.News
             var previousSource = Interlocked.Exchange(ref _loadCts, cancellationSource);
             previousSource?.Cancel();
             _loadingFilter = filterType;
-            var loadTask = LoadNewsCore(filterType, cancellationSource.Token);
+            var loadTask = LoadNewsCore(filterType, forceRefresh, cancellationSource.Token);
             _loadTask = loadTask;
             try
             {
@@ -104,13 +122,22 @@ namespace mau.ViewModel.News
             }
         }
 
-        async Task LoadNewsCore(RssData filterType, CancellationToken cancellationToken)
+        async Task LoadNewsCore(
+            RssData filterType,
+            bool forceRefresh,
+            CancellationToken cancellationToken)
         {
-            SetState(States.Loading);
+            var hadContent = News.Count > 0 && _loadedFilter == filterType;
+            if (!hadContent)
+                SetState(States.Loading);
             try
             {
-                News = [.. await _parserRequests.GetNewsAsync(filterType, cancellationToken)];
+                var freshNews = await _parserRequests.GetNewsAsync(
+                    filterType,
+                    forceRefresh,
+                    cancellationToken);
                 cancellationToken.ThrowIfCancellationRequested();
+                News = [.. freshNews];
                 _loadedFilter = filterType;
                 SetState(News.Count == 0 ? States.Empty : States.Success);
             }
@@ -120,8 +147,11 @@ namespace mau.ViewModel.News
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex);
-                SetState(States.Empty);
-                await AppShell.DisplaySnackbarAsync("Не удалось загрузить новости");
+                SetState(hadContent ? States.Success : States.Empty);
+                await AppShell.DisplaySnackbarAsync(
+                    hadContent
+                        ? "Не удалось обновить новости — показаны сохранённые данные"
+                        : "Не удалось загрузить новости");
             }
         }
 
@@ -177,6 +207,10 @@ namespace mau.ViewModel.News
             return buttons;
         }
 
-        protected override void CancelPendingOperations() => _loadCts?.Cancel();
+        protected override void CancelPendingOperations()
+        {
+            _loadCts?.Cancel();
+            RefreshCommand.Cancel();
+        }
     }
 }

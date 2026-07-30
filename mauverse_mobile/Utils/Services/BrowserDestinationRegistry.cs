@@ -16,7 +16,7 @@ public static class BrowserDestinationRegistry
                 new Uri("https://eios.mauniver.ru/moodle/", UriKind.Absolute)),
             [MauDigitalServicesKey] = new(
                 "Цифровые сервисы МАУ",
-                new Uri("https://www.mauniver.ru/services/student/", UriKind.Absolute))
+                new Uri("https://mauniver.ru/services/", UriKind.Absolute))
         };
 
     private static readonly HashSet<string> DownloadExtensions = new(StringComparer.OrdinalIgnoreCase)
