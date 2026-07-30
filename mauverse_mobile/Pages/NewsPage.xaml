@@ -81,12 +81,15 @@
                            VerticalTextAlignment="Center" />
                 </HorizontalStackLayout>
             </Border>
-            <CollectionView BackgroundColor="Transparent"
-                            IsVisible="{Binding HasContent}"
-                            ItemSizingStrategy="MeasureAllItems"
-                            ItemsSource="{Binding News}"
-                            SelectedItem="{Binding SelectedNews}"
-                            ItemTemplate="{StaticResource NewsItemTemplate}" />
+            <RefreshView IsVisible="{Binding HasContent}"
+                         IsRefreshing="{Binding IsRefreshing, Mode=OneWay}"
+                         Command="{Binding RefreshCommand}">
+                <CollectionView BackgroundColor="Transparent"
+                                ItemSizingStrategy="MeasureAllItems"
+                                ItemsSource="{Binding News}"
+                                SelectedItem="{Binding SelectedNews}"
+                                ItemTemplate="{StaticResource NewsItemTemplate}" />
+            </RefreshView>
             <Border Style="{StaticResource SurfacePanel}"
                     IsVisible="{Binding IsEmpty}"
                     VerticalOptions="Start">

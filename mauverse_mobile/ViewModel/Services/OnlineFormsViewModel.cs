@@ -23,8 +23,7 @@ public partial class OnlineFormsViewModel
             "Справка об обучении",
             "Обычная, гербовая или электронная",
             $"{FormsBaseUrl}/",
-            FluentUI.certificate_24_regular,
-            true),
+            FluentUI.certificate_24_regular),
         new(
             "Справка для перевода",
             "С перечнем дисциплин и оценок",
@@ -68,7 +67,52 @@ public partial class OnlineFormsViewModel
             "Счёт за обучение",
             "Для платных образовательных услуг",
             $"{FormsBaseUrl}/application/",
-            FluentUI.receipt_money_24_regular)
+            FluentUI.receipt_money_24_regular),
+        new(
+            "Онлайн-сервисы ММРК",
+            "Справки и заявления колледжа",
+            "https://mauniver.ru/structure/branches/mmrc/online/",
+            FluentUI.building_24_regular),
+        new(
+            "Справочная студенческого офиса",
+            "Задать вопрос об учебном процессе",
+            "https://mauniver.ru/services/virtual/",
+            FluentUI.chat_help_24_regular),
+        new(
+            "Справочная библиотеки",
+            "Получить помощь библиотекаря",
+            "https://mauniver.ru/structure/divs/library/guide/",
+            FluentUI.book_question_mark_24_regular),
+        new(
+            "Виртуальная приёмная ректора",
+            "Направить официальное обращение",
+            "https://mauniver.ru/rector/reception/",
+            FluentUI.mail_24_regular),
+        new(
+            "Вопрос приёмной комиссии",
+            "Обращение по вопросам поступления",
+            "https://mauniver.ru/abit/reception/",
+            FluentUI.person_question_mark_24_regular),
+        new(
+            "Стать волонтёром МАУ",
+            "Присоединиться к волонтёрскому движению",
+            "https://mauniver.ru/student/community/volunteer/",
+            FluentUI.heart_24_regular),
+        new(
+            "Поддержка молодых семей",
+            "Направить обращение и документы",
+            $"{FormsBaseUrl}/material/",
+            FluentUI.people_community_24_regular),
+        new(
+            "Поддержка участников СВО",
+            "Единое окно поддержки студентов",
+            $"{FormsBaseUrl}/support-svo/",
+            FluentUI.shield_24_regular),
+        new(
+            "Обратная связь «Моё образование»",
+            "Исправление данных в ГИС СЦОС",
+            $"{FormsBaseUrl}/gis-scos/",
+            FluentUI.hat_graduation_24_regular)
     ];
 
     [RelayCommand]

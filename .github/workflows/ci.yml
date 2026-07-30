@@ -104,6 +104,7 @@ jobs:
     timeout-minutes: 45
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+      MAUVERSE_SCHEDULE_TOKEN: ${{ secrets.MAUVERSE_SCHEDULE_TOKEN }}
     defaults:
       run:
         working-directory: mauverse_mobile
@@ -144,6 +145,8 @@ jobs:
         run: dotnet test ../mauverse_mobile.Tests/mauverse_mobile.Tests.csproj --configuration Release --no-restore --warnaserror
 
       - name: Build Release configuration
+        env:
+          MAUVERSE_SCHEDULE_TOKEN: ${{ secrets.MAUVERSE_SCHEDULE_TOKEN }}
         run: >-
           dotnet build mau.csproj
           --configuration Release
@@ -152,47 +155,69 @@ jobs:
           --no-restore
           --warnaserror
           -p:ContinuousIntegrationBuild=true
+          -p:MauverseScheduleToken="$MAUVERSE_SCHEDULE_TOKEN"
           -maxcpucount:1
+
+      - name: Stage unsigned AAB
+        shell: bash
+        run: |
+          mapfile -t bundles < <(find bin/Release/net10.0-android \
+            -type f -name '*.aab' ! -name '*-Signed.aab' -print)
+          test "${#bundles[@]}" -eq 1
+          mkdir -p artifacts/android
+          cp "${bundles[0]}" artifacts/android/mauverse-android-arm64-unsigned.aab
+
+      - name: Package unsigned APK
+        env:
+          MAUVERSE_SCHEDULE_TOKEN: ${{ secrets.MAUVERSE_SCHEDULE_TOKEN }}
+        run: >-
+          dotnet build mau.csproj
+          --target:PackageForAndroid
+          --configuration Release
+          --framework net10.0-android
+          --runtime android-arm64
+          --no-restore
+          --warnaserror
+          -p:AndroidPackageFormats=apk
+          -p:ContinuousIntegrationBuild=true
+          -p:MauverseScheduleToken="$MAUVERSE_SCHEDULE_TOKEN"
+          -maxcpucount:1
+
+      - name: Stage unsigned APK
+        shell: bash
+        run: |
+          mapfile -t packages < <(find bin/Release/net10.0-android \
+            -type f -name '*.apk' ! -name '*-Signed.apk' -print)
+          test "${#packages[@]}" -eq 1
+          cp "${packages[0]}" artifacts/android/mauverse-android-arm64-unsigned.apk
 
       - name: Create unsigned artifact checksums
         shell: bash
         run: |
-          mapfile -t artifacts < <(find bin/Release/net10.0-android \
-            -type f \( -name '*.aab' -o \( -name '*.apk' ! -name '*-Signed.apk' \) \) \
+          mapfile -t artifacts < <(find artifacts/android \
+            -type f \( -name '*.aab' -o -name '*.apk' \) \
             -print | sort)
-          test "${#artifacts[@]}" -ge 2
-          sha256sum "${artifacts[@]}" > bin/Release/net10.0-android/checksums.txt
+          test "${#artifacts[@]}" -eq 2
+          sha256sum "${artifacts[@]}" > artifacts/android/checksums-android.txt
 
       - name: Upload unsigned CI artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: mauverce-android-release-unsigned
-          path: |
-            mauverse_mobile/bin/Release/net10.0-android/**/*.apk
-            !mauverse_mobile/bin/Release/net10.0-android/**/*-Signed.apk
-            mauverse_mobile/bin/Release/net10.0-android/**/*.aab
-            mauverse_mobile/bin/Release/net10.0-android/checksums.txt
+          path: mauverse_mobile/artifacts/android/
           if-no-files-found: error
           retention-days: 14
           compression-level: 0
 
   ios-release-unsigned:
-    name: iPhone Release configuration (unsigned)
+    name: Native SwiftUI iPhone Release (unsigned)
     runs-on: macos-26
-    timeout-minutes: 60
+    timeout-minutes: 35
     env:
-      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
-    defaults:
-      run:
-        working-directory: mauverse_mobile
+      MAUVERSE_SCHEDULE_TOKEN: ${{ secrets.MAUVERSE_SCHEDULE_TOKEN }}
     steps:
       - name: Check out sources
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
-
-      - name: Set up .NET SDK from global.json
-        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
-        with:
-          global-json-file: mauverse_mobile/global.json
 
       - name: Select Xcode 26.5
         shell: bash
@@ -202,56 +227,48 @@ jobs:
           test -d "$developer_dir"
           sudo xcode-select --switch "$developer_dir"
 
-      - name: Report Apple toolchain
+      - name: Install project generator
+        run: brew install xcodegen
+
+      - name: Generate native Xcode project
+        working-directory: MauverseIOS
+        run: xcodegen generate --spec project.yml
+
+      - name: Report Apple toolchain and project
         shell: bash
         run: |
           set -euo pipefail
           xcodebuild -version
           xcrun --sdk iphoneos --show-sdk-version
-          dotnet --info
+          xcodegen --version
+          xcodebuild -project MauverseIOS/MAUverse.xcodeproj -list
 
-      - name: Restore NuGet cache
-        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
-        with:
-          path: ${{ env.NUGET_PACKAGES }}
-          key: ${{ runner.os }}-ios-nuget-${{ hashFiles('mauverse_mobile/global.json', 'mauverse_mobile/mau.csproj') }}
-          restore-keys: |
-            ${{ runner.os }}-ios-nuget-
-            ${{ runner.os }}-nuget-
-
-      - name: Install MAUI iOS workload
-        run: dotnet workload install maui-ios --version 10.0.300.3
-
-      - name: Restore iPhone target
-        run: >-
-          dotnet restore mau.csproj
-          -p:TargetFramework=net10.0-ios
-          -p:RuntimeIdentifier=ios-arm64
-
-      - name: Publish unsigned iPhone application
-        run: >-
-          dotnet publish mau.csproj
-          --configuration Release
-          --framework net10.0-ios
-          --runtime ios-arm64
-          --no-restore
-          --warnaserror
-          -p:ArchiveOnBuild=false
-          -p:BuildIpa=false
-          -p:CodesignRequireProvisioningProfile=false
-          -p:ContinuousIntegrationBuild=true
-          -p:CreatePackage=false
-          -p:EnableCodeSigning=false
-          -p:EnableDefaultCodesignEntitlements=false
-          -maxcpucount:1
+      - name: Build native iPhone application without signing
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$MAUVERSE_SCHEDULE_TOKEN"
+          xcodebuild \
+            -project MauverseIOS/MAUverse.xcodeproj \
+            -scheme MAUverse \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath "$PWD/build/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            DEVELOPMENT_TEAM="" \
+            MAUVERSE_SCHEDULE_TOKEN="$MAUVERSE_SCHEDULE_TOKEN" \
+            clean build
 
       - name: Verify and package unsigned application
         shell: bash
         run: |
           set -euo pipefail
 
-          publish_dir="bin/Release/net10.0-ios/ios-arm64/publish"
-          app_path="$(find "$publish_dir" -maxdepth 1 -type d -name '*.app' -print -quit)"
+          products_dir="build/DerivedData/Build/Products/Release-iphoneos"
+          app_path="$(find "$products_dir" -maxdepth 1 -type d -name '*.app' -print -quit)"
           test -n "$app_path"
 
           if codesign --verify "$app_path" >/dev/null 2>&1; then
@@ -267,39 +284,39 @@ jobs:
             exit 1
           fi
 
-          artifact_dir="bin/Release/net10.0-ios/unsigned-artifact"
+          artifact_dir="build/unsigned-artifact"
           payload_dir="$artifact_dir/Payload"
           mkdir -p "$payload_dir"
           ditto "$app_path" "$payload_dir/$(basename "$app_path")"
 
           (
             cd "$artifact_dir"
-            /usr/bin/zip -qry "../mauverce-ios-arm64-unsigned.ipa" Payload
+            /usr/bin/zip -qry "../mauverse-native-ios-arm64-unsigned.ipa" Payload
           )
 
           {
             echo "commit=${GITHUB_SHA}"
-            echo "target=net10.0-ios"
+            echo "target=native-swiftui"
             echo "runtime=ios-arm64"
             echo "signed=false"
             echo "provisioning_profile=false"
             echo "xcode=$(xcodebuild -version | tr '\n' ' ')"
             echo "iphoneos_sdk=$(xcrun --sdk iphoneos --show-sdk-version)"
-          } > "bin/Release/net10.0-ios/build-metadata.txt"
+          } > "build/build-metadata.txt"
 
           (
-            cd bin/Release/net10.0-ios
-            shasum -a 256 mauverce-ios-arm64-unsigned.ipa > checksums.txt
+            cd build
+            shasum -a 256 mauverse-native-ios-arm64-unsigned.ipa > checksums.txt
           )
 
       - name: Upload unsigned iPhone artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: mauverce-ios-arm64-release-unsigned
+          name: mauverse-native-ios-arm64-release-unsigned
           path: |
-            mauverse_mobile/bin/Release/net10.0-ios/mauverce-ios-arm64-unsigned.ipa
-            mauverse_mobile/bin/Release/net10.0-ios/checksums.txt
-            mauverse_mobile/bin/Release/net10.0-ios/build-metadata.txt
+            build/mauverse-native-ios-arm64-unsigned.ipa
+            build/checksums.txt
+            build/build-metadata.txt
           if-no-files-found: error
           retention-days: 14
           compression-level: 0

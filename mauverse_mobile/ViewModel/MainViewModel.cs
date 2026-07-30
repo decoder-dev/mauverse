@@ -257,14 +257,10 @@ namespace mau.ViewModel
         };
 
         static string GetFirstName()
-        {
-            if (!string.IsNullOrWhiteSpace(CurrentUser?.FirstName))
-                return CurrentUser.FirstName.Trim();
-
-            return CurrentUser?.FullName
-                ?.Split(' ', StringSplitOptions.RemoveEmptyEntries)
-                .FirstOrDefault() ?? "студент";
-        }
+            => UserGreeting.ResolveFirstName(
+                CurrentUser?.FirstName,
+                CurrentUser?.FullName,
+                CurrentUser?.Username);
 
         static string Capitalize(string value) => string.IsNullOrEmpty(value)
             ? value
