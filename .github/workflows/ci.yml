@@ -250,13 +250,34 @@ jobs:
         run: |
           set -euo pipefail
 
-          publish_dir="bin/Release/net10.0-ios/ios-arm64/publish"
-          app_path="$(find "$publish_dir" -maxdepth 1 -type d -name '*.app' -print -quit)"
+          # MAUI/iOS leaves the device .app under the RID output directory.
+          # The SDK publish/ folder is often empty when CreatePackage=false.
+          output_root="bin/Release/net10.0-ios"
+          rid_dir="$output_root/ios-arm64"
+          publish_dir="$rid_dir/publish"
+
+          app_path=""
+          for candidate in \
+            "$publish_dir"/*.app \
+            "$rid_dir"/*.app
+          do
+            if [[ -d "$candidate" ]]; then
+              app_path="$candidate"
+              break
+            fi
+          done
+
           if [[ -z "$app_path" ]]; then
-            echo "Unsigned application bundle was not found under $publish_dir" >&2
-            find "$publish_dir" -maxdepth 2 -print >&2 || true
+            app_path="$(find "$output_root" -type d -name '*.app' -print -quit || true)"
+          fi
+
+          if [[ -z "$app_path" || ! -d "$app_path" ]]; then
+            echo "Unsigned application bundle was not found under $output_root" >&2
+            find "$output_root" -maxdepth 3 -print >&2 || true
             exit 1
           fi
+
+          echo "Packaging application bundle: $app_path"
 
           # Device builds from the current toolchain may still carry an ad-hoc
           # signature even when EnableCodeSigning=false. Strip that material for
@@ -277,8 +298,9 @@ jobs:
             exit 1
           fi
 
-          artifact_dir="bin/Release/net10.0-ios/unsigned-artifact"
+          artifact_dir="$output_root/unsigned-artifact"
           payload_dir="$artifact_dir/Payload"
+          rm -rf "$artifact_dir"
           mkdir -p "$payload_dir"
           ditto "$app_path" "$payload_dir/$(basename "$app_path")"
 
@@ -291,14 +313,15 @@ jobs:
             echo "commit=${GITHUB_SHA}"
             echo "target=net10.0-ios"
             echo "runtime=ios-arm64"
+            echo "app_bundle=$(basename "$app_path")"
             echo "signed=false"
             echo "provisioning_profile=false"
             echo "xcode=$(xcodebuild -version | tr '\n' ' ')"
             echo "iphoneos_sdk=$(xcrun --sdk iphoneos --show-sdk-version)"
-          } > "bin/Release/net10.0-ios/build-metadata.txt"
+          } > "$output_root/build-metadata.txt"
 
           (
-            cd bin/Release/net10.0-ios
+            cd "$output_root"
             shasum -a 256 mauverce-ios-arm64-unsigned.ipa > checksums.txt
           )
 
