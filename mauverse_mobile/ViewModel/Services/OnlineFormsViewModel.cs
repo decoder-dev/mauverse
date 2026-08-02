@@ -71,6 +71,45 @@ public partial class OnlineFormsViewModel
             FluentUI.receipt_money_24_regular)
     ];
 
+    public IReadOnlyList<StudentOnlineForm> SupportForms { get; } =
+    [
+        new(
+            "Виртуальная справочная",
+            "Вопрос студенческому офису или библиотеке",
+            "https://mauniver.ru/services/virtual/",
+            FluentUI.person_feedback_24_regular),
+        new(
+            "Вопросы ректору",
+            "Обращение в виртуальную приёмную",
+            "https://mauniver.ru/rector/reception/",
+            FluentUI.mail_inbox_24_regular),
+        new(
+            "Стать волонтёром МАУ",
+            "Заявка в волонтёрские объединения",
+            "https://mauniver.ru/student/community/volunteer/",
+            FluentUI.heart_24_regular),
+        new(
+            "Поддержка молодых семей",
+            "Обращение по мерам семейной поддержки",
+            $"{FormsBaseUrl}/material/",
+            FluentUI.people_community_24_regular),
+        new(
+            "Поддержка участников СВО",
+            "Единое окно мер поддержки",
+            $"{FormsBaseUrl}/support-svo/",
+            FluentUI.shield_24_regular),
+        new(
+            "Портал «Моё образование»",
+            "Обратная связь по ГИС СЦОС",
+            $"{FormsBaseUrl}/gis-scos/",
+            FluentUI.document_checkmark_24_regular),
+        new(
+            "Вопрос приёмной комиссии",
+            "Консультация для абитуриентов",
+            "https://mauniver.ru/abit/reception/",
+            FluentUI.hat_graduation_24_regular)
+    ];
+
     [RelayCommand]
     private async Task OpenFormAsync(StudentOnlineForm? form)
     {

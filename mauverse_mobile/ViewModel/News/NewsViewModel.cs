@@ -170,6 +170,10 @@ namespace mau.ViewModel.News
                     FilterType = RssData.Science,
                 },
                 new Buttons {
+                    FilterName = "Международное",
+                    FilterType = RssData.International,
+                },
+                new Buttons {
                     FilterName = "СМИ о нас",
                     FilterType = RssData.Other,
                 },
