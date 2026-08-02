@@ -33,9 +33,9 @@ Classification: engineering release candidate, not production-approved until
 
 - Local `mauverse_mobile.Tests`: 31 passed.
 - Local `mauverse-api` unittest: 59 passed.
-- Hosted CI on `822af3e` / follow-up: `backend`, `api-image`, and
-  `android-release` green; `ios-release-unsigned` required packaging strip for
-  toolchain ad-hoc signatures (workflow fix included in this release branch).
+- Hosted CI: `backend`, `api-image`, and `android-release` green on the RC
+  commits. `ios-release-unsigned` packaging looks for the RID `.app` (not only
+  empty `publish/`) and strips toolchain ad-hoc signatures before upload.
 - Production signing, device smoke tests, and API traffic promotion remain open
   gates from `docs/RELEASE_CHECKLIST.md`.
 
