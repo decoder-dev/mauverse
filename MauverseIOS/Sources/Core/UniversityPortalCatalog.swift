@@ -49,7 +49,7 @@ enum UniversityPortalURLs {
     static let officialSite = "https://mauniver.ru/"
     static let privacyPolicy = "https://mauniver.ru/info/docs/pdn/"
     static let sveden = "https://mauniver.ru/sveden/"
-    static let campusNavigatorSite = "https://mauniver.ru/student/campus/"
+    static let campusNavigatorSite = "https://mauniver.ru/info/navigation/"
 }
 
 struct PortalLink: Identifiable, Hashable {
@@ -164,7 +164,7 @@ enum UniversityPortalCatalog {
             link("Новости науки", "Анонсы исследований и научных событий",
                  UniversityPortalURLs.scienceNews, "megaphone.fill"),
             link("Научные направления", "Приоритетные области исследований МАУ",
-                 UniversityPortalURLs.scienceFields, "compass.drawing"),
+                 UniversityPortalURLs.scienceFields, "location.north.line.fill"),
             link("Мероприятия и дайджест", "Конференции, семинары и научный дайджест",
                  UniversityPortalURLs.scienceDigest, "calendar")
         ]),
