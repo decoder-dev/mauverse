@@ -47,11 +47,24 @@ contains `_CodeSignature` or `embedded.mobileprovision`. Sign the extracted
 application with your own matching certificate, entitlements, and provisioning
 profile, then recreate the IPA.
 
+## Portal parity with Android
+
+`MauverseIOS` mirrors the Android portal surfaces from mauniver.ru:
+
+- Guides: Студенту, Абитуриенту, Наука, International
+- Digital services hub (ЭИОС, library, webmail, dorm IT, Intra, PROMT)
+- Events calendar from `/press/calendar/rss/`
+- News filters Абитуриент and Календарь
+- Contacts and payment requisites
+- Campus navigator with branches, transport tips, route and panorama
+- Settings links to official site, personal-data policy, and sveden
+- Schedule teacher/room chips (mutually exclusive)
+
 ## Required smoke checks
 
 1. Login, logout, and restored session.
 2. All five tabs: Home, Schedule, Services, News, and Profile.
-3. Service routes, in-app browser, messenger, and forms.
+3. Service routes, portal guides, calendar, contacts, in-app browser, messenger, and forms.
 4. Light and dark appearance.
 5. iOS Reduce Transparency and Increase Contrast.
 6. Dynamic Type and VoiceOver labels.

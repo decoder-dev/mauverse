@@ -4,12 +4,40 @@ import SwiftUI
 final class ScheduleViewModel: ObservableObject {
     @Published var items: [ScheduleItem] = []
     @Published var selectedDate = Calendar.current.startOfDay(for: Date())
+    @Published var selectedTeacher: String?
+    @Published var selectedRoom: String?
     @Published var isLoading = false
     @Published var error: String?
     private var activeRequest = UUID()
 
     let dates: [Date] = (0..<14).compactMap {
         Calendar.current.date(byAdding: .day, value: $0, to: Calendar.current.startOfDay(for: Date()))
+    }
+
+    var availableTeachers: [String] {
+        Array(Set(items.compactMap { item -> String? in
+            guard let teacher = item.teacher?.trimmingCharacters(in: .whitespacesAndNewlines),
+                  !teacher.isEmpty else { return nil }
+            return teacher
+        })).sorted()
+    }
+
+    var availableRooms: [String] {
+        Array(Set(items.compactMap { item -> String? in
+            guard let room = item.room?.trimmingCharacters(in: .whitespacesAndNewlines),
+                  !room.isEmpty else { return nil }
+            return room
+        })).sorted()
+    }
+
+    func selectTeacher(_ teacher: String?) {
+        selectedTeacher = teacher
+        if teacher != nil { selectedRoom = nil }
+    }
+
+    func selectRoom(_ room: String?) {
+        selectedRoom = room
+        if room != nil { selectedTeacher = nil }
     }
 
     func load(user: UserDTO?) async -> ScheduleGroup? {
@@ -45,6 +73,12 @@ final class ScheduleViewModel: ObservableObject {
             )
             guard activeRequest == request else { return nil }
             items = loaded
+            if let selectedTeacher, !availableTeachers.contains(selectedTeacher) {
+                self.selectedTeacher = nil
+            }
+            if let selectedRoom, !availableRooms.contains(selectedRoom) {
+                self.selectedRoom = nil
+            }
             return resolvedGroup
         } catch {
             guard activeRequest == request else { return nil }
@@ -57,13 +91,21 @@ final class ScheduleViewModel: ObservableObject {
         let formats = ["yyyy-MM-dd", "dd.MM.yyyy", "yyyy-MM-dd'T'HH:mm:ss"]
         return items.filter { item in
             guard let value = item.date else { return false }
-            return formats.contains { format in
+            let matchesDate = formats.contains { format in
                 let parser = DateFormatter()
                 parser.locale = Locale(identifier: "en_US_POSIX")
                 parser.dateFormat = format
                 guard let parsed = parser.date(from: value) else { return false }
                 return Calendar.current.isDate(parsed, inSameDayAs: date)
             }
+            guard matchesDate else { return false }
+            if let selectedTeacher {
+                return item.teacher == selectedTeacher
+            }
+            if let selectedRoom {
+                return item.room == selectedRoom
+            }
+            return true
         }
         .sorted { ($0.startTime ?? "") < ($1.startTime ?? "") }
     }
@@ -126,6 +168,49 @@ struct ScheduleView: View {
                             }
                         }
                         .padding(.vertical, 2)
+                    }
+
+                    if !model.availableTeachers.isEmpty || !model.availableRooms.isEmpty {
+                        VStack(alignment: .leading, spacing: 10) {
+                            if !model.availableTeachers.isEmpty {
+                                Text("Преподаватель")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(MauTheme.muted)
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack(spacing: 8) {
+                                        FilterChip(
+                                            title: "Все",
+                                            selected: model.selectedTeacher == nil
+                                        ) { model.selectTeacher(nil) }
+                                        ForEach(model.availableTeachers, id: \.self) { teacher in
+                                            FilterChip(
+                                                title: teacher,
+                                                selected: model.selectedTeacher == teacher
+                                            ) { model.selectTeacher(teacher) }
+                                        }
+                                    }
+                                }
+                            }
+                            if !model.availableRooms.isEmpty {
+                                Text("Аудитория")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(MauTheme.muted)
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack(spacing: 8) {
+                                        FilterChip(
+                                            title: "Все",
+                                            selected: model.selectedRoom == nil
+                                        ) { model.selectRoom(nil) }
+                                        ForEach(model.availableRooms, id: \.self) { room in
+                                            FilterChip(
+                                                title: room,
+                                                selected: model.selectedRoom == room
+                                            ) { model.selectRoom(room) }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     if model.isLoading {
@@ -194,6 +279,28 @@ private struct DateChip: View {
                 .stroke(selected ? Color.white.opacity(0.22) : Color.primary.opacity(0.06), lineWidth: 0.75)
         }
         .shadow(color: selected ? MauTheme.blue.opacity(0.22) : .clear, radius: 10, y: 5)
+    }
+}
+
+private struct FilterChip: View {
+    let title: String
+    let selected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(selected ? .white : MauTheme.ink)
+                .lineLimit(1)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(
+                    selected ? AnyShapeStyle(MauTheme.blue.gradient) : AnyShapeStyle(MauTheme.card.opacity(0.85)),
+                    in: Capsule()
+                )
+        }
+        .buttonStyle(.plain)
     }
 }
 
