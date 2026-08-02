@@ -11,7 +11,7 @@ same ref.
 | `backend` | Python 3.11 install, all discovered unit tests, `pip check`, Ruff, compileall | No artifact |
 | `api-image` | Docker build, UID is non-root, container reaches healthy state | No registry push |
 | `android-release` | SDK from `global.json`, JDK 17, MAUI workload, mobile tests, warning-free Release build | Unsigned APK, AAB, and SHA-256 file, retained 14 days |
-| `ios-release-unsigned` | macOS 26, Xcode/iPhoneOS SDK report, MAUI iOS workload, warning-free `ios-arm64` Release publish, explicit signature/provisioning audit | Unsigned IPA container, build metadata, and SHA-256 file, retained 14 days |
+| `ios-release-unsigned` | macOS 26, Xcode 26.5, XcodeGen, unsigned SwiftUI `MauverseIOS` device build, signature/provisioning audit | Unsigned native IPA container, build metadata, and SHA-256 file, retained 14 days |
 
 All GitHub-maintained actions are referenced by immutable commit SHA with the
 major version recorded in a comment. Dependabot checks those references and the
@@ -43,12 +43,14 @@ dotnet build mau.csproj --configuration Release --framework net10.0-android \
 The CI artifact is intentionally unsigned. A green Android job proves that the
 Release configuration compiles; it does not authorize distribution.
 
-The iPhone job produces `mauverce-ios-arm64-unsigned.ipa`. This is a ZIP
-container with an unsigned device `.app` under `Payload/`; it is not installable
-until it is signed with an Apple Distribution or Apple Development certificate
-and a matching provisioning profile. CI imports no certificate, reads no Apple
-signing secret, and fails if `_CodeSignature` or `embedded.mobileprovision` is
-present.
+The iPhone job builds the native SwiftUI app in `MauverseIOS` and produces
+`mauverse-native-ios-arm64-unsigned.ipa`. This is a ZIP container with an
+unsigned device `.app` under `Payload/`; it is not installable until it is
+signed with an Apple Distribution or Apple Development certificate and a
+matching provisioning profile. CI imports no certificate and fails if
+`_CodeSignature` or `embedded.mobileprovision` is present. The schedule API
+token is injected at build time from the `MAUVERSE_SCHEDULE_TOKEN` repository
+secret.
 
 ## Production promotion
 

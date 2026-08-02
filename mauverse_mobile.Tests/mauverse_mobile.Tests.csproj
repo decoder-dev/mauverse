@@ -21,8 +21,16 @@
   <ItemGroup>
     <Compile Include="..\mauverse_mobile\Models\BrowserRequest.cs"
              Link="Production\BrowserRequest.cs" />
+    <Compile Include="..\mauverse_mobile\Models\CampusBuilding.cs"
+             Link="Production\CampusBuilding.cs" />
     <Compile Include="..\mauverse_mobile\Utils\Services\BrowserDestinationRegistry.cs"
              Link="Production\BrowserDestinationRegistry.cs" />
+    <Compile Include="..\mauverse_mobile\Utils\Services\UniversityPortalUrls.cs"
+             Link="Production\UniversityPortalUrls.cs" />
+    <Compile Include="..\mauverse_mobile\Models\UniversityContactBlock.cs"
+             Link="Production\UniversityContactBlock.cs" />
+    <Compile Include="..\mauverse_mobile\Utils\Services\UniversityContactsCatalog.cs"
+             Link="Production\UniversityContactsCatalog.cs" />
     <Compile Include="..\mauverse_mobile\Utils\Services\ThemePalette.cs"
              Link="Production\ThemePalette.cs" />
   </ItemGroup>

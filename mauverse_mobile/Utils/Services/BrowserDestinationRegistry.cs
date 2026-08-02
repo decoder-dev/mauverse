@@ -7,6 +7,12 @@ public static class BrowserDestinationRegistry
     public const string InternalBrowserRoute = "browser/internal";
     public const string EiosKey = "eios";
     public const string MauDigitalServicesKey = "mau-digital-services";
+    public const string LibraryKey = "library";
+    public const string EventsCalendarKey = "events-calendar";
+    public const string OfficialSiteKey = "official-site";
+    public const string PrivacyPolicyKey = "privacy-policy";
+    public const string SvedenKey = "sveden";
+    public const string CampusNavigatorSiteKey = "campus-navigator-site";
 
     private static readonly Dictionary<string, BrowserRequest> KnownDestinations =
         new Dictionary<string, BrowserRequest>(StringComparer.OrdinalIgnoreCase)
@@ -16,7 +22,25 @@ public static class BrowserDestinationRegistry
                 new Uri("https://eios.mauniver.ru/moodle/", UriKind.Absolute)),
             [MauDigitalServicesKey] = new(
                 "Цифровые сервисы МАУ",
-                new Uri("https://www.mauniver.ru/services/student/", UriKind.Absolute))
+                new Uri("https://www.mauniver.ru/services/student/", UriKind.Absolute)),
+            [LibraryKey] = new(
+                "Библиотека МАУ",
+                new Uri("https://lib.mauniver.ru/MegaPro/Web", UriKind.Absolute)),
+            [EventsCalendarKey] = new(
+                "Календарь событий",
+                new Uri("https://mauniver.ru/press/calendar/", UriKind.Absolute)),
+            [OfficialSiteKey] = new(
+                "Сайт МАУ",
+                new Uri("https://mauniver.ru/", UriKind.Absolute)),
+            [PrivacyPolicyKey] = new(
+                "Политика персональных данных",
+                new Uri("https://mauniver.ru/info/docs/pdn/", UriKind.Absolute)),
+            [SvedenKey] = new(
+                "Сведения об образовательной организации",
+                new Uri("https://mauniver.ru/sveden/", UriKind.Absolute)),
+            [CampusNavigatorSiteKey] = new(
+                "Навигатор по кампусу",
+                new Uri("https://mauniver.ru/info/navigation/", UriKind.Absolute))
         };
 
     private static readonly HashSet<string> DownloadExtensions = new(StringComparer.OrdinalIgnoreCase)
@@ -65,6 +89,9 @@ public static class BrowserDestinationRegistry
         CreateUniversityRequest(title, uri);
 
     public static BrowserRequest CreateUniversityNotification(string title, Uri uri) =>
+        CreateUniversityRequest(title, uri);
+
+    public static BrowserRequest CreateUniversityPage(string title, Uri uri) =>
         CreateUniversityRequest(title, uri);
 
     public static bool IsUniversityUri(Uri? uri) =>

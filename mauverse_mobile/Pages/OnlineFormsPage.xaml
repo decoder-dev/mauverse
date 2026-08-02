@@ -89,6 +89,13 @@
                 <VerticalStackLayout BindableLayout.ItemsSource="{Binding OtherApplications}"
                                      BindableLayout.ItemTemplate="{StaticResource OnlineFormTemplate}" />
             </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Обращения и поддержка"
+                       Style="{StaticResource SectionTitle}" />
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding SupportForms}"
+                                     BindableLayout.ItemTemplate="{StaticResource OnlineFormTemplate}" />
+            </VerticalStackLayout>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
