@@ -493,7 +493,17 @@ struct APIMessage: Codable {
 }
 
 enum NewsFilter: Int, CaseIterable, Identifiable {
-    case all = 0, departments, sport, students, science, international, events, other
+    case all = 0
+    case departments = 1
+    case sport = 2
+    case students = 3
+    case science = 4
+    case international = 5
+    case events = 6
+    case other = 7
+    case applicant = 8
+    case calendar = 9
+
     var id: Int { rawValue }
     var title: String {
         return switch self {
@@ -505,6 +515,8 @@ enum NewsFilter: Int, CaseIterable, Identifiable {
         case .international: "Международное"
         case .events: "События"
         case .other: "Другое"
+        case .applicant: "Абитуриент"
+        case .calendar: "Календарь"
         }
     }
 }
