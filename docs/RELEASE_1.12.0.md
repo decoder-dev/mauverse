@@ -2,8 +2,9 @@
 
 Built: 2026-08-02
 
-Classification: engineering release candidate, not production-approved until
-`docs/RELEASE_CHECKLIST.md` gates pass on the exact promoted commit and artifact.
+Classification: engineering release published as GitHub Release `v1.12.0`.
+Not production-approved until remaining `docs/RELEASE_CHECKLIST.md` gates pass
+on the exact promoted signed artifacts.
 
 ## Targets
 
@@ -13,8 +14,17 @@ Classification: engineering release candidate, not production-approved until
 | iPhone (SwiftUI) | `MauverseIOS` | `1.12.0` | `CURRENT_PROJECT_VERSION` 29 |
 
 - Package: `com.pmi4freal.mauverse3`
-- Release branch: `cursor/university-portal-parity-010d`
-- Pull request: https://github.com/decoder-dev/mauverse/pull/16
+- Release commit: `c60be64d972be930ad68194340944d10a0dc4925` (`main`)
+- Tag / GitHub Release: https://github.com/decoder-dev/mauverse/releases/tag/v1.12.0
+- Pull request: https://github.com/decoder-dev/mauverse/pull/16 (merged)
+- CI on release commit: https://github.com/decoder-dev/mauverse/actions/runs/30763288979
+
+## Published artifacts (unsigned)
+
+| Artifact | SHA-256 |
+| --- | --- |
+| `mauverse-android-arm64-unsigned.aab` | `6e6b78a22621a520912f487004fafe7b00cc0c351f8d60b14686a961656eb030` |
+| `mauverse-native-ios-arm64-unsigned.ipa` | `561cc033124e1bda04380a62a52453516a000895ca11eb4e5ce816c1f0276837` |
 
 ## Product changes
 
@@ -44,15 +54,9 @@ Classification: engineering release candidate, not production-approved until
 
 ## Verification
 
-- Local `mauverse_mobile.Tests` and `mauverse-api` unit tests on the RC branch.
-- Hosted CI must be green for `backend`, `api-image`, `android-release`, and
-  `Native SwiftUI iPhone Release (unsigned)` on the exact release commit.
-- Production signing, device smoke tests, and API traffic promotion remain open
-  gates from `docs/RELEASE_CHECKLIST.md`.
-
-## Promotion gates still required
-
-- [ ] All four CI jobs green on the exact release commit.
+- [x] All four CI jobs green on `c60be64` (`backend`, `api-image`,
+  `android-release`, `Native SwiftUI iPhone Release (unsigned)`).
+- [x] GitHub Release `v1.12.0` published with unsigned AAB/IPA and checksums.
 - [ ] Protected production Android keystore signing (not `CN=Android Debug`).
 - [ ] Apple distribution signing of the native IPA on an approved Mac.
 - [ ] Device smoke test from `docs/RELEASE_CHECKLIST.md`.
