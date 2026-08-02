@@ -14,7 +14,7 @@ on the exact promoted signed artifacts.
 | iPhone (SwiftUI) | `MauverseIOS` | `1.12.0` | `CURRENT_PROJECT_VERSION` 29 |
 
 - Package: `com.pmi4freal.mauverse3`
-- Release commit: `c60be64d972be930ad68194340944d10a0dc4925` (`main`)
+- Release commit: `f846ddc9de327ba448b2ab2ed7213d462a67ab4d` (`main`)
 - Tag / GitHub Release: https://github.com/decoder-dev/mauverse/releases/tag/v1.12.0
 - Pull request: https://github.com/decoder-dev/mauverse/pull/16 (merged)
 - CI on release commit: https://github.com/decoder-dev/mauverse/actions/runs/30763288979
@@ -54,7 +54,7 @@ on the exact promoted signed artifacts.
 
 ## Verification
 
-- [x] All four CI jobs green on `c60be64` (`backend`, `api-image`,
+- [x] All four CI jobs green on `f846ddc` (`backend`, `api-image`,
   `android-release`, `Native SwiftUI iPhone Release (unsigned)`).
 - [x] GitHub Release `v1.12.0` published with unsigned AAB/IPA and checksums.
 - [ ] Protected production Android keystore signing (not `CN=Android Debug`).
