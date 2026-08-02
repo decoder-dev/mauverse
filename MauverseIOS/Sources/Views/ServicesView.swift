@@ -1,7 +1,10 @@
 import SwiftUI
 
 enum MauService: String, CaseIterable, Identifiable {
-    case eios, forms, messenger, campus, debts, digital, teachers, departments
+    case eios, forms, messenger, campus, debts, digital
+    case studentGuide, applicantGuide, scienceGuide, internationalGuide
+    case teachers, departments, contacts, eventsCalendar
+
     var id: String { rawValue }
 
     var title: String {
@@ -11,9 +14,15 @@ enum MauService: String, CaseIterable, Identifiable {
         case .messenger: "Мессенджер ЭИОС"
         case .campus: "Навигатор по корпусам"
         case .debts: "Учебные задолженности"
-        case .digital: "Цифровые сервисы МАУ"
+        case .digital: "Цифровые сервисы"
+        case .studentGuide: "Студенту"
+        case .applicantGuide: "Абитуриенту"
+        case .scienceGuide: "Наука"
+        case .internationalGuide: "International"
         case .teachers: "Контакты преподавателей"
         case .departments: "Подразделения и телефоны"
+        case .contacts: "Контакты и реквизиты"
+        case .eventsCalendar: "Календарь событий"
         }
     }
 
@@ -25,18 +34,25 @@ enum MauService: String, CaseIterable, Identifiable {
         case .campus: "map.fill"
         case .debts: "exclamationmark.circle.fill"
         case .digital: "network"
+        case .studentGuide: "person.3.fill"
+        case .applicantGuide: "graduationcap.circle.fill"
+        case .scienceGuide: "atom"
+        case .internationalGuide: "globe"
         case .teachers: "person.text.rectangle.fill"
         case .departments: "building.2.fill"
+        case .contacts: "doc.text.fill"
+        case .eventsCalendar: "calendar"
         }
     }
 
     var color: Color {
         return switch self {
-        case .eios, .teachers: MauTheme.blue
-        case .forms, .departments: .purple
-        case .messenger, .digital: .teal
-        case .campus: .orange
+        case .eios, .teachers, .studentGuide: MauTheme.blue
+        case .forms, .departments, .applicantGuide: .purple
+        case .messenger, .digital, .scienceGuide: .teal
+        case .campus, .eventsCalendar: .orange
         case .debts: .red
+        case .internationalGuide, .contacts: MauTheme.violet
         }
     }
 
@@ -47,24 +63,30 @@ enum MauService: String, CaseIterable, Identifiable {
         case .messenger: "Сообщения в ЭИОС"
         case .campus: "Корпуса и маршруты"
         case .debts: "Проверка успеваемости"
-        case .digital: "Онлайн-ресурсы"
+        case .digital: "Почта, ЭИОС, библиотека"
+        case .studentGuide: "Гид по разделу «Студенту»"
+        case .applicantGuide: "Поступление и приёмная"
+        case .scienceGuide: "Наука и исследования"
+        case .internationalGuide: "English and international"
         case .teachers: "Поиск по имени"
         case .departments: "Телефоны и кабинеты"
+        case .contacts: "Приёмка и платежи"
+        case .eventsCalendar: "Анонсы пресс-центра"
         }
     }
 }
 
 private enum ServiceCategory: String, CaseIterable, Identifiable {
-    case study = "Учёба"
-    case communication = "Коммуникации"
-    case university = "Университет"
+    case services = "Услуги"
+    case portal = "Портал МАУ"
+    case directories = "Справочники"
     var id: String { rawValue }
 
     var services: [MauService] {
         return switch self {
-        case .study: [.eios, .forms, .debts]
-        case .communication: [.messenger, .teachers, .departments]
-        case .university: [.campus, .digital]
+        case .services: [.eios, .forms, .messenger, .campus, .debts, .digital]
+        case .portal: [.studentGuide, .applicantGuide, .scienceGuide, .internationalGuide]
+        case .directories: [.teachers, .departments, .contacts, .eventsCalendar]
         }
     }
 }
@@ -79,7 +101,7 @@ struct ServicesView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Сервисы").font(.system(size: 36, weight: .bold, design: .rounded))
-                        Text("Учёба и университет — в одном месте")
+                        Text("Учебные сервисы и разделы сайта МАУ")
                             .font(.subheadline)
                             .foregroundStyle(MauTheme.muted)
                     }
@@ -134,21 +156,52 @@ private struct ServiceDestination: View {
     var body: some View {
         switch service {
         case .eios:
-            WebServiceView(title: service.title, url: "https://eios.mauniver.ru/moodle/")
+            WebServiceView(title: service.title, url: UniversityPortalURLs.eios)
         case .digital:
-            WebServiceView(title: service.title, url: "https://mauniver.ru/services/")
+            DigitalServicesView()
         case .messenger:
-            WebServiceView(title: service.title, url: "https://eios.mauniver.ru/moodle/message/index.php")
+            WebServiceView(
+                title: service.title,
+                url: "https://eios.mauniver.ru/moodle/message/index.php"
+            )
         case .forms:
             FormsView()
         case .campus:
-            CampusView()
+            CampusNavigatorView()
         case .debts:
             DebtsView()
         case .teachers:
             TeacherContactsView()
         case .departments:
             DepartmentsView()
+        case .studentGuide:
+            PortalGuideView(
+                title: "Студенту",
+                subtitle: "Офис, FAQ, общежитие и поддержка",
+                sections: UniversityPortalCatalog.studentSections
+            )
+        case .applicantGuide:
+            PortalGuideView(
+                title: "Абитуриенту",
+                subtitle: "Поступление, экзамены и контакты приёмной",
+                sections: UniversityPortalCatalog.applicantSections
+            )
+        case .scienceGuide:
+            PortalGuideView(
+                title: "Наука",
+                subtitle: "Направления, гранты и публикации МАУ",
+                sections: UniversityPortalCatalog.scienceSections
+            )
+        case .internationalGuide:
+            PortalGuideView(
+                title: "International",
+                subtitle: "English site and international activity",
+                sections: UniversityPortalCatalog.internationalSections
+            )
+        case .contacts:
+            UniversityContactsView()
+        case .eventsCalendar:
+            EventsCalendarView()
         }
     }
 }
@@ -544,79 +597,6 @@ private struct CertificateRequestView: View {
         if comment.count > 2_000 { return "Комментарий не должен превышать 2000 символов" }
         if !consent { return "Подтвердите согласие на обработку данных" }
         return nil
-    }
-}
-
-private struct Campus: Identifiable {
-    let id = UUID()
-    let code: String
-    let address: String
-}
-
-private struct CampusView: View {
-    private let south = [
-        Campus(code: "А", address: "Спортивная, 13/6"),
-        Campus(code: "Б", address: "Колхозная, 2"),
-        Campus(code: "В", address: "Спортивная, 13"),
-        Campus(code: "Г", address: "Советская, 8А"),
-        Campus(code: "Д", address: "Советская, 8"),
-        Campus(code: "Е", address: "Советская, 12А"),
-        Campus(code: "К", address: "Спортивная, 9"),
-        Campus(code: "Л1 / Л2", address: "Кирова, 1"),
-        Campus(code: "М", address: "Советская, 17"),
-        Campus(code: "Н", address: "Спортивная, 11"),
-        Campus(code: "П", address: "Советская, 10"),
-        Campus(code: "С", address: "Советская, 14"),
-        Campus(code: "Э", address: "Горького, 14")
-    ]
-    private let north = [
-        Campus(code: "Е15", address: "Капитана Егорова, 15"),
-        Campus(code: "Е16", address: "Капитана Егорова, 16"),
-        Campus(code: "К9", address: "Коммуны, 9"),
-        Campus(code: "Л57", address: "проспект Ленина, 57")
-    ]
-
-    var body: some View {
-        ZStack {
-            MauBackground()
-            List {
-                CampusSection(title: "Южный кампус", campuses: south)
-                CampusSection(title: "Северный кампус", campuses: north)
-            }
-            .scrollContentBackground(.hidden)
-        }
-        .navigationTitle("Корпуса")
-        .toolbar(.hidden, for: .tabBar)
-    }
-}
-
-private struct CampusSection: View {
-    let title: String
-    let campuses: [Campus]
-    var body: some View {
-        Section(title) {
-            ForEach(campuses) { campus in
-                if let url = mapURL(for: campus) {
-                    NavigationLink(destination: InAppBrowserView(url: url, title: "Корпус \(campus.code)")) {
-                        HStack {
-                            Text(campus.code)
-                                .font(.headline)
-                                .foregroundStyle(MauTheme.blue)
-                                .frame(width: 54, alignment: .leading)
-                            Text(campus.address).foregroundStyle(MauTheme.ink)
-                            Spacer()
-                            Image(systemName: "location.fill").foregroundStyle(MauTheme.blue)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private func mapURL(for campus: Campus) -> URL? {
-        let query = "Мурманск, \(campus.address)"
-        let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? query
-        return URL(string: "https://2gis.ru/murmansk/search/\(encoded)")
     }
 }
 
