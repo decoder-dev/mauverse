@@ -73,7 +73,7 @@ struct ProfileView: View {
                     .buttonStyle(.plain)
                     .mauSurface()
 
-                    Text("MAUverse 1.11.0 (28)")
+                    Text("MAUverse 1.12.1 (30)")
                         .font(.caption)
                         .foregroundStyle(MauTheme.muted)
                 }
@@ -245,6 +245,18 @@ private struct SettingsView: View {
                     .mauSurface()
 
                     VStack(alignment: .leading, spacing: 12) {
+                        Label("Университет", systemImage: "building.columns.fill").font(.headline)
+                        settingsLink("Официальный сайт", url: UniversityPortalURLs.officialSite)
+                        Divider()
+                        settingsLink("Политика персональных данных", url: UniversityPortalURLs.privacyPolicy)
+                        Divider()
+                        settingsLink("Сведения об образовательной организации", url: UniversityPortalURLs.sveden)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(20)
+                    .mauSurface()
+
+                    VStack(alignment: .leading, spacing: 12) {
                         Label("О приложении", systemImage: "info.circle.fill").font(.headline)
                         Text("Нативное приложение Мурманского арктического университета.")
                             .font(.subheadline).foregroundStyle(MauTheme.muted)
@@ -268,7 +280,7 @@ private struct SettingsView: View {
                                 .foregroundStyle(MauTheme.blue)
                             }
                         }
-                        Text("Версия 1.11.0 • сборка 28").font(.caption)
+                        Text("Версия 1.12.1 • сборка 30").font(.caption)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(20)
@@ -280,6 +292,26 @@ private struct SettingsView: View {
         }
         .navigationTitle("Настройки")
         .toolbar(.hidden, for: .tabBar)
+    }
+
+    @ViewBuilder
+    private func settingsLink(_ title: String, url: String) -> some View {
+        if let destination = URL(string: url) {
+            NavigationLink {
+                InAppBrowserView(url: destination, title: title)
+            } label: {
+                HStack {
+                    Text(title)
+                        .foregroundStyle(MauTheme.ink)
+                        .multilineTextAlignment(.leading)
+                    Spacer()
+                    Image(systemName: "arrow.up.right")
+                        .font(.caption2.bold())
+                        .foregroundStyle(MauTheme.blue)
+                }
+                .font(.subheadline.weight(.semibold))
+            }
+        }
     }
 
     private func clearCaches() {
