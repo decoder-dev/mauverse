@@ -14,16 +14,19 @@ public partial class SettingsViewModel : BaseViewModel
     readonly ICacheService _persistentCache;
     readonly IMemoryCache _memoryCache;
     readonly IThemeService _themeService;
+    readonly IAppNavigationService _navigation;
 
     public SettingsViewModel(
         DbConnect context,
         ICacheService persistentCache,
         IMemoryCache memoryCache,
-        IThemeService themeService) : base(context)
+        IThemeService themeService,
+        IAppNavigationService navigation) : base(context)
     {
         _persistentCache = persistentCache;
         _memoryCache = memoryCache;
         _themeService = themeService;
+        _navigation = navigation;
         _selectedThemeIndex = (int)_themeService.CurrentMode;
         UpdateThemeSelection(_selectedThemeIndex);
     }
@@ -188,6 +191,29 @@ public partial class SettingsViewModel : BaseViewModel
         {
             System.Diagnostics.Debug.WriteLine(ex);
             await AppShell.DisplaySnackbarAsync("Не удалось скопировать сведения");
+        }
+    }
+
+    [RelayCommand]
+    async Task OpenUniversityLink(string? key)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+            return;
+
+        if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
+        {
+            await AppShell.DisplaySnackbarAsync("Для открытия ссылки требуется интернет");
+            return;
+        }
+
+        try
+        {
+            await _navigation.OpenKnownBrowserAsync(key);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine(ex);
+            await AppShell.DisplaySnackbarAsync("Не удалось открыть раздел сайта");
         }
     }
 

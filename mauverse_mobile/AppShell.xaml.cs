@@ -24,6 +24,8 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("services/study_info/details", typeof(DetailStudentDebtPage));
         Routing.RegisterRoute("services/forms", typeof(OnlineFormsPage));
         Routing.RegisterRoute("services/forms/certificate", typeof(CertificateRequestPage));
+        Routing.RegisterRoute("services/student_guide", typeof(StudentGuidePage));
+        Routing.RegisterRoute("services/applicant", typeof(ApplicantGuidePage));
         Routing.RegisterRoute("profile/settings", typeof(SettingsPage));
         Routing.RegisterRoute(BrowserDestinationRegistry.InternalBrowserRoute, typeof(InternalBrowserPage));
         Navigated += OnNavigated;

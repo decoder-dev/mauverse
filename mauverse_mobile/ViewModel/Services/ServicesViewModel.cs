@@ -2,6 +2,7 @@ using mau.Database;
 using mau.DTOModels;
 using mau.Resources.Fonts;
 using mau.Utils;
+using mau.Utils.Services;
 using mau.Utils.Services.Interface;
 
 using CommunityToolkit.Mvvm.Input;
@@ -41,6 +42,14 @@ namespace mau.ViewModel.Services
                 CreateService("Цифровые сервисы МАУ", FluentUI.building_24_regular, "students")
             ];
 
+            ServiceDTO[] portalServices =
+            [
+                CreateService("Студенту", FluentUI.people_community_24_regular, "student_guide"),
+                CreateService("Абитуриенту", FluentUI.hat_graduation_24_regular, "applicant"),
+                CreateService("Библиотека", FluentUI.library_24_regular, "library"),
+                CreateService("Календарь событий", FluentUI.calendar_ltr_24_regular, "events_calendar")
+            ];
+
             ServiceDTO[] directories =
             [
                 CreateService("Контакты преподавателей", FluentUI.person_support_24_regular, "teacher_info"),
@@ -52,12 +61,14 @@ namespace mau.ViewModel.Services
                 new("Услуги", universityServices[0], universityServices[1]),
                 new(string.Empty, universityServices[2], universityServices[3]),
                 new(string.Empty, universityServices[4], universityServices[5]),
+                new("Портал МАУ", portalServices[0], portalServices[1]),
+                new(string.Empty, portalServices[2], portalServices[3]),
                 new("Справочники", directories[0], directories[1])
             ];
             SelectService = new AsyncRelayCommand<string?>(OpenServiceAsync);
         }
 
-        public string PageDescription { get; } = "Учебные и цифровые инструменты";
+        public string PageDescription { get; } = "Учебные сервисы и разделы сайта МАУ";
         public IReadOnlyList<ServiceRow> ServiceRows { get; }
         public IAsyncRelayCommand<string?> SelectService { get; }
 
@@ -78,6 +89,18 @@ namespace mau.ViewModel.Services
                 if (string.Equals(page, "students", StringComparison.Ordinal))
                 {
                     await _navigation.OpenKnownBrowserAsync(BrowserDestinationRegistry.MauDigitalServicesKey);
+                    return;
+                }
+
+                if (string.Equals(page, "library", StringComparison.Ordinal))
+                {
+                    await _navigation.OpenKnownBrowserAsync(BrowserDestinationRegistry.LibraryKey);
+                    return;
+                }
+
+                if (string.Equals(page, "events_calendar", StringComparison.Ordinal))
+                {
+                    await _navigation.OpenKnownBrowserAsync(BrowserDestinationRegistry.EventsCalendarKey);
                     return;
                 }
 
