@@ -105,6 +105,8 @@ class ParsingSettings(BaseSettings):
     SCIENCE_URL: str = "/press/science/rss/"
     STUDENTS_URL: str = "/press/community/rss/"
     OTHER_URL: str = "/press/smi/rss/"
+    APPLICANT_URL: str = "/abit/news/rss/"
+    CALENDAR_URL: str = "/press/calendar/rss/"
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     @field_validator("MAIN_URL")

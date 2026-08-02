@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:fonts="clr-namespace:mau.Resources.Fonts"
+             xmlns:models="clr-namespace:mau.Models"
+             xmlns:controls="clr-namespace:mau.Controls"
+             xmlns:converters="clr-namespace:mau.Utils.Converters"
+             xmlns:viewmodel="clr-namespace:mau.ViewModel.Services"
+             x:Class="mau.UniversityContactsPage"
+             x:DataType="viewmodel:UniversityContactsViewModel"
+             Title="Контакты и реквизиты"
+             BackgroundColor="{DynamicResource Background}">
+    <ContentPage.Resources>
+        <converters:HideLabelConverter x:Key="HideLabelConverter" />
+        <DataTemplate x:Key="ContactBlockTemplate"
+                      x:DataType="models:UniversityContactBlock">
+            <Border Margin="0,0,0,10"
+                    controls:LiquidGlass.UsesLiquidGlass="True"
+                    Padding="14"
+                    BackgroundColor="{DynamicResource Surface}"
+                    Stroke="{DynamicResource BorderSubtle}"
+                    StrokeThickness="1">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{Binding Title}"
+                           FontFamily="MontserratSemiBold"
+                           FontSize="14"
+                           TextColor="{DynamicResource TextPrimary}" />
+                    <Label Text="{Binding Details}"
+                           FontSize="12"
+                           TextColor="{DynamicResource TextSecondary}"
+                           LineBreakMode="WordWrap" />
+                    <Label Text="{Binding Address}"
+                           IsVisible="{Binding Address, Converter={StaticResource HideLabelConverter}}"
+                           FontSize="12"
+                           TextColor="{DynamicResource TextPrimary}"
+                           LineBreakMode="WordWrap" />
+                    <HorizontalStackLayout Spacing="8">
+                        <Button Text="Позвонить"
+                                IsVisible="{Binding Phone, Converter={StaticResource HideLabelConverter}}"
+                                Command="{Binding Path=CallCommand, Source={RelativeSource AncestorType={x:Type viewmodel:UniversityContactsViewModel}}, x:DataType={x:Type viewmodel:UniversityContactsViewModel}}"
+                                CommandParameter="{Binding .}"
+                                Style="{StaticResource SecondaryButton}"
+                                FontSize="12"
+                                Padding="12,8"
+                                MinimumHeightRequest="40" />
+                        <Button Text="Копировать"
+                                Command="{Binding Path=CopyCommand, Source={RelativeSource AncestorType={x:Type viewmodel:UniversityContactsViewModel}}, x:DataType={x:Type viewmodel:UniversityContactsViewModel}}"
+                                CommandParameter="{Binding .}"
+                                Style="{StaticResource SecondaryButton}"
+                                FontSize="12"
+                                Padding="12,8"
+                                MinimumHeightRequest="40" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </DataTemplate>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16,16,16,28"
+                             Spacing="20"
+                             MaximumWidthRequest="720">
+            <Label Text="{Binding PageDescription}"
+                   Style="{StaticResource SectionSubtitle}" />
+
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Приёмная комиссия"
+                       Style="{StaticResource SectionTitle}" />
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding AdmissionContacts}"
+                                     BindableLayout.ItemTemplate="{StaticResource ContactBlockTemplate}" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Реквизиты"
+                       Style="{StaticResource SectionTitle}" />
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding UniversityRequisites}"
+                                     BindableLayout.ItemTemplate="{StaticResource ContactBlockTemplate}" />
+            </VerticalStackLayout>
+
+            <Border controls:LiquidGlass.UsesLiquidGlass="True"
+                    Padding="14"
+                    BackgroundColor="{DynamicResource Surface}"
+                    Stroke="{DynamicResource BorderSubtle}"
+                    StrokeThickness="1"
+                    SemanticProperties.Description="Открыть реквизиты на сайте МАУ">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding OpenRequisitesPageCommand}" />
+                </Border.GestureRecognizers>
+                <Grid ColumnDefinitions="*,24">
+                    <Label Text="Полные реквизиты на сайте МАУ"
+                           FontFamily="MontserratSemiBold"
+                           FontSize="14"
+                           TextColor="{DynamicResource Primary}"
+                           VerticalTextAlignment="Center" />
+                    <Label Grid.Column="1"
+                           Text="{x:Static fonts:FluentUI.open_20_regular}"
+                           FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                           FontSize="18"
+                           TextColor="{DynamicResource Primary}"
+                           VerticalTextAlignment="Center" />
+                </Grid>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

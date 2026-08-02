@@ -9,5 +9,7 @@ public enum RssData
     Science = 4,
     International = 5,
     Events = 6,
-    Other = 7
+    Other = 7,
+    Applicant = 8,
+    Calendar = 9
 }

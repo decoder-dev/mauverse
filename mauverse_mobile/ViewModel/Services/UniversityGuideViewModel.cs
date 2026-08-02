@@ -37,6 +37,24 @@ public partial class UniversityGuideViewModel
             "Поступление, программы и контакты приёмной комиссии",
             UniversityGuideCatalog.ApplicantSections);
 
+    public static UniversityGuideViewModel CreateScience(IAppNavigationService navigation) =>
+        new(
+            navigation,
+            "Новости, гранты, издательство и инфраструктура науки МАУ",
+            UniversityGuideCatalog.ScienceSections);
+
+    public static UniversityGuideViewModel CreateInternational(IAppNavigationService navigation) =>
+        new(
+            navigation,
+            "English site, exchange and international admissions",
+            UniversityGuideCatalog.InternationalSections);
+
+    public static UniversityGuideViewModel CreateDigital(IAppNavigationService navigation) =>
+        new(
+            navigation,
+            "ЭИОС, библиотека, почта, Intra и заявки УИТ",
+            UniversityGuideCatalog.DigitalSections);
+
     [RelayCommand]
     async Task OpenLinkAsync(UniversityGuideLink? link)
     {

@@ -2,6 +2,7 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:mau.Controls"
+             xmlns:models="clr-namespace:mau.Models"
              xmlns:viewmodel="clr-namespace:mau.ViewModel.Services"
              x:Class="mau.Templates.SearchListTemplate">
     <DataTemplate x:Key="TeacherListItemTemplate" x:DataType="x:String">
@@ -27,6 +28,13 @@
         <ViewCell>
             <Grid Padding="12,8" MinimumHeightRequest="48" BackgroundColor="{DynamicResource Surface}">
                 <Label VerticalOptions="Center" Text="{Binding .}" Style="{StaticResource ListLabel}"/>
+            </Grid>
+        </ViewCell>
+    </DataTemplate>
+    <DataTemplate x:Key="RoomListItemTemplate" x:DataType="models:Room">
+        <ViewCell>
+            <Grid Padding="12,8" MinimumHeightRequest="48" BackgroundColor="{DynamicResource Surface}">
+                <Label VerticalOptions="Center" Text="{Binding Name}" Style="{StaticResource ListLabel}"/>
             </Grid>
         </ViewCell>
     </DataTemplate>
