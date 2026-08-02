@@ -2,8 +2,9 @@
 
 Built: 2026-08-02
 
-Classification: engineering release candidate for native iOS portal parity with
-Android 1.12.0 surfaces.
+Classification: engineering release published as GitHub Release `v1.12.1`.
+Not production-approved until remaining `docs/RELEASE_CHECKLIST.md` gates pass
+on the exact promoted signed artifacts.
 
 ## Targets
 
@@ -13,7 +14,17 @@ Android 1.12.0 surfaces.
 | iPhone (SwiftUI) | `MauverseIOS` | `1.12.1` | `CURRENT_PROJECT_VERSION` 30 |
 
 - Package: `com.pmi4freal.mauverse3`
-- Branch: `cursor/ios-portal-parity-010d`
+- Release commit: `36a068412a2fee49632593ec1e759e99125df55c` (`main`)
+- Tag / GitHub Release: https://github.com/decoder-dev/mauverse/releases/tag/v1.12.1
+- Pull request: https://github.com/decoder-dev/mauverse/pull/18 (merged)
+- CI on release commit: https://github.com/decoder-dev/mauverse/actions/runs/30764355781
+
+## Published artifacts (unsigned)
+
+| Artifact | SHA-256 |
+| --- | --- |
+| `mauverse-android-arm64-unsigned.aab` | `7af8a3de23cae9cd0e5eba956af0ac7c95723458209716d44e84c6885814f833` |
+| `mauverse-native-ios-arm64-unsigned.ipa` | `1315cf660d53e409d279b9bbbe5ce31d299b189154a5a0435cf05d3c85b37afc` |
 
 ## iPhone changes
 
@@ -28,5 +39,9 @@ Android 1.12.0 surfaces.
 
 ## Verification
 
-- Hosted `Native SwiftUI iPhone Release (unsigned)` must be green on the release commit.
-- Production Apple signing and device smoke tests remain open gates.
+- [x] All four CI jobs green on `36a0684`.
+- [x] GitHub Release `v1.12.1` published with unsigned AAB/IPA and checksums.
+- [ ] Protected production Android keystore signing (not `CN=Android Debug`).
+- [ ] Apple distribution signing of the native IPA on an approved Mac.
+- [ ] Device smoke test from `docs/RELEASE_CHECKLIST.md`.
+- [ ] Production API TLS, readiness, Moodle/mail monitoring, and rollback owner.
