@@ -252,18 +252,28 @@ jobs:
 
           publish_dir="bin/Release/net10.0-ios/ios-arm64/publish"
           app_path="$(find "$publish_dir" -maxdepth 1 -type d -name '*.app' -print -quit)"
-          test -n "$app_path"
-
-          if codesign --verify "$app_path" >/dev/null 2>&1; then
-            echo "Refusing to upload a signed iOS application." >&2
+          if [[ -z "$app_path" ]]; then
+            echo "Unsigned application bundle was not found under $publish_dir" >&2
+            find "$publish_dir" -maxdepth 2 -print >&2 || true
             exit 1
           fi
 
-          signing_material="$(find "$app_path" \
-            \( -type d -name '_CodeSignature' -o -type f -name 'embedded.mobileprovision' \) \
-            -print -quit)"
-          if [[ -n "$signing_material" ]]; then
-            echo "Signing material was found: $signing_material" >&2
+          # Device builds from the current toolchain may still carry an ad-hoc
+          # signature even when EnableCodeSigning=false. Strip that material for
+          # the CI artifact, but refuse a provisioning profile.
+          if [[ -f "$app_path/embedded.mobileprovision" ]]; then
+            echo "Refusing to upload an application with a provisioning profile." >&2
+            exit 1
+          fi
+
+          if codesign --verify "$app_path" >/dev/null 2>&1 || [[ -d "$app_path/_CodeSignature" ]]; then
+            echo "Stripping ad-hoc code signature from unsigned CI artifact."
+            codesign --remove-signature "$app_path" || true
+            rm -rf "$app_path/_CodeSignature"
+          fi
+
+          if [[ -d "$app_path/_CodeSignature" ]] || [[ -f "$app_path/embedded.mobileprovision" ]]; then
+            echo "Signing material remains after strip: $app_path" >&2
             exit 1
           fi
 
