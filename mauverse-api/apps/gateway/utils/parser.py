@@ -221,6 +221,26 @@ class ContactsParser:
         return payload
 
 
+_THIN_SPACES = (
+    "\xa0",  # nbsp
+    "\u2002",  # ensp
+    "\u2003",  # emsp
+    "\u2009",  # thinsp
+    "\u200a",
+    "\u202f",
+    "\u205f",
+)
+
+
+def _clean_rss_text(value: str) -> str:
+    text = html.unescape(value or "")
+    for space in _THIN_SPACES:
+        text = text.replace(space, " ")
+    text = re.sub(r"<[^>]+>", "", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text.replace("\n", "")
+
+
 class RssParser:
     def __init__(self) -> None:
         self.base_url = parser_config.MAIN_URL
@@ -247,16 +267,8 @@ class RssParser:
             if any(node is None for node in (title_node, link_node, description_node, date_node)):
                 continue
 
-            title = re.sub(
-                r"<[^>]+>",
-                "",
-                html.unescape(title_node.text).replace("\xa0", " "),
-            ).replace("\n", "")
-            description = re.sub(
-                r"<[^>]+>",
-                "",
-                html.unescape(description_node.text).replace("\xa0", " "),
-            ).replace("\n", "")
+            title = _clean_rss_text(title_node.text)
+            description = _clean_rss_text(description_node.text)
             try:
                 local_date = date_parser.parse(date_node.text)
             except (OverflowError, ValueError):

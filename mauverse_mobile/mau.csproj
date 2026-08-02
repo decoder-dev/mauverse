@@ -16,8 +16,8 @@
 
     <ApplicationTitle>MAUverse</ApplicationTitle>
     <ApplicationId>com.pmi4freal.mauverse3</ApplicationId>
-    <ApplicationDisplayVersion>1.12.0</ApplicationDisplayVersion>
-    <ApplicationVersion>29</ApplicationVersion>
+    <ApplicationDisplayVersion>1.12.2</ApplicationDisplayVersion>
+    <ApplicationVersion>31</ApplicationVersion>
     <MauverseApiBaseUrl Condition="'$(MauverseApiBaseUrl)' == ''">https://app.mauniver.ru/dev/mauverse/</MauverseApiBaseUrl>
 
     <WindowsPackageType>None</WindowsPackageType>

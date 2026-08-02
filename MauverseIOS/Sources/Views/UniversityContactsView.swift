@@ -110,8 +110,7 @@ struct UniversityContactsView: View {
     }
 
     private func phoneURL(_ phone: String) -> URL? {
-        let digits = phone.filter { $0.isNumber || $0 == "+" }
-        return URL(string: "tel:\(digits)")
+        PhoneNumberFormatting.telURL(from: phone)
     }
 
     private func copyText(_ value: String, label: String) {

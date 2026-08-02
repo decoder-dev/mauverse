@@ -964,9 +964,7 @@ private struct ContactCard: View {
     }
 
     private func phoneURL(_ value: String) -> URL? {
-        let normalized = value.filter { $0.isNumber || $0 == "+" }
-        guard normalized.filter(\.isNumber).count >= 5 else { return nil }
-        return URL(string: "tel:\(normalized)")
+        PhoneNumberFormatting.telURL(from: value)
     }
 }
 
