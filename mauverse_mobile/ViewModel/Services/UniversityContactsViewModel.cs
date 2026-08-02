@@ -37,11 +37,14 @@ public partial class UniversityContactsViewModel
 
         try
         {
-            var digits = new string(block.Phone.Where(c => char.IsDigit(c) || c == '+').ToArray());
-            if (digits.StartsWith('8') && digits.Length >= 11)
-                digits = "+7" + digits[1..];
+            var dial = PhoneNumberFormatting.ToDialString(block.Phone);
+            if (string.IsNullOrWhiteSpace(dial))
+            {
+                await AppShell.DisplaySnackbarAsync("Некорректный номер телефона");
+                return;
+            }
 
-            PhoneDialer.Default.Open(digits);
+            PhoneDialer.Default.Open(dial);
         }
         catch (Exception ex)
         {
