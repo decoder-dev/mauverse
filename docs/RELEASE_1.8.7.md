@@ -33,8 +33,9 @@ Classification: engineering release candidate, not production-approved until
 
 - Local `mauverse_mobile.Tests`: 31 passed.
 - Local `mauverse-api` unittest: 59 passed.
-- Hosted CI on the release commit must show green `backend`, `api-image`,
-  `android-release`, and `ios-release-unsigned` before promotion.
+- Hosted CI on `822af3e` / follow-up: `backend`, `api-image`, and
+  `android-release` green; `ios-release-unsigned` required packaging strip for
+  toolchain ad-hoc signatures (workflow fix included in this release branch).
 - Production signing, device smoke tests, and API traffic promotion remain open
   gates from `docs/RELEASE_CHECKLIST.md`.
 
