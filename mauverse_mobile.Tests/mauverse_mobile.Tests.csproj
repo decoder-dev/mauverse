@@ -33,6 +33,8 @@
              Link="Production\UniversityContactsCatalog.cs" />
     <Compile Include="..\mauverse_mobile\Utils\Services\ThemePalette.cs"
              Link="Production\ThemePalette.cs" />
+    <Compile Include="..\mauverse_mobile\Utils\PhoneNumberFormatting.cs"
+             Link="Production\PhoneNumberFormatting.cs" />
   </ItemGroup>
 
   <ItemGroup>
