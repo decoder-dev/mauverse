@@ -157,6 +157,133 @@ public static class UniversityGuideCatalog
             ])
     ];
 
+    public static IReadOnlyList<UniversityGuideSection> ScienceSections { get; } =
+    [
+        new(
+            "Наука МАУ",
+            [
+                Link(
+                    "Раздел «Наука»",
+                    "Главная страница научного блока университета",
+                    UniversityPortalUrls.ScienceHome,
+                    FluentUI.beaker_24_regular),
+                Link(
+                    "Новости науки",
+                    "Анонсы исследований и научных событий",
+                    UniversityPortalUrls.ScienceNews,
+                    FluentUI.megaphone_loud_24_regular),
+                Link(
+                    "Научные направления",
+                    "Приоритетные области исследований МАУ",
+                    UniversityPortalUrls.ScienceFields,
+                    FluentUI.book_compass_24_regular),
+                Link(
+                    "Мероприятия и дайджест",
+                    "Конференции, семинары и научный дайджест",
+                    UniversityPortalUrls.ScienceDigest,
+                    FluentUI.calendar_ltr_24_regular)
+            ]),
+        new(
+            "Исследователю",
+            [
+                Link(
+                    "Гранты",
+                    "Конкурсы и поддержка научных проектов",
+                    UniversityPortalUrls.ScienceGrants,
+                    FluentUI.trophy_24_regular),
+                Link(
+                    "Помощь исследователю",
+                    "Инструкции, базы и доступ к ресурсам",
+                    UniversityPortalUrls.ScienceHelp,
+                    FluentUI.book_question_mark_24_regular),
+                Link(
+                    "Издательство",
+                    "Журналы и публикации МАУ",
+                    UniversityPortalUrls.SciencePublishing,
+                    FluentUI.book_open_24_regular),
+                Link(
+                    "Инновации и инфраструктура",
+                    "Площадки, лаборатории и инновации",
+                    UniversityPortalUrls.ScienceInnovations,
+                    FluentUI.building_factory_24_regular)
+            ])
+    ];
+
+    public static IReadOnlyList<UniversityGuideSection> InternationalSections { get; } =
+    [
+        new(
+            "International",
+            [
+                Link(
+                    "English website",
+                    "English-language pages of Murmansk Arctic University",
+                    UniversityPortalUrls.EnglishSite,
+                    FluentUI.globe_24_regular),
+                Link(
+                    "Международная деятельность",
+                    "Партнёрства, обмен и проекты МАУ",
+                    UniversityPortalUrls.InternationalActivity,
+                    FluentUI.airplane_24_regular),
+                Link(
+                    "Иностранным поступающим",
+                    "Поступление для граждан других стран",
+                    UniversityPortalUrls.ForeignApplicants,
+                    FluentUI.hat_graduation_24_regular),
+                Link(
+                    "Diploma Supplement",
+                    "Европейское приложение к диплому",
+                    UniversityPortalUrls.DiplomaSupplement,
+                    FluentUI.document_ribbon_24_regular)
+            ])
+    ];
+
+    public static IReadOnlyList<UniversityGuideSection> DigitalSections { get; } =
+    [
+        new(
+            "Обучение и документы",
+            [
+                Link(
+                    "Цифровые сервисы студентов",
+                    "Справки и онлайн-заявки Студенческого офиса",
+                    UniversityPortalUrls.DigitalStudentServices,
+                    FluentUI.building_24_regular),
+                Link(
+                    "ЭИОС",
+                    "Электронная информационно-образовательная среда",
+                    UniversityPortalUrls.Eios,
+                    FluentUI.book_open_microphone_24_regular),
+                Link(
+                    "Электронный каталог библиотеки",
+                    "Поиск книг и электронных ресурсов",
+                    UniversityPortalUrls.LibraryCatalog,
+                    FluentUI.library_24_regular)
+            ]),
+        new(
+            "Почта и поддержка",
+            [
+                Link(
+                    "Webmail МАУ",
+                    "Корпоративная почта @mauniver.ru",
+                    UniversityPortalUrls.Webmail,
+                    FluentUI.mail_inbox_24_regular),
+                Link(
+                    "Заявка по общежитию (УИТ)",
+                    "Интернет и ИТ-поддержка в общежитии",
+                    UniversityPortalUrls.DormItRequest,
+                    FluentUI.wifi_1_24_regular),
+                Link(
+                    "Intra МАУ",
+                    "Внутренний портал для работников",
+                    UniversityPortalUrls.Intra,
+                    FluentUI.building_people_24_regular),
+                Link(
+                    "PROMT Translation Factory",
+                    "Сервис перевода для направления «Лингвистика»",
+                    UniversityPortalUrls.Promt,
+                    FluentUI.translate_24_regular)
+            ])
+    ];
+
     static UniversityGuideLink Link(string title, string description, string url, string glyph) =>
         new(title, description, url, glyph);
 }

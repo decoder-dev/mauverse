@@ -27,6 +27,10 @@
              Link="Production\BrowserDestinationRegistry.cs" />
     <Compile Include="..\mauverse_mobile\Utils\Services\UniversityPortalUrls.cs"
              Link="Production\UniversityPortalUrls.cs" />
+    <Compile Include="..\mauverse_mobile\Models\UniversityContactBlock.cs"
+             Link="Production\UniversityContactBlock.cs" />
+    <Compile Include="..\mauverse_mobile\Utils\Services\UniversityContactsCatalog.cs"
+             Link="Production\UniversityContactsCatalog.cs" />
     <Compile Include="..\mauverse_mobile\Utils\Services\ThemePalette.cs"
              Link="Production\ThemePalette.cs" />
   </ItemGroup>

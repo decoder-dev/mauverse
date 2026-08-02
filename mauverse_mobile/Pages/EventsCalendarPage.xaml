@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Name="PageRoot"
+             x:Class="mau.EventsCalendarPage"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewmodel="clr-namespace:mau.ViewModel.Services"
+             xmlns:fonts="clr-namespace:mau.Resources.Fonts"
+             xmlns:controls="clr-namespace:mau.Controls"
+             xmlns:dto="clr-namespace:mau.DTOModels"
+             BackgroundColor="{DynamicResource Background}"
+             x:DataType="viewmodel:EventsCalendarViewModel"
+             Title="Календарь событий">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                        EventName="Appearing"
+                                        Command="{Binding LoadDataCommand}"/>
+        <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                        EventName="Disappearing"
+                                        Command="{Binding CancelPendingOperationsCommand}" />
+    </ContentPage.Behaviors>
+    <ContentPage.Resources>
+        <DataTemplate x:Key="EventItemTemplate" x:DataType="dto:RssDTO">
+            <Border Padding="14"
+                    controls:LiquidGlass.UsesLiquidGlass="True"
+                    Margin="0,0,0,10"
+                    BackgroundColor="{DynamicResource Surface}"
+                    Stroke="{DynamicResource BorderSubtle}"
+                    StrokeThickness="1"
+                    SemanticProperties.Description="{Binding Title}"
+                    SemanticProperties.Hint="Открыть событие">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding OpenEventCommand, Source={RelativeSource AncestorType={x:Type viewmodel:EventsCalendarViewModel}}, x:DataType={x:Type viewmodel:EventsCalendarViewModel}}"
+                                          CommandParameter="{Binding .}" />
+                </Border.GestureRecognizers>
+                <Grid ColumnDefinitions="*,24" ColumnSpacing="8">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="{Binding Publish}"
+                               Style="{StaticResource Eyebrow}"
+                               MaxLines="1" />
+                        <Label Text="{Binding Title}"
+                               FontFamily="MontserratSemiBold"
+                               FontSize="15"
+                               TextColor="{DynamicResource TextPrimary}"
+                               MaxLines="3"
+                               LineBreakMode="TailTruncation" />
+                        <Label Text="{Binding Description}"
+                               FontSize="12"
+                               TextColor="{DynamicResource TextSecondary}"
+                               MaxLines="3"
+                               LineBreakMode="TailTruncation" />
+                    </VerticalStackLayout>
+                    <Label Grid.Column="1"
+                           Text="{x:Static fonts:FluentUI.chevron_right_20_regular}"
+                           FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                           FontSize="20"
+                           TextColor="{DynamicResource TextMuted}"
+                           VerticalTextAlignment="Center" />
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="auto,*"
+          Padding="16,16,16,16"
+          RowSpacing="14"
+          MaximumWidthRequest="720">
+        <VerticalStackLayout Spacing="10">
+            <Label Text="События из календаря МАУ"
+                   Style="{StaticResource SectionSubtitle}" />
+            <Border controls:LiquidGlass.UsesLiquidGlass="True"
+                    Padding="14,12"
+                    BackgroundColor="{DynamicResource Surface}"
+                    Stroke="{DynamicResource BorderSubtle}"
+                    StrokeThickness="1"
+                    SemanticProperties.Description="Открыть календарь на сайте">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding OpenSiteCalendarCommand}" />
+                </Border.GestureRecognizers>
+                <Grid ColumnDefinitions="*,24">
+                    <Label Text="Месячная сетка на сайте МАУ"
+                           FontFamily="MontserratSemiBold"
+                           FontSize="14"
+                           TextColor="{DynamicResource Primary}" />
+                    <Label Grid.Column="1"
+                           Text="{x:Static fonts:FluentUI.open_20_regular}"
+                           FontFamily="{x:Static fonts:FluentUI.FontFamily}"
+                           FontSize="18"
+                           TextColor="{DynamicResource Primary}" />
+                </Grid>
+            </Border>
+        </VerticalStackLayout>
+
+        <Grid Grid.Row="1">
+            <Border Style="{StaticResource SurfacePanel}"
+                    IsVisible="{Binding IsLoading}"
+                    VerticalOptions="Start">
+                <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+                    <ActivityIndicator IsRunning="{Binding IsLoading}"
+                                       SemanticProperties.Description="Загрузка событий" />
+                    <Label Text="Загружаем события"
+                           Style="{StaticResource SectionSubtitle}"
+                           VerticalTextAlignment="Center" />
+                </HorizontalStackLayout>
+            </Border>
+            <CollectionView BackgroundColor="Transparent"
+                            IsVisible="{Binding HasContent}"
+                            ItemSizingStrategy="MeasureAllItems"
+                            ItemsSource="{Binding Events}"
+                            ItemTemplate="{StaticResource EventItemTemplate}" />
+            <Border Style="{StaticResource SurfacePanel}"
+                    IsVisible="{Binding IsEmpty}"
+                    VerticalOptions="Start">
+                <Label Text="Событий пока нет"
+                       Style="{StaticResource EmptyStateTitle}" />
+            </Border>
+        </Grid>
+    </Grid>
+</ContentPage>

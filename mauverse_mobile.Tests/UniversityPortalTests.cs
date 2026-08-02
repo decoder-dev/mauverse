@@ -35,6 +35,30 @@ public sealed class UniversityPortalTests
         Assert.All(UniversityPortalUrls.ApplicantUrls, AssertUniversityHttps);
     }
 
+    [Fact]
+    public void ScienceInternationalAndDigitalUrlsStayOnUniversityHosts()
+    {
+        Assert.Contains(UniversityPortalUrls.ScienceUrls, url => url.Contains("/science/", StringComparison.Ordinal));
+        Assert.Contains(UniversityPortalUrls.InternationalUrls, url => url.Contains("/en/", StringComparison.Ordinal));
+        Assert.Contains(UniversityPortalUrls.DigitalServiceUrls, url => url.Contains("webmail.mauniver.ru", StringComparison.Ordinal));
+        Assert.Contains(UniversityPortalUrls.DigitalServiceUrls, url => url.Contains("serviceahd.mauniver.ru", StringComparison.Ordinal));
+
+        Assert.All(UniversityPortalUrls.ScienceUrls, AssertUniversityHttps);
+        Assert.All(UniversityPortalUrls.InternationalUrls, AssertUniversityHttps);
+        Assert.All(UniversityPortalUrls.DigitalServiceUrls, AssertUniversityHttps);
+    }
+
+    [Fact]
+    public void ContactsCatalogIncludesAdmissionAndPaymentDetails()
+    {
+        Assert.Contains(
+            UniversityContactsCatalog.AdmissionContacts,
+            block => block.Phone is not null && block.Phone.Contains("800", StringComparison.Ordinal));
+        Assert.Contains(
+            UniversityContactsCatalog.UniversityRequisites,
+            block => block.Details.Contains("5190100176", StringComparison.Ordinal));
+    }
+
     [Theory]
     [InlineData(BrowserDestinationRegistry.LibraryKey, "lib.mauniver.ru")]
     [InlineData(BrowserDestinationRegistry.EventsCalendarKey, "mauniver.ru")]
