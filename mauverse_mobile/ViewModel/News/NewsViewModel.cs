@@ -174,6 +174,14 @@ namespace mau.ViewModel.News
                     FilterType = RssData.International,
                 },
                 new Buttons {
+                    FilterName = "Абитуриент",
+                    FilterType = RssData.Applicant,
+                },
+                new Buttons {
+                    FilterName = "Календарь",
+                    FilterType = RssData.Calendar,
+                },
+                new Buttons {
                     FilterName = "СМИ о нас",
                     FilterType = RssData.Other,
                 },
