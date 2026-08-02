@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 using mau.Models;
+using mau.Utils.Services;
 using mau.Utils.Services.Interface;
 
 using System.Collections.ObjectModel;
@@ -39,6 +40,13 @@ public partial class CampusNavigatorViewModel : ObservableObject
         Building("Л57", "пр. Ленина, 57")
     ];
 
+    private static readonly IReadOnlyList<CampusBuilding> Branches =
+    [
+        Building("Филиал в г. Апатиты", "ул. Лесная, 29", "apatity", "Апатиты"),
+        Building("Филиал в г. Кировске", "ул. 50 лет Октября, 2", "kirovsk", "Кировск"),
+        Building("Филиал в г. Полярный", "ул. Лунина, 5", "murmansk", "Полярный")
+    ];
+
     [ObservableProperty]
     private string _searchText = string.Empty;
 
@@ -70,7 +78,8 @@ public partial class CampusNavigatorViewModel : ObservableObject
         try
         {
             var query = Uri.EscapeDataString(building.SearchQuery);
-            var routeUri = new Uri($"https://2gis.ru/murmansk/search/{query}");
+            var city = string.IsNullOrWhiteSpace(building.MapCity) ? "murmansk" : building.MapCity;
+            var routeUri = new Uri($"https://2gis.ru/{city}/search/{query}");
             var opened = await _navigation.OpenExternalAsync(routeUri);
 
             if (!opened)
@@ -83,6 +92,53 @@ public partial class CampusNavigatorViewModel : ObservableObject
         }
     }
 
+    [RelayCommand]
+    private async Task OpenPanoramaAsync(CampusBuilding? building)
+    {
+        if (building is null)
+            return;
+
+        if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
+        {
+            await AppShell.DisplaySnackbarAsync("Для панорамы требуется интернет");
+            return;
+        }
+
+        try
+        {
+            var query = Uri.EscapeDataString(building.SearchQuery);
+            var panoramaUri = new Uri($"https://yandex.ru/maps/?text={query}&l=stv");
+            var opened = await _navigation.OpenExternalAsync(panoramaUri);
+            if (!opened)
+                await AppShell.DisplaySnackbarAsync("Не удалось открыть панораму");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine(ex);
+            await AppShell.DisplaySnackbarAsync("Не удалось открыть панораму");
+        }
+    }
+
+    [RelayCommand]
+    private async Task OpenOfficialNavigatorAsync()
+    {
+        if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
+        {
+            await AppShell.DisplaySnackbarAsync("Для открытия навигатора требуется интернет");
+            return;
+        }
+
+        try
+        {
+            await _navigation.OpenKnownBrowserAsync(BrowserDestinationRegistry.CampusNavigatorSiteKey);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine(ex);
+            await AppShell.DisplaySnackbarAsync("Не удалось открыть навигатор на сайте");
+        }
+    }
+
     private void ApplyFilter()
     {
         var query = SearchText.Trim();
@@ -90,12 +146,16 @@ public partial class CampusNavigatorViewModel : ObservableObject
 
         AddGroup(
             "Южный кампус",
-            "Остановки: МАУ, переулок Хибинский",
+            "Остановки: «МАУ», «переулок Хибинский». Автобусы и маршрутки по ул. Спортивной / Колхозной / Советской.",
             Filter(SouthCampus, query));
         AddGroup(
             "Северный кампус",
-            "Остановки: Капитана Егорова, Академика Книповича",
+            "Остановки: «Капитана Егорова», «Академика Книповича». Удобно добираться от ж/д вокзала и центра.",
             Filter(NorthCampus, query));
+        AddGroup(
+            "Филиалы",
+            "Апатиты, Кировск и Полярный — смотрите расписание пригородного транспорта и пропуска для ЗАТО Полярный.",
+            Filter(Branches, query));
 
         OnPropertyChanged(nameof(HasResults));
         OnPropertyChanged(nameof(ShowEmptyState));
@@ -118,4 +178,11 @@ public partial class CampusNavigatorViewModel : ObservableObject
 
     private static CampusBuilding Building(string title, string address) =>
         new(title, address, $"МАУ {title}, {address}, Мурманск");
+
+    private static CampusBuilding Building(
+        string title,
+        string address,
+        string mapCity,
+        string cityName) =>
+        new(title, address, $"МАУ {title}, {address}, {cityName}", mapCity);
 }

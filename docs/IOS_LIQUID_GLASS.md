@@ -1,58 +1,57 @@
-# iPhone and Liquid Glass
+# Native iPhone app (SwiftUI)
 
-The iPhone application uses the same MAUverse pages, view models, API clients,
-cache, authentication, and navigation routes as the Android application.
+The shipping iPhone application is the native SwiftUI client in `MauverseIOS`.
+Android remains the .NET MAUI client in `mauverse_mobile`. Both talk to the same
+MAUverse API and share the same bundle id `com.pmi4freal.mauverse3`.
 
 ## Rendering
 
-- iOS 26 and newer use `UIGlassEffect` for marked content surfaces.
-- iOS 15 through 25 fall back to the adaptive UIKit system material.
-- Shell navigation and tab bars keep their native translucent appearance, so
-  iOS 26 renders Apple's current Liquid Glass treatment automatically.
+- iOS 26 and newer use the system Liquid Glass appearance for navigation and
+  translucent surfaces.
+- iOS 18–25 use native SwiftUI / UIKit materials.
 - Reduce Transparency, Increase Contrast, and Reduce Motion remain controlled
-  by iOS because the implementation uses native UIKit materials.
+  by iOS.
 
 ## Build and run
 
-Use a Mac with .NET 10, the .NET MAUI workload, Xcode 26 or newer, and an Apple
-development signing identity:
+Requires a Mac with Xcode 26.5 (or newer matching `project.yml`) and
+[XcodeGen](https://github.com/yonaskolb/XcodeGen):
 
 ```bash
-cd mauverse_mobile
-dotnet workload restore
-dotnet restore mau.csproj
-dotnet build mau.csproj -f net10.0-ios -c Debug
+brew install xcodegen
+cd MauverseIOS
+xcodegen generate --spec project.yml
+open MAUverse.xcodeproj
 ```
 
-Open the solution in Visual Studio Code with the .NET MAUI extension or use the
-command line to select an iPhone simulator/device. A physical iPhone is
-recommended for the final material, accessibility, dark-mode, and performance
-checks.
+Set `MAUVERSE_SCHEDULE_TOKEN` in the Xcode build settings or scheme environment
+when calling the schedule API. A physical iPhone is recommended for final
+material, accessibility, dark-mode, and performance checks.
 
 For App Store distribution, configure the team, provisioning profile, and
-release signing on the Mac. Do not publish a Debug-signed archive.
+release signing on the Mac. Do not publish an unsigned or Debug-signed archive.
 
 ## Unsigned GitHub CI artifact
 
-The `ios-release-unsigned` GitHub Actions job publishes
-`mauverce-ios-arm64-release-unsigned`. It contains:
+The `ios-release-unsigned` job (display name
+`Native SwiftUI iPhone Release (unsigned)`) publishes
+`mauverse-native-ios-arm64-release-unsigned`. It contains:
 
-- `mauverce-ios-arm64-unsigned.ipa`;
+- `mauverse-native-ios-arm64-unsigned.ipa`;
 - `checksums.txt`;
 - `build-metadata.txt`.
 
 The IPA is only an unsigned container for later signing. The job does not import
-an Apple certificate or provisioning profile and verifies that the application
-contains neither `_CodeSignature` nor `embedded.mobileprovision` before upload.
-Sign the extracted application with your own matching certificate, entitlements,
-and provisioning profile, then recreate the IPA. Never store an unprotected
-private key in the repository or in a downloadable CI artifact.
+an Apple certificate or provisioning profile and fails if the application
+contains `_CodeSignature` or `embedded.mobileprovision`. Sign the extracted
+application with your own matching certificate, entitlements, and provisioning
+profile, then recreate the IPA.
 
 ## Required smoke checks
 
 1. Login, logout, and restored session.
 2. All five tabs: Home, Schedule, Services, News, and Profile.
-3. Service routes, popups, embedded browser, messenger, and forms.
+3. Service routes, in-app browser, messenger, and forms.
 4. Light and dark appearance.
 5. iOS Reduce Transparency and Increase Contrast.
 6. Dynamic Type and VoiceOver labels.
