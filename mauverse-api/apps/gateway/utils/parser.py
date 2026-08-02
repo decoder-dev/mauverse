@@ -62,6 +62,8 @@ class ParserType(enum.Enum):
     INTERNATIONAL = 5, parser_config.INTERNATIONAL_URL
     EVENTS = 6, parser_config.EVENTS_URL
     OTHER = 7, parser_config.OTHER_URL
+    APPLICANT = 8, parser_config.APPLICANT_URL
+    CALENDAR = 9, parser_config.CALENDAR_URL
 
     def __init__(self, parser_id: int, url: str) -> None:
         self._id = parser_id

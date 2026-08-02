@@ -34,3 +34,11 @@
 *.log
 .DS_Store
 Thumbs.db
+
+# Native iOS (XcodeGen output and local builds)
+MauverseIOS/*.xcodeproj/
+MauverseIOS/*.xcworkspace/
+build/
+**/DerivedData/
+*.xcuserstate
+xcuserdata/

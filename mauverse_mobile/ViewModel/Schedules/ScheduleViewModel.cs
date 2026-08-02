@@ -152,12 +152,27 @@ namespace mau.ViewModel.Schedules
         [RelayCommand]
         async Task FilterData(CancellationToken cancellationToken)
         {
-            if (SelectedRoom?.RoomId == 0 || TeacherName == "Ничего не найдено")
+            var teacher = TeacherName?.Trim() ?? string.Empty;
+            if (string.Equals(teacher, "Ничего не найдено", StringComparison.Ordinal))
                 return;
 
-            var roomId = SelectedRoom?.RoomId;
-            RoomName = SelectedRoom?.Name ?? string.Empty;
-            await FilterScheduleAsync(roomId: roomId ?? 0, teacher: TeacherName, cancellationToken);
+            if (!string.IsNullOrWhiteSpace(teacher))
+            {
+                SelectedRoom = null;
+                RoomName = string.Empty;
+                await FilterScheduleAsync(teacher: teacher, cancellationToken: cancellationToken);
+            }
+            else if (SelectedRoom is { RoomId: > 0 })
+            {
+                TeacherName = string.Empty;
+                RoomName = SelectedRoom.Name;
+                await FilterScheduleAsync(roomId: SelectedRoom.RoomId, cancellationToken: cancellationToken);
+            }
+            else
+            {
+                return;
+            }
+
             TeacherList.Clear();
             RoomsList.Clear();
             TeacherFilterListIsVisible = false;
