@@ -6,13 +6,6 @@ using mau.DTOModels;
 using mau.Utils;
 using mau.Utils.API.Interaface;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
-
 namespace mau.ViewModel.Dialogs
 {
     public partial class DetailTelephoneViewModel : BaseViewModel
@@ -51,6 +44,30 @@ namespace mau.ViewModel.Dialogs
             finally
             {
                 IsBusy = false;
+            }
+        }
+
+        [RelayCommand]
+        async Task CallAsync(string? rawPhone)
+        {
+            if (string.IsNullOrWhiteSpace(rawPhone))
+                return;
+
+            try
+            {
+                var dial = PhoneNumberFormatting.ToDialString(rawPhone);
+                if (string.IsNullOrWhiteSpace(dial))
+                {
+                    await AppShell.DisplaySnackbarAsync("Некорректный номер телефона");
+                    return;
+                }
+
+                PhoneDialer.Default.Open(dial);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex);
+                await AppShell.DisplaySnackbarAsync("Не удалось открыть телефон");
             }
         }
     }

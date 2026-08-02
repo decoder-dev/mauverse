@@ -58,7 +58,7 @@ actor OfficialNewsService {
     private func fetch(url: URL, cachePolicy: URLRequest.CachePolicy) async throws -> [NewsItem] {
         var request = URLRequest(url: url, cachePolicy: cachePolicy, timeoutInterval: 30)
         request.timeoutInterval = 30
-        request.setValue("MAUverse/1.12.1 (iOS)", forHTTPHeaderField: "User-Agent")
+        request.setValue("MAUverse/1.12.2 (iOS)", forHTTPHeaderField: "User-Agent")
         request.setValue("application/rss+xml, application/xml, text/xml", forHTTPHeaderField: "Accept")
 
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -152,10 +152,10 @@ private final class RSSNewsParser: NSObject, XMLParserDelegate {
         guard current != nil else { return }
         let value = text.trimmingCharacters(in: .whitespacesAndNewlines)
         switch elementName {
-        case "title": current?.title = value.cleanedRSS
+        case "title": current?.title = HTMLTextCleaning.cleanRSS(value)
         case "link": current?.link = Self.absoluteURL(value)
         case "description":
-            current?.description = value.cleanedRSS
+            current?.description = HTMLTextCleaning.cleanRSS(value)
             if current?.image == nil {
                 current?.image = Self.firstImageURL(in: value)
             }
@@ -202,20 +202,6 @@ private final class RSSNewsParser: NSObject, XMLParserDelegate {
         guard let match = expression.firstMatch(in: html, range: range),
               let urlRange = Range(match.range(at: 1), in: html) else { return nil }
         return absoluteURL(String(html[urlRange]))
-    }
-}
-
-private extension String {
-    var cleanedRSS: String {
-        replacingOccurrences(of: "<[^>]+>", with: " ", options: .regularExpression)
-            .replacingOccurrences(of: "&nbsp;", with: " ")
-            .replacingOccurrences(of: "&mdash;", with: "—")
-            .replacingOccurrences(of: "&ndash;", with: "–")
-            .replacingOccurrences(of: "&laquo;", with: "«")
-            .replacingOccurrences(of: "&raquo;", with: "»")
-            .replacingOccurrences(of: "&amp;", with: "&")
-            .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
 
