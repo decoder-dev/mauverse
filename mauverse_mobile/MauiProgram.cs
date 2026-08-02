@@ -97,6 +97,11 @@ public static class MauiProgram
         builder.Services.AddTransient<OnlineFormsPage>();
         builder.Services.AddTransient<StudentGuidePage>();
         builder.Services.AddTransient<ApplicantGuidePage>();
+        builder.Services.AddTransient<ScienceGuidePage>();
+        builder.Services.AddTransient<InternationalGuidePage>();
+        builder.Services.AddTransient<DigitalServicesPage>();
+        builder.Services.AddTransient<UniversityContactsPage>();
+        builder.Services.AddTransient<EventsCalendarPage>();
         builder.Services.AddTransient<CertificateRequestPage>();
         builder.Services.AddTransient<InternalBrowserPage>();
         builder.Services.AddTransient<NewsPage>();

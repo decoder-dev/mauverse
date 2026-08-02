@@ -19,22 +19,17 @@
                     Stroke="{DynamicResource BorderSubtle}"
                     StrokeThickness="1"
                     SemanticProperties.Description="{Binding Title}"
-                    SemanticProperties.Hint="Открыть маршрут в 2GIS">
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer
-                        Command="{Binding Path=OpenRouteCommand, Source={RelativeSource AncestorType={x:Type viewmodel:CampusNavigatorViewModel}}, x:DataType={x:Type viewmodel:CampusNavigatorViewModel}}"
-                        CommandParameter="{Binding .}" />
-                </Border.GestureRecognizers>
+                    SemanticProperties.Hint="Корпус кампуса МАУ">
                 <Grid ColumnDefinitions="44,*,auto"
                       ColumnSpacing="12"
-                      RowDefinitions="auto,auto"
+                      RowDefinitions="auto,auto,auto"
                       RowSpacing="3">
-                    <Border Grid.RowSpan="2"
+                    <Border Grid.RowSpan="3"
                             WidthRequest="44"
                             HeightRequest="44"
                             Padding="0"
                             BackgroundColor="{DynamicResource PrimaryLight}"
-                            VerticalOptions="Center">
+                            VerticalOptions="Start">
                         <Label Text="{x:Static fonts:FluentUI.building_24_regular}"
                                FontFamily="{x:Static fonts:FluentUI.FontFamily}"
                                FontSize="23"
@@ -52,18 +47,31 @@
                            Text="{Binding Address}"
                            FontSize="12"
                            TextColor="{DynamicResource TextSecondary}" />
-                    <HorizontalStackLayout Grid.RowSpan="2"
-                                           Grid.Column="2"
-                                           Spacing="5"
-                                           VerticalOptions="Center">
-                        <Label Text="2GIS"
+                    <HorizontalStackLayout Grid.Row="2"
+                                           Grid.Column="1"
+                                           Grid.ColumnSpan="2"
+                                           Spacing="14"
+                                           Margin="0,4,0,0">
+                        <Label Text="Маршрут"
                                FontFamily="MontserratSemiBold"
-                               FontSize="11"
-                               TextColor="{DynamicResource Primary}" />
-                        <Label Text="{x:Static fonts:FluentUI.open_20_regular}"
-                               FontFamily="{x:Static fonts:FluentUI.FontFamily}"
-                               FontSize="18"
-                               TextColor="{DynamicResource Primary}" />
+                               FontSize="12"
+                               TextColor="{DynamicResource Primary}">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Path=OpenRouteCommand, Source={RelativeSource AncestorType={x:Type viewmodel:CampusNavigatorViewModel}}, x:DataType={x:Type viewmodel:CampusNavigatorViewModel}}"
+                                    CommandParameter="{Binding .}" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                        <Label Text="Панорама"
+                               FontFamily="MontserratSemiBold"
+                               FontSize="12"
+                               TextColor="{DynamicResource Primary}">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Path=OpenPanoramaCommand, Source={RelativeSource AncestorType={x:Type viewmodel:CampusNavigatorViewModel}}, x:DataType={x:Type viewmodel:CampusNavigatorViewModel}}"
+                                    CommandParameter="{Binding .}" />
+                            </Label.GestureRecognizers>
+                        </Label>
                     </HorizontalStackLayout>
                 </Grid>
             </Border>

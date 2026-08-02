@@ -93,6 +93,33 @@ public partial class CampusNavigatorViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task OpenPanoramaAsync(CampusBuilding? building)
+    {
+        if (building is null)
+            return;
+
+        if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
+        {
+            await AppShell.DisplaySnackbarAsync("Для панорамы требуется интернет");
+            return;
+        }
+
+        try
+        {
+            var query = Uri.EscapeDataString(building.SearchQuery);
+            var panoramaUri = new Uri($"https://yandex.ru/maps/?text={query}&l=stv");
+            var opened = await _navigation.OpenExternalAsync(panoramaUri);
+            if (!opened)
+                await AppShell.DisplaySnackbarAsync("Не удалось открыть панораму");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine(ex);
+            await AppShell.DisplaySnackbarAsync("Не удалось открыть панораму");
+        }
+    }
+
+    [RelayCommand]
     private async Task OpenOfficialNavigatorAsync()
     {
         if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
@@ -119,15 +146,15 @@ public partial class CampusNavigatorViewModel : ObservableObject
 
         AddGroup(
             "Южный кампус",
-            "Остановки: МАУ, переулок Хибинский",
+            "Остановки: «МАУ», «переулок Хибинский». Автобусы и маршрутки по ул. Спортивной / Колхозной / Советской.",
             Filter(SouthCampus, query));
         AddGroup(
             "Северный кампус",
-            "Остановки: Капитана Егорова, Академика Книповича",
+            "Остановки: «Капитана Егорова», «Академика Книповича». Удобно добираться от ж/д вокзала и центра.",
             Filter(NorthCampus, query));
         AddGroup(
             "Филиалы",
-            "Апатиты, Кировск и Полярный",
+            "Апатиты, Кировск и Полярный — смотрите расписание пригородного транспорта и пропуска для ЗАТО Полярный.",
             Filter(Branches, query));
 
         OnPropertyChanged(nameof(HasResults));
