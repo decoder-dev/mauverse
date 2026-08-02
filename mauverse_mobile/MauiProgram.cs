@@ -95,6 +95,8 @@ public static class MauiProgram
         builder.Services.AddTransient<HomeChatPage>();
         builder.Services.AddTransient<CampusNavigatorPage>();
         builder.Services.AddTransient<OnlineFormsPage>();
+        builder.Services.AddTransient<StudentGuidePage>();
+        builder.Services.AddTransient<ApplicantGuidePage>();
         builder.Services.AddTransient<CertificateRequestPage>();
         builder.Services.AddTransient<InternalBrowserPage>();
         builder.Services.AddTransient<NewsPage>();

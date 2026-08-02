@@ -12,10 +12,16 @@ public partial class SettingsPage : ContentPage
         DbConnect context,
         ICacheService persistentCache,
         IMemoryCache memoryCache,
-        IThemeService themeService)
+        IThemeService themeService,
+        IAppNavigationService navigation)
     {
         InitializeComponent();
-        BindingContext = new SettingsViewModel(context, persistentCache, memoryCache, themeService);
+        BindingContext = new SettingsViewModel(
+            context,
+            persistentCache,
+            memoryCache,
+            themeService,
+            navigation);
         Shell.SetTabBarIsVisible(this, false);
     }
 }
