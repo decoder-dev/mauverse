@@ -48,6 +48,10 @@ namespace mau.ViewModel.Dialogs
         }
 
         [RelayCommand]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "CA1822:Mark members as static",
+            Justification = "RelayCommand generation requires the instance command contract used by XAML.")]
         async Task CallAsync(string? rawPhone)
         {
             if (string.IsNullOrWhiteSpace(rawPhone))
