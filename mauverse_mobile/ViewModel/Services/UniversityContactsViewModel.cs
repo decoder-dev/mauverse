@@ -26,6 +26,10 @@ public partial class UniversityContactsViewModel
         UniversityContactsCatalog.UniversityRequisites;
 
     [RelayCommand]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Performance",
+        "CA1822:Mark members as static",
+        Justification = "RelayCommand generation requires the instance command contract used by XAML.")]
     async Task CallAsync(UniversityContactBlock? block)
     {
         if (block is null || string.IsNullOrWhiteSpace(block.Phone))
@@ -47,6 +51,10 @@ public partial class UniversityContactsViewModel
     }
 
     [RelayCommand]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Performance",
+        "CA1822:Mark members as static",
+        Justification = "RelayCommand generation requires the instance command contract used by XAML.")]
     async Task CopyAsync(UniversityContactBlock? block)
     {
         if (block is null)
