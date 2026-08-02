@@ -1,14 +1,17 @@
 # MAUverce
 
 MAUverce is a student mobile application for Murmansk Arctic University. The
-repository contains a .NET 9 MAUI client and a FastAPI gateway.
+repository contains a .NET MAUI Android client, a native SwiftUI iPhone client,
+and a FastAPI gateway.
 
 ## Repository layout
 
-- `mauverse_mobile` - .NET MAUI application for Android and iPhone.
+- `mauverse_mobile` - .NET MAUI application for Android.
+- `MauverseIOS` - native SwiftUI application for iPhone.
 - `mauverse-api` - FastAPI gateway for EIOS, schedules, news, debts, contacts,
   and student forms.
-- `.github/workflows/ci.yml` - backend, container, and Android verification.
+- `.github/workflows/ci.yml` - backend, container, Android, and native iPhone
+  verification.
 - `docs` - production audit, release process, and release records.
 
 ## Backend development
@@ -73,19 +76,26 @@ engineering build and must not be distributed as a production release.
 
 ## iPhone development
 
-The iPhone target keeps the full MAUverse feature set and uses native Liquid
-Glass navigation and content surfaces on iOS 26, with an adaptive UIKit material
-fallback on iOS 15-25. Building and signing iOS requires a Mac with Xcode 26 or
-newer. See [iPhone and Liquid Glass](docs/IOS_LIQUID_GLASS.md).
+The shipping iPhone app is native SwiftUI in `MauverseIOS`. It uses system
+Liquid Glass on iOS 26 and native materials on iOS 18–25. Generate the Xcode
+project with XcodeGen, then build or archive in Xcode 26.5+. See
+[native iPhone app](docs/IOS_LIQUID_GLASS.md).
+
+```bash
+brew install xcodegen
+cd MauverseIOS
+xcodegen generate --spec project.yml
+open MAUverse.xcodeproj
+```
 
 ## CI and releases
 
 GitHub Actions uses minimal `contents: read` permission, immutable action SHAs,
 pip and NuGet caches, bounded job timeouts, and concurrency cancellation. It
 runs backend tests, Ruff, compileall, a non-root container health smoke test,
-Android and iPhone Release-configuration builds. CI uploads unsigned Android
-packages and an unsigned `ios-arm64` IPA container; it never imports signing
-certificates or provisioning profiles.
+the Android MAUI Release build, and the native SwiftUI iPhone Release build. CI
+uploads unsigned Android packages and an unsigned native iPhone IPA container;
+it never imports signing certificates or provisioning profiles.
 
 Production signing, device smoke testing, deployment, and rollback are explicit
 promotion gates. See [CI and release engineering](docs/CI_AND_RELEASE.md), the

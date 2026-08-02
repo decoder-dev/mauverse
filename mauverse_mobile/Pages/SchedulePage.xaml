@@ -110,7 +110,7 @@
                               IsVisible="{Binding RoomFilterListIsVisible}"
                               ItemsSource="{Binding RoomsList}"
                               SelectedItem="{Binding SelectedRoom}"
-                              ItemTemplate="{StaticResource ListItemTemplate}">
+                              ItemTemplate="{StaticResource RoomListItemTemplate}">
                         <ListView.Behaviors>
                             <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
                                                             EventName="ItemSelected"
