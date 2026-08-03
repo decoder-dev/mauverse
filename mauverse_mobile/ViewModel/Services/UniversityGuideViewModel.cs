@@ -46,7 +46,7 @@ public partial class UniversityGuideViewModel
     public static UniversityGuideViewModel CreateInternational(IAppNavigationService navigation) =>
         new(
             navigation,
-            "English site, exchange and international admissions",
+            "Англоязычный сайт, обмен и поступление для иностранных студентов",
             UniversityGuideCatalog.InternationalSections);
 
     public static UniversityGuideViewModel CreateDigital(IAppNavigationService navigation) =>

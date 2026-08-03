@@ -231,7 +231,7 @@ private struct HeroNewsCard: View {
                     .lineLimit(4)
                     .fixedSize(horizontal: false, vertical: true)
                 if let description = item.description {
-                    Text(description.strippingHTML)
+                    Text(description.cleanedForDisplay)
                         .font(.system(size: 13, weight: .regular))
                         .foregroundStyle(MauTheme.muted)
                         .lineLimit(2)
@@ -252,9 +252,7 @@ private struct HeroNewsCard: View {
 }
 
 private extension String {
-    var strippingHTML: String {
-        replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
-            .replacingOccurrences(of: "&nbsp;", with: " ")
-            .replacingOccurrences(of: "&amp;", with: "&")
+    var cleanedForDisplay: String {
+        HTMLTextCleaning.cleanRSS(self)
     }
 }

@@ -225,7 +225,8 @@ private struct FormsView: View {
             title: "Справка об обучении",
             subtitle: "Обычная, гербовая или электронная",
             icon: "doc.badge.plus",
-            url: "https://mauniver.ru/services/student/"
+            url: nil,
+            isNative: true
         ),
         OnlineFormLink(
             title: "Справка для перевода",
@@ -376,7 +377,9 @@ private struct FormsView: View {
 
     @ViewBuilder
     private func destination(for form: OnlineFormLink) -> some View {
-        if let value = form.url, let url = URL(string: value) {
+        if form.isNative {
+            CertificateRequestView()
+        } else if let value = form.url, let url = URL(string: value) {
             InAppBrowserView(url: url, title: form.title)
         } else {
             EmptyState(icon: "link.badge.plus", title: "Ссылка недоступна", message: form.title)
@@ -389,6 +392,7 @@ private struct OnlineFormLink: Identifiable {
     let subtitle: String
     let icon: String
     let url: String?
+    var isNative: Bool = false
     var id: String { title }
 }
 
@@ -705,6 +709,7 @@ private final class TeachersModel: ObservableObject {
     @Published var teachers: [Teacher] = []
     @Published var isLoading = false
     @Published var error: String?
+    @Published var hint: String?
     private var activeRequest = UUID()
 
     func search(_ text: String, user: UserDTO?) async {
@@ -713,11 +718,13 @@ private final class TeachersModel: ObservableObject {
         let query = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard query.count >= 2 else {
             teachers = []
-            error = "Введите минимум две буквы фамилии"
+            error = nil
+            hint = query.isEmpty ? nil : "Введите минимум две буквы фамилии"
             return
         }
         isLoading = true
         error = nil
+        hint = nil
         defer {
             if activeRequest == request { isLoading = false }
         }
@@ -766,7 +773,12 @@ private struct TeacherContactsView: View {
                 .mauGlass(radius: 20)
 
                 if model.isLoading { LoadingOverlay(title: "Ищем") }
-                else if let error = model.error { EmptyState(icon: "wifi.exclamationmark", title: "Ошибка", message: error) }
+                else if let error = model.error {
+                    EmptyState(icon: "wifi.exclamationmark", title: "Не удалось найти", message: error)
+                }
+                else if let hint = model.hint {
+                    EmptyState(icon: "character.cursor.ibeam", title: "Продолжите ввод", message: hint)
+                }
                 else if query.isEmpty {
                     EmptyState(
                         icon: "person.text.rectangle",
@@ -941,16 +953,8 @@ private struct ContactCard: View {
                 Text(subtitle).font(.caption).foregroundStyle(MauTheme.muted)
             }
             HStack {
-                if let phone, let destination = phoneURL(phone) {
-                    Link(destination: destination) {
-                        Label(phone, systemImage: "phone.fill")
-                    }
-                }
-                if let phone2, let destination = phoneURL(phone2) {
-                    Link(destination: destination) {
-                        Label(phone2, systemImage: "phone.fill")
-                    }
-                }
+                phoneLabel(phone)
+                phoneLabel(phone2)
                 if let email, let url = URL(string: "mailto:\(email.trimmed)") {
                     Link(destination: url) { Image(systemName: "envelope.fill") }
                 }
@@ -961,6 +965,20 @@ private struct ContactCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(17)
         .mauGlass(radius: 22)
+    }
+
+    @ViewBuilder
+    private func phoneLabel(_ value: String?) -> some View {
+        if let value, !value.trimmed.isEmpty {
+            if let destination = phoneURL(value) {
+                Link(destination: destination) {
+                    Label(value, systemImage: "phone.fill")
+                }
+            } else {
+                Label(value, systemImage: "phone")
+                    .foregroundStyle(MauTheme.muted)
+            }
+        }
     }
 
     private func phoneURL(_ value: String) -> URL? {

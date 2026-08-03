@@ -38,7 +38,7 @@ struct LoginView: View {
                     }
 
                     VStack(spacing: 16) {
-                        TextField("Логин ЭИОС", text: $username)
+                        TextField("Логин учебного портала", text: $username)
                             .textContentType(.username)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()

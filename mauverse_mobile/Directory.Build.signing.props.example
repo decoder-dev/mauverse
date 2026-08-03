@@ -1,0 +1,10 @@
+<!-- Copy to Directory.Build.signing.props (gitignored) for local signed Release builds. -->
+<Project>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release' and $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+    <AndroidKeyStore>true</AndroidKeyStore>
+    <AndroidSigningKeyStore>$(MSBuildThisFileDirectory)../.artifacts/signing/mauverse-engineering.keystore</AndroidSigningKeyStore>
+    <AndroidSigningStorePass>mauverse-eng</AndroidSigningStorePass>
+    <AndroidSigningKeyAlias>mauverse</AndroidSigningKeyAlias>
+    <AndroidSigningKeyPass>mauverse-eng</AndroidSigningKeyPass>
+  </PropertyGroup>
+</Project>
