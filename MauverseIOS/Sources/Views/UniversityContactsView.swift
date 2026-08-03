@@ -59,6 +59,9 @@ struct UniversityContactsView: View {
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
                     .background(.ultraThinMaterial, in: Capsule())
+                    .overlay {
+                        Capsule().strokeBorder(Color.white.opacity(0.25), lineWidth: 0.6)
+                    }
                     .padding(.bottom, 24)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
