@@ -1,71 +1,47 @@
-# Native iPhone app (SwiftUI)
+# iOS Liquid Glass — production pass (1.12.4)
 
-The shipping iPhone application is the native SwiftUI client in `MauverseIOS`.
-Android remains the .NET MAUI client in `mauverse_mobile`. Both talk to the same
-MAUverse API and share the same bundle id `com.pmi4freal.mauverse3`.
+Built: 2026-08-03  
+Client: `MauverseIOS` (SwiftUI), deployment iOS 18+, glass API gated iOS 26+
 
-## Rendering
+## Intent
 
-- iOS 26 and newer use the system Liquid Glass appearance for navigation and
-  translucent surfaces.
-- iOS 18–25 use native SwiftUI / UIKit materials.
-- Reduce Transparency, Increase Contrast, and Reduce Motion remain controlled
-  by iOS.
+Ship a coherent Liquid Glass campus app: translucent materials everywhere cards live, intentional motion, no matte-on-glass bugs, Reduce Transparency / Reduce Motion respected.
 
-## Build and run
+## Contract
 
-Requires a Mac with Xcode 26.5 (or newer matching `project.yml`) and
-[XcodeGen](https://github.com/yonaskolb/XcodeGen):
+| API | Meaning |
+| --- | --- |
+| `mauGlass(radius:style:)` | Primary glass. iOS 26 → `glassEffect(.regular)`; older → materials; Reduce Transparency → solid card |
+| `mauSurface` | Alias of **thin glass** (not opaque fill) |
+| `MauGlassStack` | `GlassEffectContainer` on iOS 26 for sibling morph |
+| `mauPressable()` | Scale/opacity press spring |
+| `MauMotion` | `snappy` / `soft` / `press` / `orb` / `pulse` |
+| `MauBackground` | Canvas + drifting cyan/navy orbs (orb motion off if Reduce Motion) |
 
-```bash
-brew install xcodegen
-cd MauverseIOS
-xcodegen generate --spec project.yml
-open MAUverse.xcodeproj
-```
+Styles: `.regular` (cards), `.thin` (secondary / fields), `.interactive` (tappable tiles).
 
-Set `MAUVERSE_SCHEDULE_TOKEN` in the Xcode build settings or scheme environment
-when calling the schedule API. A physical iPhone is recommended for final
-material, accessibility, dark-mode, and performance checks.
+## What changed in 1.12.4
 
-For App Store distribution, configure the team, provisioning profile, and
-release signing on the Mac. Do not publish an unsigned or Debug-signed archive.
+- Redesigned `DesignSystem.swift` (materials, a11y, motion tokens, press, glass stack, pulsing glass skeletons).
+- Home: glass quick actions in `MauGlassStack`, press, skeleton, soft tab switches.
+- Schedule: glass date/filter chips + lesson cards, skeleton loaders, list transitions.
+- News: fixed double-layer card (opaque under glass); hero glass; animated filter chips.
+- Services: interactive glass tiles.
+- Login: glass form + fields + error appear.
+- Campus search glass; events HTML cleaned; contacts toast stroked.
+- RootTab: selection haptic + soft animation.
+- Brand gradient: less purple, more Arctic cyan/navy.
 
-## Unsigned GitHub CI artifact
+## Smoke (device, before production)
 
-The `ios-release-unsigned` job (display name
-`Native SwiftUI iPhone Release (unsigned)`) publishes
-`mauverse-native-ios-arm64-release-unsigned`. It contains:
+1. iOS 26: glass on Home / Schedule / News / Services; tab bar system glass.
+2. Dark mode + Reduce Transparency (solids, no broken strokes).
+3. Reduce Motion (no orb drift / press scale still subtle).
+4. Login → Home → each tab; news filters; schedule day chips.
+5. Dynamic Type large; VoiceOver on quick cards.
 
-- `mauverse-native-ios-arm64-unsigned.ipa`;
-- `checksums.txt`;
-- `build-metadata.txt`.
+## Follow-ups (post-ship if needed)
 
-The IPA is only an unsigned container for later signing. The job does not import
-an Apple certificate or provisioning profile and fails if the application
-contains `_CodeSignature` or `embedded.mobileprovision`. Sign the extracted
-application with your own matching certificate, entitlements, and provisioning
-profile, then recreate the IPA.
-
-## Portal parity with Android
-
-`MauverseIOS` mirrors the Android portal surfaces from mauniver.ru:
-
-- Guides: Студенту, Абитуриенту, Наука, International
-- Digital services hub (ЭИОС, library, webmail, dorm IT, Intra, PROMT)
-- Events calendar from `/press/calendar/rss/`
-- News filters Абитуриент and Календарь
-- Contacts and payment requisites
-- Campus navigator with branches, transport tips, route and panorama
-- Settings links to official site, personal-data policy, and sveden
-- Schedule teacher/room chips (mutually exclusive)
-
-## Required smoke checks
-
-1. Login, logout, and restored session.
-2. All five tabs: Home, Schedule, Services, News, and Profile.
-3. Service routes, portal guides, calendar, contacts, in-app browser, messenger, and forms.
-4. Light and dark appearance.
-5. iOS Reduce Transparency and Increase Contrast.
-6. Dynamic Type and VoiceOver labels.
-7. iPhone portrait and landscape layouts.
+- Custom glass Form for certificate / profile editor.
+- Departments off system `List`.
+- Matched-geometry date chip pill.

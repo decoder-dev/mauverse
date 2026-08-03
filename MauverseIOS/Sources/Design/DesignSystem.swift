@@ -7,14 +7,14 @@ enum AppTheme: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
     var title: String {
-        return switch self {
+        switch self {
         case .system: "Как на iPhone"
         case .light: "Светлая"
         case .dark: "Тёмная"
         }
     }
     var colorScheme: ColorScheme? {
-        return switch self {
+        switch self {
         case .system: nil
         case .light: .light
         case .dark: .dark
@@ -25,17 +25,16 @@ enum AppTheme: String, CaseIterable, Identifiable {
 enum MauTheme {
     static let blue = Color(red: 0.09, green: 0.46, blue: 0.97)
     static let cyan = Color(red: 0.29, green: 0.78, blue: 1.0)
-    static let violet = Color(red: 0.47, green: 0.40, blue: 1.0)
+    static let violet = Color(red: 0.38, green: 0.42, blue: 0.92)
     static let navy = Color(red: 0.015, green: 0.075, blue: 0.13)
     static let success = Color(red: 0.16, green: 0.70, blue: 0.45)
     static let ink = Color(uiColor: .label)
     static let muted = Color(uiColor: .secondaryLabel)
     static let canvas = Color(uiColor: .systemBackground)
     static let card = Color(uiColor: .secondarySystemBackground)
-    static let lavender = Color(red: 0.88, green: 0.90, blue: 1.0)
 
     static let heroGradient = LinearGradient(
-        colors: [blue, Color(red: 0.08, green: 0.27, blue: 0.68), violet],
+        colors: [blue, Color(red: 0.08, green: 0.27, blue: 0.68), cyan.opacity(0.85)],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
@@ -55,55 +54,138 @@ enum MauRadius {
     static let hero: CGFloat = 30
 }
 
+enum MauMotion {
+    static let snappy = Animation.snappy(duration: 0.28, extraBounce: 0.05)
+    static let soft = Animation.spring(response: 0.42, dampingFraction: 0.86)
+    static let press = Animation.spring(response: 0.22, dampingFraction: 0.72)
+    static let orb = Animation.easeInOut(duration: 9.5).repeatForever(autoreverses: true)
+    static let pulse = Animation.easeInOut(duration: 1.05).repeatForever(autoreverses: true)
+}
+
+/// Atmospheric canvas with drifting glass orbs (respects Reduce Motion).
 struct MauBackground: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var drift = false
 
     var body: some View {
         ZStack {
             MauTheme.canvas
             LinearGradient(
                 colors: colorScheme == .dark
-                    ? [MauTheme.navy.opacity(0.96), .black, Color.purple.opacity(0.10)]
-                    : [Color.blue.opacity(0.055), MauTheme.canvas, Color.purple.opacity(0.045)],
+                    ? [MauTheme.navy.opacity(0.97), .black, MauTheme.blue.opacity(0.12)]
+                    : [MauTheme.cyan.opacity(0.07), MauTheme.canvas, MauTheme.blue.opacity(0.05)],
                 startPoint: .topTrailing,
                 endPoint: .bottomLeading
             )
             Circle()
-                .fill(MauTheme.cyan.opacity(colorScheme == .dark ? 0.13 : 0.10))
-                .frame(width: 420, height: 420)
-                .blur(radius: 70)
-                .offset(x: 190, y: -350)
+                .fill(MauTheme.cyan.opacity(colorScheme == .dark ? 0.16 : 0.12))
+                .frame(width: 440, height: 440)
+                .blur(radius: 78)
+                .offset(x: drift ? 175 : 205, y: drift ? -330 : -360)
             Circle()
-                .fill(MauTheme.violet.opacity(colorScheme == .dark ? 0.15 : 0.075))
-                .frame(width: 390, height: 390)
-                .blur(radius: 80)
-                .offset(x: -190, y: 390)
+                .fill(MauTheme.blue.opacity(colorScheme == .dark ? 0.18 : 0.09))
+                .frame(width: 400, height: 400)
+                .blur(radius: 88)
+                .offset(x: drift ? -175 : -210, y: drift ? 360 : 410)
+            Circle()
+                .fill(MauTheme.violet.opacity(colorScheme == .dark ? 0.10 : 0.05))
+                .frame(width: 280, height: 280)
+                .blur(radius: 70)
+                .offset(x: drift ? 40 : -20, y: drift ? 120 : 160)
         }
         .ignoresSafeArea()
+        .onAppear {
+            guard !reduceMotion else { return }
+            withAnimation(MauMotion.orb) { drift = true }
+        }
     }
+}
+
+enum MauGlassStyle {
+    case regular
+    case thin
+    case interactive
 }
 
 private struct MauGlassModifier: ViewModifier {
     let radius: CGFloat
+    let style: MauGlassStyle
+
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
     @ViewBuilder
     func body(content: Content) -> some View {
-        if #available(iOS 26.0, *) {
-            content.glassEffect(.regular, in: RoundedRectangle(cornerRadius: radius, style: .continuous))
+        if reduceTransparency {
+            content
+                .background(MauTheme.card.opacity(colorScheme == .dark ? 0.94 : 0.96),
+                            in: RoundedRectangle(cornerRadius: radius, style: .continuous))
+                .overlay { stroke }
+        } else if #available(iOS 26.0, *) {
+            glass26(content)
+                .overlay { stroke.opacity(0.55) }
         } else {
             content
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: radius, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: radius, style: .continuous)
-                        .stroke(Color.white.opacity(0.75), lineWidth: 1)
-                }
+                .background(fallbackMaterial, in: RoundedRectangle(cornerRadius: radius, style: .continuous))
+                .overlay { stroke }
         }
+    }
+
+    @available(iOS 26.0, *)
+    @ViewBuilder
+    private func glass26(_ content: Content) -> some View {
+        let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
+        // Keep to stable glassEffect APIs shipped with Xcode 26.5.
+        content.glassEffect(.regular, in: shape)
+    }
+
+    private var fallbackMaterial: Material {
+        switch style {
+        case .thin: .thinMaterial
+        case .regular, .interactive: .ultraThinMaterial
+        }
+    }
+
+    private var stroke: some View {
+        RoundedRectangle(cornerRadius: radius, style: .continuous)
+            .strokeBorder(
+                LinearGradient(
+                    colors: colorScheme == .dark
+                        ? [Color.white.opacity(0.28), Color.white.opacity(0.06)]
+                        : [Color.white.opacity(0.85), Color.white.opacity(0.25)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                lineWidth: 0.9
+            )
+    }
+}
+
+private struct MauPressStyle: ButtonStyle {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.965 : 1)
+            .opacity(configuration.isPressed ? 0.92 : 1)
+            .animation(MauMotion.press, value: configuration.isPressed)
     }
 }
 
 extension View {
-    func mauGlass(radius: CGFloat = 24) -> some View {
-        modifier(MauGlassModifier(radius: radius))
+    /// Primary Liquid Glass surface (cards, sheets, chrome).
+    func mauGlass(radius: CGFloat = MauRadius.card, style: MauGlassStyle = .regular) -> some View {
+        modifier(MauGlassModifier(radius: radius, style: style))
+    }
+
+    /// Secondary translucent surface — prefers glass over opaque fills.
+    func mauSurface(radius: CGFloat = MauRadius.card) -> some View {
+        mauGlass(radius: radius, style: .thin)
+    }
+
+    func mauPressable() -> some View {
+        buttonStyle(MauPressStyle())
     }
 
     func pageTitle(_ title: String, subtitle: String? = nil) -> some View {
@@ -119,14 +201,6 @@ extension View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
-
-    func mauSurface(radius: CGFloat = MauRadius.card) -> some View {
-        background(MauTheme.card.opacity(0.78), in: RoundedRectangle(cornerRadius: radius, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: radius, style: .continuous)
-                    .stroke(Color.primary.opacity(0.07), lineWidth: 0.75)
-            }
-    }
 }
 
 struct IconTile: View {
@@ -139,6 +213,7 @@ struct IconTile: View {
             .foregroundStyle(.white)
             .frame(width: 44, height: 44)
             .background(color.gradient, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .shadow(color: color.opacity(0.28), radius: 8, y: 3)
     }
 }
 
@@ -172,28 +247,35 @@ struct MauStatusPill: View {
             .foregroundStyle(color)
             .padding(.horizontal, 11)
             .padding(.vertical, 7)
-            .background(color.opacity(0.12), in: Capsule())
+            .background(color.opacity(0.14), in: Capsule())
+            .overlay {
+                Capsule().strokeBorder(color.opacity(0.22), lineWidth: 0.6)
+            }
     }
 }
 
 struct SkeletonCard: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var pulse = false
+    var height: CGFloat = 150
 
     var body: some View {
         VStack(alignment: .leading, spacing: 13) {
-            RoundedRectangle(cornerRadius: 14)
-                .frame(height: 150)
-            RoundedRectangle(cornerRadius: 6)
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .frame(height: height)
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
                 .frame(height: 18)
                 .padding(.trailing, 40)
-            RoundedRectangle(cornerRadius: 6)
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
                 .frame(width: 150, height: 12)
         }
-        .foregroundStyle(MauTheme.muted.opacity(pulse ? 0.12 : 0.23))
+        .foregroundStyle(MauTheme.muted.opacity(pulse ? 0.10 : 0.22))
         .padding(16)
-        .mauSurface()
-        .animation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true), value: pulse)
-        .onAppear { pulse = true }
+        .mauGlass(radius: MauRadius.card, style: .thin)
+        .onAppear {
+            guard !reduceMotion else { pulse = true; return }
+            withAnimation(MauMotion.pulse) { pulse = true }
+        }
     }
 }
 
@@ -207,7 +289,7 @@ struct LoadingOverlay: View {
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 14)
-        .mauGlass(radius: 18)
+        .mauGlass(radius: MauRadius.compact, style: .interactive)
     }
 }
 
@@ -219,7 +301,7 @@ struct EmptyState: View {
     var body: some View {
         VStack(spacing: 12) {
             Image(systemName: icon)
-                .font(.system(size: 35))
+                .font(.system(size: 35, weight: .medium))
                 .foregroundStyle(MauTheme.blue)
             Text(title).font(.headline)
             Text(message)
@@ -229,6 +311,19 @@ struct EmptyState: View {
         }
         .frame(maxWidth: .infinity)
         .padding(28)
-        .mauGlass()
+        .mauGlass(radius: MauRadius.card)
+    }
+}
+
+/// Groups sibling glass views so iOS 26 can morph materials together.
+struct MauGlassStack<Content: View>: View {
+    @ViewBuilder var content: () -> Content
+
+    var body: some View {
+        if #available(iOS 26.0, *) {
+            GlassEffectContainer { content() }
+        } else {
+            content()
+        }
     }
 }
