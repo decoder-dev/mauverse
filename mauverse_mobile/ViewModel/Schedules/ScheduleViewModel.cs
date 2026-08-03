@@ -272,7 +272,9 @@ namespace mau.ViewModel.Schedules
 
         async Task LoadSubgroupsFilterAsync(CancellationToken cancellationToken)
         {
-            if (CurrentUser.Role != UserRole.Student || string.IsNullOrWhiteSpace(CurrentUser.GroupName))
+            if (CurrentUser is null ||
+                CurrentUser.Role != UserRole.Student ||
+                string.IsNullOrWhiteSpace(CurrentUser.GroupName))
             {
                 IsHaveSubgroups = false;
                 Subgroups = [];

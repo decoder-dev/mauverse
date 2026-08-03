@@ -85,6 +85,7 @@ final class HomeViewModel: ObservableObject {
 
 struct HomeView: View {
     @EnvironmentObject private var session: SessionStore
+    @Binding var selectedTab: Int
     @StateObject private var model = HomeViewModel()
 
     private var firstName: String {
@@ -106,17 +107,21 @@ struct HomeView: View {
                         HomeDataErrorCard(
                             title: "Расписание недоступно",
                             message: error,
-                            icon: "calendar.badge.exclamationmark"
+                            icon: "calendar.badge.exclamationmark",
+                            retry: { Task { await model.load(user: session.user) } }
                         )
                     } else {
-                        NextLessonCard(item: model.nextLesson, group: session.user?.groupName)
+                        Button { selectedTab = 1 } label: {
+                            NextLessonCard(item: model.nextLesson, group: session.user?.groupName)
+                        }
+                        .buttonStyle(.plain)
                     }
 
                     MauSectionHeader(title: "Быстрый доступ")
                     quickActions
 
                     if !model.notifications.isEmpty {
-                        MauSectionHeader(title: "Обновления ЭИОС")
+                        MauSectionHeader(title: "Уведомления портала")
                         ScrollView(.horizontal, showsIndicators: false) {
                             LazyHStack(spacing: 12) {
                                 ForEach(model.notifications) { notification in
@@ -132,7 +137,7 @@ struct HomeView: View {
                                 .font(.title3.bold())
                                 .foregroundStyle(MauTheme.ink)
                             Spacer()
-                            NavigationLink(destination: NewsView()) {
+                            Button { selectedTab = 3 } label: {
                                 HStack(spacing: 4) {
                                     Text("Все новости")
                                     Image(systemName: "chevron.right")
@@ -147,7 +152,8 @@ struct HomeView: View {
                         HomeDataErrorCard(
                             title: "Новости не обновились",
                             message: error,
-                            icon: "newspaper"
+                            icon: "newspaper",
+                            retry: { Task { await model.load(user: session.user) } }
                         )
                     }
                 }
@@ -171,7 +177,7 @@ struct HomeView: View {
                     .font(.system(size: 38, weight: .bold, design: .rounded))
                     .foregroundStyle(MauTheme.ink)
                 HStack(spacing: 8) {
-                    MauStatusPill(title: "Сессия защищена", icon: "lock.fill")
+                    MauStatusPill(title: "Вход сохранён", icon: "lock.fill")
                     if let group = session.user?.groupName, !group.isEmpty {
                         Text(group)
                             .font(.caption.weight(.semibold))
@@ -181,7 +187,7 @@ struct HomeView: View {
                 }
             }
             Spacer()
-            NavigationLink(destination: ProfileView()) {
+            Button { selectedTab = 4 } label: {
                 ZStack {
                     Circle().fill(MauTheme.blue.opacity(0.13))
                     Image(systemName: "person.crop.circle.fill")
@@ -226,17 +232,25 @@ struct HomeView: View {
             spacing: 12
         ) {
             PremiumQuickCard(title: "Расписание", subtitle: "Занятия и аудитории", icon: "calendar", color: MauTheme.blue) {
-                ScheduleView()
+                selectedTab = 1
             }
             PremiumQuickCard(title: "Сервисы", subtitle: "Все инструменты МАУ", icon: "square.grid.2x2.fill", color: MauTheme.violet) {
-                ServicesView()
+                selectedTab = 2
             }
             PremiumQuickCard(title: "Новости", subtitle: "События университета", icon: "newspaper.fill", color: .orange) {
-                NewsView()
+                selectedTab = 3
             }
-            PremiumQuickCard(title: "ЭИОС", subtitle: "Учебный портал", icon: "graduationcap.fill", color: .teal) {
-                InAppBrowserView(url: URL(string: "https://eios.mauniver.ru/moodle/")!, title: "ЭИОС")
+            NavigationLink {
+                InAppBrowserView(url: URL(string: "https://eios.mauniver.ru/moodle/")!, title: "Учебный портал")
+            } label: {
+                PremiumQuickCardContent(
+                    title: "Учёба",
+                    subtitle: "Учебный портал",
+                    icon: "graduationcap.fill",
+                    color: .teal
+                )
             }
+            .buttonStyle(.plain)
         }
     }
 
@@ -298,18 +312,26 @@ private struct HomeDataErrorCard: View {
     let title: String
     let message: String
     let icon: String
+    var retry: (() -> Void)?
 
     var body: some View {
-        HStack(spacing: 14) {
-            IconTile(systemName: icon, color: .orange)
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title).font(.headline)
-                Text(message)
-                    .font(.caption)
-                    .foregroundStyle(MauTheme.muted)
-                    .lineLimit(2)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 14) {
+                IconTile(systemName: icon, color: .orange)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title).font(.headline)
+                    Text(message)
+                        .font(.caption)
+                        .foregroundStyle(MauTheme.muted)
+                        .lineLimit(3)
+                }
+                Spacer()
             }
-            Spacer()
+            if let retry {
+                Button("Повторить", action: retry)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(MauTheme.blue)
+            }
         }
         .padding(17)
         .mauSurface(radius: 22)
@@ -377,36 +399,47 @@ private struct NextLessonCard: View {
     }
 }
 
-private struct PremiumQuickCard<Destination: View>: View {
+private struct PremiumQuickCard: View {
     let title: String
     let subtitle: String
     let icon: String
     let color: Color
-    @ViewBuilder let destination: () -> Destination
+    let action: () -> Void
 
     var body: some View {
-        NavigationLink(destination: destination()) {
-            VStack(alignment: .leading, spacing: 15) {
-                HStack {
-                    IconTile(systemName: icon, color: color)
-                    Spacer()
-                    Image(systemName: "arrow.up.right")
-                        .font(.caption.bold())
-                        .foregroundStyle(MauTheme.muted)
-                }
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(title).font(.headline)
-                    Text(subtitle)
-                        .font(.caption)
-                        .foregroundStyle(MauTheme.muted)
-                        .lineLimit(1)
-                }
-            }
-            .foregroundStyle(MauTheme.ink)
-            .frame(maxWidth: .infinity, minHeight: 105, alignment: .topLeading)
-            .padding(16)
+        Button(action: action) {
+            PremiumQuickCardContent(title: title, subtitle: subtitle, icon: icon, color: color)
         }
         .buttonStyle(.plain)
+    }
+}
+
+private struct PremiumQuickCardContent: View {
+    let title: String
+    let subtitle: String
+    let icon: String
+    let color: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 15) {
+            HStack {
+                IconTile(systemName: icon, color: color)
+                Spacer()
+                Image(systemName: "arrow.up.right")
+                    .font(.caption.bold())
+                    .foregroundStyle(MauTheme.muted)
+            }
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title).font(.headline)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(MauTheme.muted)
+                    .lineLimit(1)
+            }
+        }
+        .foregroundStyle(MauTheme.ink)
+        .frame(maxWidth: .infinity, minHeight: 105, alignment: .topLeading)
+        .padding(16)
         .mauSurface(radius: 22)
     }
 }

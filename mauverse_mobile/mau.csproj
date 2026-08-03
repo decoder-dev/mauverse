@@ -16,8 +16,8 @@
 
     <ApplicationTitle>MAUverse</ApplicationTitle>
     <ApplicationId>com.pmi4freal.mauverse3</ApplicationId>
-    <ApplicationDisplayVersion>1.12.2</ApplicationDisplayVersion>
-    <ApplicationVersion>31</ApplicationVersion>
+    <ApplicationDisplayVersion>1.12.3</ApplicationDisplayVersion>
+    <ApplicationVersion>32</ApplicationVersion>
     <MauverseApiBaseUrl Condition="'$(MauverseApiBaseUrl)' == ''">https://app.mauniver.ru/dev/mauverse/</MauverseApiBaseUrl>
 
     <WindowsPackageType>None</WindowsPackageType>
@@ -77,4 +77,6 @@
     <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.80" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.3" />
   </ItemGroup>
+
+  <Import Project="Directory.Build.signing.props" Condition="Exists('Directory.Build.signing.props')" />
 </Project>

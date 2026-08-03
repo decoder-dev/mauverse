@@ -77,12 +77,12 @@
                                TextColor="{DynamicResource TextSecondary}" />
 
                         <Label Style="{StaticResource LoginFieldLabel}"
-                               Text="Логин ЭИОС" />
+                               Text="Логин учебного портала" />
                         <Border Margin="0,8,0,20"
                                 Style="{StaticResource LoginFieldBorder}">
                             <Entry Style="{StaticResource LoginEntry}"
                                    Text="{Binding Username}"
-                                   SemanticProperties.Description="Логин ЭИОС"
+                                   SemanticProperties.Description="Логин учебного портала"
                                    Focused="OnFieldFocused"
                                    Placeholder="Введите логин"
                                    ClearButtonVisibility="WhileEditing"
@@ -91,12 +91,12 @@
                         </Border>
 
                         <Label Style="{StaticResource LoginFieldLabel}"
-                               Text="Пароль ЭИОС" />
+                               Text="Пароль учебного портала" />
                         <Border Margin="0,8,0,28"
                                 Style="{StaticResource LoginFieldBorder}">
                             <Entry Style="{StaticResource LoginEntry}"
                                    Text="{Binding Password}"
-                                   SemanticProperties.Description="Пароль ЭИОС"
+                                   SemanticProperties.Description="Пароль учебного портала"
                                    Focused="OnFieldFocused"
                                    Placeholder="Введите пароль"
                                    IsPassword="True"

@@ -77,12 +77,18 @@ struct UniversityContactsView: View {
                 .fixedSize(horizontal: false, vertical: true)
 
             HStack(spacing: 10) {
-                if let phone = block.phone, let url = phoneURL(phone) {
-                    Link(destination: url) {
-                        Label("Позвонить", systemImage: "phone.fill")
+                if let phone = block.phone {
+                    if let url = phoneURL(phone) {
+                        Link(destination: url) {
+                            Label("Позвонить", systemImage: "phone.fill")
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.small)
+                    } else {
+                        Text(phone)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(MauTheme.muted)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.small)
                 }
                 Button {
                     copyText(block.details, label: "Скопировано")
@@ -94,13 +100,21 @@ struct UniversityContactsView: View {
             }
 
             if let email = block.email {
-                Button {
-                    copyText(email, label: "E-mail скопирован")
-                } label: {
-                    Label(email, systemImage: "envelope")
-                        .font(.caption.weight(.semibold))
+                HStack(spacing: 10) {
+                    if let mailURL = URL(string: "mailto:\(email)") {
+                        Link(destination: mailURL) {
+                            Label(email, systemImage: "envelope.fill")
+                                .font(.caption.weight(.semibold))
+                        }
+                    }
+                    Button {
+                        copyText(email, label: "E-mail скопирован")
+                    } label: {
+                        Image(systemName: "doc.on.doc")
+                            .font(.caption.weight(.semibold))
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
                 .foregroundStyle(MauTheme.blue)
             }
         }
