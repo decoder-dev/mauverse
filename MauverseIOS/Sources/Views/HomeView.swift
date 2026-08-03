@@ -220,37 +220,37 @@ struct HomeView: View {
     }
 
     private var lessonSkeleton: some View {
-        RoundedRectangle(cornerRadius: MauRadius.hero)
-            .fill(MauTheme.blue.opacity(0.14))
+        SkeletonCard(height: 120)
             .frame(height: 220)
-            .overlay { ProgressView().tint(MauTheme.blue) }
     }
 
     private var quickActions: some View {
-        LazyVGrid(
-            columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
-            spacing: 12
-        ) {
-            PremiumQuickCard(title: "Расписание", subtitle: "Занятия и аудитории", icon: "calendar", color: MauTheme.blue) {
-                selectedTab = 1
+        MauGlassStack {
+            LazyVGrid(
+                columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
+                spacing: 12
+            ) {
+                PremiumQuickCard(title: "Расписание", subtitle: "Занятия и аудитории", icon: "calendar", color: MauTheme.blue) {
+                    withAnimation(MauMotion.soft) { selectedTab = 1 }
+                }
+                PremiumQuickCard(title: "Сервисы", subtitle: "Все инструменты МАУ", icon: "square.grid.2x2.fill", color: MauTheme.violet) {
+                    withAnimation(MauMotion.soft) { selectedTab = 2 }
+                }
+                PremiumQuickCard(title: "Новости", subtitle: "События университета", icon: "newspaper.fill", color: .orange) {
+                    withAnimation(MauMotion.soft) { selectedTab = 3 }
+                }
+                NavigationLink {
+                    InAppBrowserView(url: URL(string: "https://eios.mauniver.ru/moodle/")!, title: "Учебный портал")
+                } label: {
+                    PremiumQuickCardContent(
+                        title: "Учёба",
+                        subtitle: "Учебный портал",
+                        icon: "graduationcap.fill",
+                        color: .teal
+                    )
+                }
+                .mauPressable()
             }
-            PremiumQuickCard(title: "Сервисы", subtitle: "Все инструменты МАУ", icon: "square.grid.2x2.fill", color: MauTheme.violet) {
-                selectedTab = 2
-            }
-            PremiumQuickCard(title: "Новости", subtitle: "События университета", icon: "newspaper.fill", color: .orange) {
-                selectedTab = 3
-            }
-            NavigationLink {
-                InAppBrowserView(url: URL(string: "https://eios.mauniver.ru/moodle/")!, title: "Учебный портал")
-            } label: {
-                PremiumQuickCardContent(
-                    title: "Учёба",
-                    subtitle: "Учебный портал",
-                    icon: "graduationcap.fill",
-                    color: .teal
-                )
-            }
-            .buttonStyle(.plain)
         }
     }
 
@@ -410,7 +410,7 @@ private struct PremiumQuickCard: View {
         Button(action: action) {
             PremiumQuickCardContent(title: title, subtitle: subtitle, icon: icon, color: color)
         }
-        .buttonStyle(.plain)
+        .mauPressable()
     }
 }
 
@@ -440,7 +440,7 @@ private struct PremiumQuickCardContent: View {
         .foregroundStyle(MauTheme.ink)
         .frame(maxWidth: .infinity, minHeight: 105, alignment: .topLeading)
         .padding(16)
-        .mauSurface(radius: 22)
+        .mauGlass(radius: MauRadius.card, style: .interactive)
     }
 }
 

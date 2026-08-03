@@ -22,5 +22,7 @@ struct RootTabView: View {
                 .tag(4)
         }
         .tint(MauTheme.blue)
+        .sensoryFeedback(.selection, trigger: selectedTab)
+        .animation(MauMotion.soft, value: selectedTab)
     }
 }

@@ -63,17 +63,26 @@ struct NewsView: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 9) {
                             ForEach(NewsFilter.allCases) { filter in
-                                Button(filter.title) {
-                                    model.filter = filter
+                                Button {
+                                    withAnimation(MauMotion.snappy) {
+                                        model.filter = filter
+                                    }
                                     Task { await model.load() }
+                                } label: {
+                                    Text(filter.title)
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundStyle(model.filter == filter ? .white : MauTheme.ink)
+                                        .padding(.horizontal, 15)
+                                        .padding(.vertical, 10)
+                                        .background {
+                                            if model.filter == filter {
+                                                Capsule().fill(MauTheme.heroGradient)
+                                            }
+                                        }
+                                        .mauGlass(radius: 22, style: .thin)
                                 }
-                                .font(.system(size: 14, weight: .semibold))
-                                .foregroundStyle(model.filter == filter ? .white : MauTheme.ink)
-                                .padding(.horizontal, 15)
-                                .padding(.vertical, 10)
-                                .background(model.filter == filter ? AnyShapeStyle(MauTheme.blue.gradient) : AnyShapeStyle(MauTheme.card.opacity(0.78)),
-                                            in: Capsule())
-                                .buttonStyle(.plain)
+                                .mauPressable()
+                                .sensoryFeedback(.selection, trigger: model.filter)
                             }
                         }
                     }
@@ -118,15 +127,17 @@ private struct NewsCard: View {
 
     @ViewBuilder
     var body: some View {
-        if let value = item.link, let url = URL(string: value) {
-            NavigationLink(destination: InAppBrowserView(url: url, title: item.title ?? "Новости МАУ")) {
+        Group {
+            if let value = item.link, let url = URL(string: value) {
+                NavigationLink(destination: InAppBrowserView(url: url, title: item.title ?? "Новости МАУ")) {
+                    content
+                }
+                .buttonStyle(.plain)
+            } else {
                 content
             }
-            .buttonStyle(.plain)
-            .mauGlass(radius: 24)
-        } else {
-            content.mauGlass(radius: 24)
         }
+        .mauGlass(radius: MauRadius.card, style: .regular)
     }
 
     private var content: some View {
@@ -135,6 +146,7 @@ private struct NewsCard: View {
                 AsyncImage(url: url) { phase in
                     if case .success(let image) = phase {
                         image.resizable().scaledToFill()
+                            .transition(.opacity)
                     } else {
                         MauTheme.heroGradient
                             .overlay(Image(systemName: "photo").foregroundStyle(.white.opacity(0.7)))
@@ -164,7 +176,6 @@ private struct NewsCard: View {
             .frame(maxWidth: .infinity, minHeight: 106, alignment: .topLeading)
             .padding(16)
         }
-        .background(MauTheme.card.opacity(0.74))
         .clipShape(RoundedRectangle(cornerRadius: MauRadius.card, style: .continuous))
     }
 }
@@ -175,14 +186,18 @@ private struct HeroNewsCard: View {
 
     @ViewBuilder
     var body: some View {
-        if let value = item.link, let url = URL(string: value) {
-            NavigationLink(destination: InAppBrowserView(url: url, title: item.title ?? "Новости МАУ")) {
+        Group {
+            if let value = item.link, let url = URL(string: value) {
+                NavigationLink(destination: InAppBrowserView(url: url, title: item.title ?? "Новости МАУ")) {
+                    content
+                }
+                .buttonStyle(.plain)
+            } else {
                 content
             }
-            .buttonStyle(.plain)
-        } else {
-            content
         }
+        .mauGlass(radius: MauRadius.hero)
+        .shadow(color: MauTheme.blue.opacity(0.12), radius: 18, y: 10)
     }
 
     private var content: some View {
@@ -193,6 +208,7 @@ private struct HeroNewsCard: View {
                         image
                             .resizable()
                             .scaledToFill()
+                            .transition(.opacity)
                     } else {
                         MauTheme.heroGradient
                             .overlay {
@@ -241,13 +257,7 @@ private struct HeroNewsCard: View {
             .padding(20)
         }
         .frame(maxWidth: .infinity)
-        .background(MauTheme.card.opacity(0.82))
         .clipShape(RoundedRectangle(cornerRadius: MauRadius.hero, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: MauRadius.hero, style: .continuous)
-                .stroke(Color.primary.opacity(0.07), lineWidth: 0.75)
-        }
-        .shadow(color: .black.opacity(0.12), radius: 18, y: 10)
     }
 }
 
