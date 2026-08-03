@@ -37,6 +37,9 @@ namespace mau.ViewModel.News
         [ObservableProperty]
         List<Buttons> _filterButtons = [];
 
+        [ObservableProperty]
+        string _emptyMessage = "Новостей в этой категории нет";
+
         public bool IsLoading => CurrentState == States.Loading;
         public bool HasContent => CurrentState == States.Success;
         public bool IsEmpty => CurrentState == States.Empty;
@@ -67,7 +70,7 @@ namespace mau.ViewModel.News
         [RelayCommand]
         async Task LoadData()
         {
-            await LoadNews(RssData.Default);
+            await LoadNews(SelectedButton?.FilterType ?? RssData.Default);
         }
 
         async Task LoadNews(RssData filterType)
@@ -112,6 +115,7 @@ namespace mau.ViewModel.News
                 News = [.. await _parserRequests.GetNewsAsync(filterType, cancellationToken)];
                 cancellationToken.ThrowIfCancellationRequested();
                 _loadedFilter = filterType;
+                EmptyMessage = "Новостей в этой категории нет";
                 SetState(News.Count == 0 ? States.Empty : States.Success);
             }
             catch (OperationCanceledException)
@@ -120,6 +124,8 @@ namespace mau.ViewModel.News
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex);
+                News = [];
+                EmptyMessage = "Не удалось загрузить новости. Потяните вниз или откройте вкладку снова";
                 SetState(States.Empty);
                 await AppShell.DisplaySnackbarAsync("Не удалось загрузить новости");
             }

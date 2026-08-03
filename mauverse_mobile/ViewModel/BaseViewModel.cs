@@ -37,7 +37,7 @@ namespace mau.ViewModel
         bool _isBusy;
 
         [ObservableProperty]
-        bool _canStateChange;
+        bool _canStateChange = true;
 
         [ObservableProperty]
         string _currentState = States.Loading;

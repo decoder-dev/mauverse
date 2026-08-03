@@ -20,10 +20,16 @@ extension Notification.Name {
 
 final class APIClient {
     static let shared = APIClient()
-    private let baseURL = URL(string: "https://app.mauniver.ru/dev/mauverse/")!
+    private let baseURL: URL
     private let session: URLSession
 
     private init() {
+        if let configured = Bundle.main.object(forInfoDictionaryKey: "MAUVERSE_API_BASE_URL") as? String,
+           let url = URL(string: configured), !configured.isEmpty {
+            baseURL = url
+        } else {
+            baseURL = URL(string: "https://app.mauniver.ru/dev/mauverse/")!
+        }
         let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = 30
         configuration.waitsForConnectivity = true

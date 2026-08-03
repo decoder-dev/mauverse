@@ -20,6 +20,10 @@ final class SessionStore: ObservableObject {
                 UserDefaults.standard.removeObject(forKey: storageKey)
             }
         }
+        if var current = user {
+            Self.clearMistakenScheduleUID(&current)
+            user = current
+        }
         sessionObserver = NotificationCenter.default.addObserver(
             forName: .mauverseSessionExpired,
             object: nil,
@@ -63,9 +67,7 @@ final class SessionStore: ObservableObject {
                 )
             }
             authenticated.username = authenticated.username ?? normalizedUsername
-            if authenticated.scheduleGroupUID?.isEmpty != false {
-                authenticated.scheduleGroupUID = authenticated.groupId
-            }
+            Self.clearMistakenScheduleUID(&authenticated)
             user = authenticated
             persist()
             await refreshProfile()
@@ -83,6 +85,7 @@ final class SessionStore: ObservableObject {
 
     func signOut() {
         user = nil
+        errorMessage = nil
         KeychainStore.delete(account: storageKey)
         UserDefaults.standard.removeObject(forKey: storageKey)
     }
@@ -117,5 +120,16 @@ final class SessionStore: ObservableObject {
     private func persist() {
         guard let user, let data = try? JSONEncoder().encode(user) else { return }
         KeychainStore.write(data, account: storageKey)
+    }
+
+    /// Moodle numeric group ids were previously copied into scheduleGroupUID and broke lookups.
+    private static func clearMistakenScheduleUID(_ user: inout UserDTO) {
+        guard let uid = user.scheduleGroupUID, !uid.isEmpty else {
+            user.scheduleGroupUID = nil
+            return
+        }
+        if let groupId = user.groupId, uid == groupId {
+            user.scheduleGroupUID = nil
+        }
     }
 }

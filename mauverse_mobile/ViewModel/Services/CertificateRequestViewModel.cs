@@ -74,7 +74,7 @@ public partial class CertificateRequestViewModel : BaseViewModel
     private string _phone = string.Empty;
 
     [ObservableProperty]
-    private DateTime _birthDate = new(2000, 1, 1);
+    private DateTime _birthDate = DateTime.Today;
 
     [ObservableProperty]
     private string? _institute;
@@ -208,8 +208,8 @@ public partial class CertificateRequestViewModel : BaseViewModel
             return "Проверьте контактный e-mail";
         if (Phone.Length > 32 || Phone.Count(char.IsDigit) is < 10 or > 15)
             return "Проверьте номер телефона";
-        if (BirthDate < MinimumBirthDate || BirthDate > MaximumBirthDate)
-            return "Проверьте дату рождения";
+        if (BirthDate < MinimumBirthDate || BirthDate > MaximumBirthDate.AddYears(-14))
+            return "Укажите дату рождения";
         if (string.IsNullOrWhiteSpace(Institute))
             return "Выберите факультет или институт";
         if (string.IsNullOrWhiteSpace(StudyForm))
