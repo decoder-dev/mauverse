@@ -135,8 +135,8 @@ struct ServicesView: View {
                                     .padding(16)
                                     .frame(maxWidth: .infinity, minHeight: 135, alignment: .topLeading)
                                 }
-                                .buttonStyle(.plain)
-                                .mauSurface(radius: 23)
+                                .mauPressable()
+                                .mauGlass(radius: MauRadius.card, style: .interactive)
                             }
                         }
                     }
