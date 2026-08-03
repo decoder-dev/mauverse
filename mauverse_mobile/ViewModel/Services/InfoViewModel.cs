@@ -134,7 +134,7 @@ namespace mau.ViewModel.Services
         }
 
         [RelayCommand]
-        void TeacherSelected(string teacher)
+        async Task TeacherSelected(string teacher)
         {
             if (string.IsNullOrWhiteSpace(teacher) || teacher == "Ничего не найдено")
             {
@@ -145,6 +145,7 @@ namespace mau.ViewModel.Services
             TeacherName = teacher;
             IsListVisible = false;
             TeacherList.Clear();
+            await GetTeacherInfo(CancellationToken.None);
         }
 
         protected override void CancelPendingOperations()

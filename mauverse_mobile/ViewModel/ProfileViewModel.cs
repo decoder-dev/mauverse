@@ -61,7 +61,27 @@ namespace mau.ViewModel
             _userRequests = userRequests;
             _validationRequests = validationRequests;
             _navigation = navigation;
-            _user = CurrentUser;
+            _user = CurrentUser ?? new User();
+            if (CurrentUser is null)
+            {
+                ButtonExitLabel = "Выйти";
+                ButtonChangeLabel = "Выбрать подгруппу";
+                PageTitle = "Личный кабинет";
+                MainSectionLabel = "Основная информация";
+                DescriptionLabel = "Специальность";
+                NameLabel = "Полное имя";
+                GroupLabel = "Группа";
+                CreditBookLabel = "Номер зачетной книжки";
+                _loadData = new AsyncRelayCommand(LoadDataAsync);
+                Edit = new AsyncRelayCommand(cancellationToken =>
+                    RunSafelyAsync(EditInfoAsync, "Не удалось сохранить изменения", cancellationToken));
+                Change = new AsyncRelayCommand(cancellationToken =>
+                    RunSafelyAsync(ChangeSubgroupAsync, "Не удалось изменить подгруппу", cancellationToken));
+                OpenSettings = new AsyncRelayCommand(OpenSettingsAsync);
+                Exit = new AsyncRelayCommand(ConfirmExitAsync);
+                return;
+            }
+
             if (CurrentUser.Role == UserRole.Student)
             {
                 IsCreditBookPanelIsVisible = true;

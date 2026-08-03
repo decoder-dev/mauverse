@@ -24,6 +24,7 @@
 *.p12
 *.pfx
 *.mobileprovision
+**/Directory.Build.signing.props
 
 # Generated artifacts
 .artifacts/

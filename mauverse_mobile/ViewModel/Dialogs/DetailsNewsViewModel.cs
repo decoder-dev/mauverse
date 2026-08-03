@@ -25,12 +25,23 @@ namespace mau.ViewModel.Dialogs
         {
             _popup = popup;
             _navigation = navigation;
-            Title = news.Title;
+            Title = CleanNewsText(news.Title);
             ImageUrl = news.Image;
-            Description = news.Description;
+            Description = CleanNewsText(news.Description);
             Url = news.Link;
             Publish = news.Publish;
             GoToFull = new AsyncRelayCommand<string?>(OpenArticleAsync);
+        }
+
+        private static string CleanNewsText(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return string.Empty;
+
+            var decoded = System.Net.WebUtility.HtmlDecode(value);
+            decoded = System.Text.RegularExpressions.Regex.Replace(decoded, "<[^>]+>", " ");
+            decoded = System.Text.RegularExpressions.Regex.Replace(decoded, @"\s+", " ");
+            return decoded.Trim();
         }
 
         public IAsyncRelayCommand<string?> GoToFull { get; }
