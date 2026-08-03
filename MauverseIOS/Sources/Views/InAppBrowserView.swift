@@ -23,7 +23,7 @@ final class InAppBrowserController: NSObject, ObservableObject, WKNavigationDele
 
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .default()
-        configuration.applicationNameForUserAgent = "MAUverse/1.12.3"
+        configuration.applicationNameForUserAgent = "MAUverse/1.12.4"
         configuration.defaultWebpagePreferences.allowsContentJavaScript = true
         configuration.allowsInlineMediaPlayback = true
         webView = WKWebView(frame: .zero, configuration: configuration)
@@ -224,7 +224,7 @@ private struct BrowserLocationBar: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 9)
-            .background(.bar)
+            .background(.ultraThinMaterial)
 
             if browser.isLoading {
                 ProgressView(value: browser.progress)

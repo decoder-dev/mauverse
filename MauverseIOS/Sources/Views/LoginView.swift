@@ -46,7 +46,7 @@ struct LoginView: View {
                             .submitLabel(.next)
                             .onSubmit { focused = .password }
                             .padding(18)
-                            .background(MauTheme.card.opacity(0.78), in: RoundedRectangle(cornerRadius: 18))
+                            .mauGlass(radius: MauRadius.compact, style: .thin)
 
                         SecureField("Пароль", text: $password)
                             .textContentType(.password)
@@ -54,13 +54,14 @@ struct LoginView: View {
                             .submitLabel(.go)
                             .onSubmit { signIn() }
                             .padding(18)
-                            .background(MauTheme.card.opacity(0.78), in: RoundedRectangle(cornerRadius: 18))
+                            .mauGlass(radius: MauRadius.compact, style: .thin)
 
                         if let error = session.errorMessage {
                             Text(error)
                                 .font(.footnote)
                                 .foregroundStyle(.red)
                                 .frame(maxWidth: .infinity, alignment: .leading)
+                                .transition(.opacity.combined(with: .move(edge: .top)))
                         }
 
                         Button(action: signIn) {
@@ -72,14 +73,15 @@ struct LoginView: View {
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 17)
                         }
-                        .buttonStyle(.plain)
+                        .mauPressable()
                         .foregroundStyle(.white)
-                        .background(MauTheme.heroGradient, in: RoundedRectangle(cornerRadius: 18))
+                        .background(MauTheme.heroGradient, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
                         .shadow(color: MauTheme.blue.opacity(0.22), radius: 14, y: 7)
                         .disabled(session.isBusy)
                     }
                     .padding(20)
-                    .mauSurface(radius: 28)
+                    .mauGlass(radius: 28)
+                    .animation(MauMotion.soft, value: session.errorMessage)
 
                     Text("Используйте данные от электронной информационно-образовательной среды МАУ")
                         .font(.caption)

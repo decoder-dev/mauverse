@@ -34,7 +34,8 @@ struct CampusNavigatorView: View {
                     }
 
                     TextField("Поиск корпуса или адреса", text: $searchText)
-                        .textFieldStyle(.roundedBorder)
+                        .padding(14)
+                        .mauGlass(radius: MauRadius.compact, style: .thin)
 
                     if let url = URL(string: UniversityPortalURLs.campusNavigatorSite) {
                         NavigationLink {
