@@ -224,12 +224,10 @@ struct ScheduleView: View {
                     if model.isLoading {
                         VStack(spacing: 12) {
                             ForEach(0..<3, id: \.self) { _ in
-                                RoundedRectangle(cornerRadius: 22)
-                                    .fill(MauTheme.card.opacity(0.75))
-                                    .frame(height: 112)
-                                    .overlay { ProgressView().opacity(0.45) }
+                                SkeletonCard(height: 56)
                             }
                         }
+                        .transition(.opacity)
                     } else if let error = model.error {
                         VStack(spacing: 12) {
                             EmptyState(icon: "wifi.exclamationmark", title: "Не удалось загрузить", message: error)
@@ -238,12 +236,18 @@ struct ScheduleView: View {
                         }
                     } else if model.items(for: model.selectedDate).isEmpty {
                         EmptyState(icon: "cup.and.saucer.fill", title: "Занятий нет", message: "На выбранную дату расписание пустое")
+                            .transition(.opacity.combined(with: .move(edge: .bottom)))
                     } else {
                         LazyVStack(spacing: 12) {
                             ForEach(model.items(for: model.selectedDate), id: \.stableID) { item in
                                 LessonCard(item: item)
+                                    .transition(.asymmetric(
+                                        insertion: .opacity.combined(with: .move(edge: .trailing)),
+                                        removal: .opacity
+                                    ))
                             }
                         }
+                        .animation(MauMotion.soft, value: model.selectedDate)
                     }
                 }
                 .padding(20)
@@ -280,13 +284,15 @@ private struct DateChip: View {
         }
         .foregroundStyle(selected ? .white : MauTheme.ink)
         .frame(width: 58, height: 68)
-        .background(selected ? AnyShapeStyle(MauTheme.heroGradient) : AnyShapeStyle(MauTheme.card.opacity(0.82)),
-                    in: RoundedRectangle(cornerRadius: 19, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 19, style: .continuous)
-                .stroke(selected ? Color.white.opacity(0.22) : Color.primary.opacity(0.06), lineWidth: 0.75)
+        .background {
+            if selected {
+                RoundedRectangle(cornerRadius: 19, style: .continuous)
+                    .fill(MauTheme.heroGradient)
+            }
         }
+        .mauGlass(radius: 19, style: selected ? .regular : .thin)
         .shadow(color: selected ? MauTheme.blue.opacity(0.22) : .clear, radius: 10, y: 5)
+        .animation(MauMotion.snappy, value: selected)
     }
 }
 
@@ -296,19 +302,24 @@ private struct FilterChip: View {
     let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
+        Button {
+            withAnimation(MauMotion.snappy) { action() }
+        } label: {
             Text(title)
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(selected ? .white : MauTheme.ink)
                 .lineLimit(1)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
-                .background(
-                    selected ? AnyShapeStyle(MauTheme.blue.gradient) : AnyShapeStyle(MauTheme.card.opacity(0.85)),
-                    in: Capsule()
-                )
+                .background {
+                    if selected {
+                        Capsule().fill(MauTheme.blue.gradient)
+                    }
+                }
+                .mauGlass(radius: 20, style: .thin)
         }
-        .buttonStyle(.plain)
+        .mauPressable()
+        .sensoryFeedback(.selection, trigger: selected)
     }
 }
 
@@ -366,7 +377,7 @@ private struct LessonCard: View {
             Spacer()
         }
         .padding(17)
-        .mauSurface(radius: 22)
+        .mauGlass(radius: MauRadius.card, style: .interactive)
     }
 }
 

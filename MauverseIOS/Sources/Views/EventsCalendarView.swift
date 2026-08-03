@@ -109,7 +109,7 @@ struct EventsCalendarView: View {
                             .foregroundStyle(MauTheme.blue)
                     }
                     if let description = item.description, !description.isEmpty {
-                        Text(description)
+                        Text(HTMLTextCleaning.cleanRSS(description))
                             .font(.caption)
                             .foregroundStyle(MauTheme.muted)
                             .lineLimit(3)
@@ -118,7 +118,7 @@ struct EventsCalendarView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(16)
-                .mauSurface(radius: 18)
+                .mauGlass(radius: MauRadius.compact)
             }
             .buttonStyle(.plain)
         }
