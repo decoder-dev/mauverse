@@ -145,20 +145,28 @@ struct ScheduleView: View {
                         .disabled(model.isLoading)
                     }
 
-                    HStack(spacing: 12) {
-                        IconTile(systemName: "person.3.fill")
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text(session.user?.groupName ?? "Группа не указана")
-                                .font(.headline)
-                            Text(session.user?.speciality ?? "Изменить можно в профиле")
-                                .font(.caption)
+                    NavigationLink {
+                        ProfileView()
+                    } label: {
+                        HStack(spacing: 12) {
+                            IconTile(systemName: "person.3.fill")
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(session.user?.groupName ?? "Группа не указана")
+                                    .font(.headline)
+                                Text(session.user?.speciality ?? "Нажмите, чтобы указать группу в профиле")
+                                    .font(.caption)
+                                    .foregroundStyle(MauTheme.muted)
+                                    .lineLimit(1)
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption.bold())
                                 .foregroundStyle(MauTheme.muted)
-                                .lineLimit(1)
                         }
-                        Spacer()
+                        .padding(17)
+                        .mauSurface(radius: 22)
                     }
-                    .padding(17)
-                    .mauSurface(radius: 22)
+                    .buttonStyle(.plain)
 
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 10) {
@@ -265,9 +273,9 @@ private struct DateChip: View {
 
     var body: some View {
         VStack(spacing: 5) {
-            Text(date.formatted(.dateTime.weekday(.abbreviated)).uppercased())
+            Text(date.formatted(.dateTime.weekday(.abbreviated).locale(Locale(identifier: "ru_RU"))).uppercased())
                 .font(.caption2.weight(.bold))
-            Text(date.formatted(.dateTime.day()))
+            Text(date.formatted(.dateTime.day().locale(Locale(identifier: "ru_RU"))))
                 .font(.title3.bold())
         }
         .foregroundStyle(selected ? .white : MauTheme.ink)

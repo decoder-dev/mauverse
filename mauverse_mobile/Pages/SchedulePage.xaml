@@ -162,7 +162,7 @@
                     StrokeShape="RoundRectangle 4"
                     VerticalOptions="Center" />
             <Label Grid.Column="1"
-                   Text="Нет занятий"
+                   Text="Зелёная точка — день без пар"
                    Style="{StaticResource SectionSubtitle}"
                    VerticalTextAlignment="Center" />
             <Label Grid.Column="2"

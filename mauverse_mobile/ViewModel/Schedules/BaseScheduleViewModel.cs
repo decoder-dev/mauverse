@@ -139,6 +139,11 @@ namespace mau.ViewModel.Schedules
             CancellationToken cancellationToken = default)
         {
             List<Schedule> schedules = new();
+            if (CurrentUser is null && string.IsNullOrEmpty(teacher) && roomId == 0)
+            {
+                return ScheduleList;
+            }
+
             if (!string.IsNullOrEmpty(teacher))
             {
                 var searchTeacher = teacher.Split(' ');
@@ -148,7 +153,7 @@ namespace mau.ViewModel.Schedules
             {
                 schedules = new(await _scheduleRequests.GetSchedulesAsync(room_id: roomId, cancellationToken));
             }
-            else if (CurrentUser.Role == UserRole.Teacher)
+            else if (CurrentUser!.Role == UserRole.Teacher)
             {
                 schedules = [.. await _scheduleRequests.GetSchedulesAsync(teacher: CurrentUser.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries), cancellationToken)];
             }

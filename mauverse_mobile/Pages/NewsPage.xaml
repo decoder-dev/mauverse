@@ -96,7 +96,7 @@
                            FontSize="28"
                            TextColor="{DynamicResource TextMuted}"
                            HorizontalTextAlignment="Center" />
-                    <Label Text="Новостей в этой категории нет"
+                    <Label Text="{Binding EmptyMessage}"
                            Style="{StaticResource EmptyStateTitle}" />
                 </VerticalStackLayout>
             </Border>
