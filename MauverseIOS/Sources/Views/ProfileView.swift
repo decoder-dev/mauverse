@@ -28,7 +28,7 @@ struct ProfileView: View {
                             .font(.subheadline)
                             .foregroundStyle(.white.opacity(0.72))
                         HStack(spacing: 8) {
-                            Label("Сессия в Keychain", systemImage: "lock.fill")
+                            Label("Вход сохранён", systemImage: "lock.fill")
                             if let group = session.user?.groupName, !group.isEmpty {
                                 Text("•")
                                 Text(group)
@@ -73,7 +73,7 @@ struct ProfileView: View {
                     .buttonStyle(.plain)
                     .mauSurface()
 
-                    Text("MAUverse 1.12.2 (31)")
+                    Text("MAUverse 1.12.3 (32)")
                         .font(.caption)
                         .foregroundStyle(MauTheme.muted)
                 }
@@ -280,7 +280,7 @@ private struct SettingsView: View {
                                 .foregroundStyle(MauTheme.blue)
                             }
                         }
-                        Text("Версия 1.12.2 • сборка 31").font(.caption)
+                        Text("Версия 1.12.3 • сборка 32").font(.caption)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(20)

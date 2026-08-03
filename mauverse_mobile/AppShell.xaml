@@ -24,7 +24,7 @@
                       Icon="home_icon"
                       ContentTemplate="{DataTemplate local:MainPage}"
                       Route="MainPage" />
-        <ShellContent Title="Пары"
+        <ShellContent Title="Расписание"
                       Icon="schedule_icon"
                       ContentTemplate="{DataTemplate local:SchedulePage}"
                       Route="SchedulePage" />

@@ -128,7 +128,6 @@ struct UserDTO: Codable, Equatable {
         subGroupId = values.decodeLossyStringIfPresent(forKey: .subGroupId)
             ?? values.decodeLossyStringIfPresent(forKey: .legacySubGroupId)
         scheduleGroupUID = try values.decodeIfPresent(String.self, forKey: .scheduleGroupUID)
-            ?? values.decodeLossyStringIfPresent(forKey: .apiGroupId)
         groupName = try values.decodeIfPresent(String.self, forKey: .groupName)
             ?? values.decodeLossyStringIfPresent(forKey: .legacyGroupName)
         speciality = try values.decodeIfPresent(String.self, forKey: .speciality)

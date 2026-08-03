@@ -203,11 +203,13 @@ namespace mau.ViewModel
                 {
                     var subgroup = await Shell.Current.DisplayActionSheetAsync(
                         "Выберите подгруппу",
-                        null,
+                        "Выбрать позже в профиле",
                         null,
                         buttons: userSubgroups.SubGroups.Select(p => p.Name).ToArray());
-                    if (subgroup is null)
+                    if (subgroup is null || subgroup == "Выбрать позже в профиле")
                     {
+                        await AppShell.DisplaySnackbarAsync(
+                            "Подгруппа не выбрана — укажите её в профиле, чтобы расписание было точным");
                         break;
                     }
 
