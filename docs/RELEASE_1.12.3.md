@@ -14,7 +14,7 @@ on the exact promoted signed artifacts.
 | iPhone (SwiftUI) | `MauverseIOS` | `1.12.3` | `CURRENT_PROJECT_VERSION` 32 |
 
 - Package: `com.pmi4freal.mauverse3`
-- Release commit: `07a20420c2a7219ecb9822db655d1f01e72179df` (`main`)
+- Release commit: `40ac91bb5349f8883a7131c8e6de10dce35bd240` (`main`)
 - Tag / GitHub Release: https://github.com/decoder-dev/mauverse/releases/tag/v1.12.3
 - Pull request: https://github.com/decoder-dev/mauverse/pull/24 (merged)
 - CI on release artifacts: https://github.com/decoder-dev/mauverse/actions/runs/30841992477
