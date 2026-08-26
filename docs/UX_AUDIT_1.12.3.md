@@ -69,7 +69,7 @@ Production Play keystore stays out of repo (existing policy).
 
 ## Implementation status (2026-08-03)
 
-Implemented on branch `cursor/ux-audit-fixes-010d` for release **1.12.3**:
+Implemented on branch `decoder-dev/ux-audit-fixes-010d` for release **1.12.3**:
 
 - Android: B1–B6, B10, U1–U2, U6–U8 (+ profile/schedule null guards)
 - iOS: B7–B9, U3–U6, U9–U10, U12, B8 (+ mailto on contacts)
