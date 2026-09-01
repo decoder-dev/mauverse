@@ -22,4 +22,7 @@ public static class LayoutMetrics
 
     public static Thickness ServiceCardPaddingThickness =>
         new(ServiceCardPadding);
+
+    public static Thickness SectionBlockMargin =>
+        new(0, 0, 0, SectionStackSpacing);
 }
