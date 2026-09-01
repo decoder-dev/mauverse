@@ -14,17 +14,17 @@ on the exact promoted signed artifacts.
 | iPhone (SwiftUI) | `MauverseIOS` | `1.12.5` | `CURRENT_PROJECT_VERSION` 35 |
 
 - Package: `com.pmi4freal.mauverse3`
-- Release commit: `17f6f98fc0949cc4d30b092a2024c70b9569373f` (`main`)
+- Release commit: `097505fc1cd4f5d4cf6b1dd7c70fa1b4e5f643a8` (`main`)
 - Tag / GitHub Release: https://github.com/decoder-dev/mauverse/releases/tag/v1.12.5
 - Pull request: https://github.com/decoder-dev/mauverse/pull/34 (group hints)
-- CI on release artifacts: https://github.com/decoder-dev/mauverse/actions/runs/33455483313
+- CI on release artifacts: https://github.com/decoder-dev/mauverse/actions/runs/33456756216
 
 ## Published artifacts (unsigned)
 
 | Artifact | SHA-256 |
 | --- | --- |
-| `mauverse-android-arm64-unsigned.aab` | `5f14b84f8dd0e2e423ef2db26f5ae444f2015cf7d5e5c5b4b27aedd8921af387` |
-| `mauverse-native-ios-arm64-unsigned.ipa` | `199a8dfcab881eace5fc8871d5a45a714e06071c0b7c9ff9463442881850659d` |
+| `mauverse-android-arm64-unsigned.aab` | `ae4767be4a0814df5cf4064fbaaedd87fc344f9fed01ccf649731a3f49b15f48` |
+| `mauverse-native-ios-arm64-unsigned.ipa` | `49cd2d936e86db7ab333f6225bd2d6e75b84c52891f6c629380a3459dd7043be` |
 
 ## Product changes
 
@@ -35,7 +35,7 @@ on the exact promoted signed artifacts.
 
 ## Verification
 
-- [x] All four CI jobs green on release commit / run `33455483313`.
+- [x] All four CI jobs green on release commit / run `33456756216`.
 - [x] GitHub Release `v1.12.5` published with unsigned AAB/IPA and checksums.
 - [ ] Protected production Android keystore signing.
 - [ ] Apple distribution signing of the native IPA on an approved Mac.
