@@ -303,7 +303,8 @@ private struct MoodleNotificationCard: View {
             }
         }
         .padding(MauLayout.cardPadding)
-        .frame(width: 272, height: 164, alignment: .topLeading)
+        .frame(width: 272, alignment: .topLeading)
+        .frame(minHeight: 164, alignment: .topLeading)
         .mauSurface(radius: 22)
     }
 }
