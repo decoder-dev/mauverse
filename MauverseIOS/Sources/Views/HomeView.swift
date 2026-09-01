@@ -258,7 +258,8 @@ struct HomeView: View {
         return switch hour {
         case 5..<12: "Доброе утро,"
         case 12..<18: "Добрый день,"
-        default: "Добрый вечер,"
+        case 18..<23: "Добрый вечер,"
+        default: "Доброй ночи,"
         }
     }
 }
