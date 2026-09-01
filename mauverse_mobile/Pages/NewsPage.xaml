@@ -53,8 +53,6 @@
                     <Border Style="{StaticResource FilterButtons}"
                             HeightRequest="40"
                             MinimumHeightRequest="40"
-                            Margin="0,6"
-                            Padding="14,0"
                             HorizontalOptions="Center"
                             VerticalOptions="Center">
                         <Label x:Name="FilterLabel"

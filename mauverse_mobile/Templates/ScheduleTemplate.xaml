@@ -7,10 +7,11 @@
              xmlns:dto="clr-namespace:mau.DTOModels"
              xmlns:models="clr-namespace:mau.Models"
              xmlns:controls="clr-namespace:mau.Controls"
+             xmlns:utils="clr-namespace:mau.Utils"
              x:Class="mau.Templates.ScheduleTemplate">
     <converters:MenuPopupConverter x:Key="MenuParametersConverter" />
     <DataTemplate x:Key="ScheduleDataTemplate" x:DataType="models:Schedule">
-        <Grid Margin="0,5" ColumnDefinitions="62,*" ColumnSpacing="10">
+        <Grid Margin="0,5" ColumnDefinitions="62,*" ColumnSpacing="{x:Static utils:LayoutMetrics.GridGutter}">
             <VerticalStackLayout Padding="0,12,0,0"
                                  Spacing="2"
                                  HorizontalOptions="Center">
@@ -34,7 +35,7 @@
                     StrokeThickness="1">
                 <Grid ColumnDefinitions="4,*,52">
                     <BoxView Color="{DynamicResource Primary}" />
-                    <VerticalStackLayout Grid.Column="1" Padding="14,12" Spacing="6">
+                    <VerticalStackLayout Grid.Column="1" Padding="{x:Static utils:LayoutMetrics.ServiceCardPaddingThickness}" Spacing="6">
                         <Label Text="{Binding PairType}"
                                Style="{StaticResource Eyebrow}" />
                         <Label Text="{Binding Name}"

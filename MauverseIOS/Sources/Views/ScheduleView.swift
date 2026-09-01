@@ -121,19 +121,16 @@ struct ScheduleView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: MauLayout.sectionStack) {
                     HStack(alignment: .top) {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("Расписание")
-                                .font(.system(size: 36, weight: .bold, design: .rounded))
-                            Text(model.selectedDate.formatted(
+                        pageTitle(
+                            "Расписание",
+                            subtitle: model.selectedDate.formatted(
                                 .dateTime
                                     .locale(Locale(identifier: "ru_RU"))
                                     .weekday(.wide)
                                     .day()
                                     .month(.wide)
-                            ))
-                                .font(.subheadline)
-                                .foregroundStyle(MauTheme.muted)
-                        }
+                            )
+                        )
                         Spacer()
                         Button { Task { await reload() } } label: {
                             Image(systemName: "arrow.clockwise")

@@ -61,11 +61,11 @@ struct ProfileView: View {
                         Button { showingEditor = true } label: {
                             ProfileActionRow(title: "Учебные данные", icon: "pencil", color: MauTheme.blue)
                         }
-                        Divider().padding(.leading, 58)
+                        Divider().padding(.leading, MauLayout.actionRowDividerLeading)
                         NavigationLink(destination: SettingsView()) {
                             ProfileActionRow(title: "Настройки", icon: "gearshape.fill", color: MauTheme.violet)
                         }
-                        Divider().padding(.leading, 58)
+                        Divider().padding(.leading, MauLayout.actionRowDividerLeading)
                         Button(role: .destructive) { showingLogout = true } label: {
                             ProfileActionRow(title: "Выйти из аккаунта", icon: "rectangle.portrait.and.arrow.right", color: .red)
                         }
@@ -73,15 +73,15 @@ struct ProfileView: View {
                     .buttonStyle(.plain)
                     .mauSurface()
 
-                    Text("MAUverse 1.12.5 (36)")
+                    Text("MAUverse 1.12.5 (37)")
                         .font(.caption)
                         .foregroundStyle(MauTheme.muted)
                 }
                 .mauTabPageContent()
             }
         }
-        .navigationTitle("Профиль")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .navigationBar)
         .sheet(isPresented: $showingEditor) { ProfileEditor() }
         .confirmationDialog("Выйти из аккаунта?", isPresented: $showingLogout, titleVisibility: .visible) {
             Button("Выйти", role: .destructive) { session.signOut() }
@@ -95,11 +95,11 @@ private struct ProfileActionRow: View {
     let color: Color
 
     var body: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: MauLayout.actionRowSpacing) {
             Image(systemName: icon)
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(color)
-                .frame(width: 34, height: 34)
+                .frame(width: MauLayout.actionRowIconSize, height: MauLayout.actionRowIconSize)
                 .background(color.opacity(0.11), in: RoundedRectangle(cornerRadius: 10))
             Text(title)
                 .font(.subheadline.weight(.semibold))
@@ -109,7 +109,7 @@ private struct ProfileActionRow: View {
                 .font(.caption.bold())
                 .foregroundStyle(MauTheme.muted)
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, MauLayout.cardPadding)
         .padding(.vertical, 13)
     }
 }

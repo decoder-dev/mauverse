@@ -60,6 +60,12 @@ enum MauLayout {
     static let cardPadding: CGFloat = 16
     static let cardMinHeight: CGFloat = 140
     static let maxContentWidth: CGFloat = 760
+    static let actionRowIconSize: CGFloat = 34
+    static let actionRowSpacing: CGFloat = 14
+
+    static var actionRowDividerLeading: CGFloat {
+        cardPadding + actionRowIconSize + actionRowSpacing
+    }
 
     static var twoColumnGrid: [GridItem] {
         [

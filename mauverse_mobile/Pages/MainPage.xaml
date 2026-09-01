@@ -60,7 +60,7 @@
                 </Border>
             </Grid>
 
-            <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="8">
+            <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="{x:Static utils:LayoutMetrics.GridGutter}">
                 <Border HeightRequest="7"
                         WidthRequest="7"
                         BackgroundColor="{StaticResource Success}"
@@ -297,11 +297,14 @@
                     </Grid>
                 </Border>
                 <CollectionView ItemsSource="{Binding Notifications}"
-                                ItemsLayout="HorizontalList"
                                 ItemSizingStrategy="MeasureAllItems"
                                 MinimumHeightRequest="156"
                                 HorizontalScrollBarVisibility="Never"
                                 ItemTemplate="{StaticResource NotificationItemTemplate}">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Horizontal"
+                                           ItemSpacing="{x:Static utils:LayoutMetrics.GridGutter}" />
+                    </CollectionView.ItemsLayout>
                     <CollectionView.Triggers>
                         <DataTrigger TargetType="CollectionView"
                                      Binding="{Binding IsBusy}"

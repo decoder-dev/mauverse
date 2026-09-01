@@ -28,4 +28,13 @@ public static class LayoutMetrics
 
     public static Thickness PageHeaderBottomMargin =>
         new(0, 0, 0, SectionHeaderSpacing);
+
+    public static Thickness CardContentPadding =>
+        new(ServiceCardPadding);
+
+    public static Thickness NotificationItemMargin =>
+        new(0, 0, GridGutter, 0);
+
+    public static Thickness ListItemBottomMargin =>
+        new(0, 0, 0, GridGutter);
 }
