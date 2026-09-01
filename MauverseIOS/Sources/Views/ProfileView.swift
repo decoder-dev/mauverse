@@ -54,6 +54,7 @@ struct ProfileView: View {
                         Divider()
                         ProfileRow(label: "Зачётная книжка", value: session.user?.creditBook)
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(MauLayout.cardPadding)
                     .mauSurface()
 
@@ -118,12 +119,14 @@ private struct ProfileRow: View {
     let label: String
     let value: String?
     var body: some View {
-        HStack(alignment: .top) {
-            Text(label).foregroundStyle(MauTheme.muted)
-            Spacer()
+        HStack(alignment: .top, spacing: 12) {
+            Text(label)
+                .foregroundStyle(MauTheme.muted)
+                .layoutPriority(1)
             Text(value?.isEmpty == false ? value! : "Не указано")
                 .fontWeight(.medium)
                 .multilineTextAlignment(.trailing)
+                .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .font(.subheadline)
     }
