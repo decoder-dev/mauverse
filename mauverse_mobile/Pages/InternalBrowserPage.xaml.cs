@@ -43,6 +43,22 @@ public partial class InternalBrowserPage : ContentPage, IQueryAttributable, IDis
         })();
         """;
 
+    // Some university pages render a hair wider than the viewport (a stray
+    // horizontal scrollbar or a few px of overflow), which lets the page
+    // scroll horizontally and clips flush-left content — labels, form
+    // fields — against the screen edge. These pages are meant to scroll
+    // vertically only, so guard against any horizontal overflow.
+    private const string OverflowGuardScript = """
+        (() => {
+            if (window.__mauverseOverflowGuardInstalled) return true;
+            window.__mauverseOverflowGuardInstalled = true;
+            const style = document.createElement('style');
+            style.textContent = 'html, body { overflow-x: hidden !important; max-width: 100% !important; }';
+            document.documentElement.appendChild(style);
+            return true;
+        })();
+        """;
+
     private static readonly HashSet<string> ExternalSchemes = new(StringComparer.OrdinalIgnoreCase)
     {
         Uri.UriSchemeHttp,
@@ -447,6 +463,8 @@ public partial class InternalBrowserPage : ContentPage, IQueryAttributable, IDis
     {
         cancellationToken.ThrowIfCancellationRequested();
         await BrowserWebView.EvaluateJavaScriptAsync(SameWindowScript);
+        cancellationToken.ThrowIfCancellationRequested();
+        await BrowserWebView.EvaluateJavaScriptAsync(OverflowGuardScript);
         cancellationToken.ThrowIfCancellationRequested();
     }
 

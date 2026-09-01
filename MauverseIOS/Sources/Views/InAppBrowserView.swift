@@ -16,6 +16,23 @@ final class InAppBrowserController: NSObject, ObservableObject, WKNavigationDele
     private let fallbackTitle: String
     private var observations: [NSKeyValueObservation] = []
 
+    /// Guards against pages that render wider than the viewport (a stray
+    /// horizontal scrollbar or a few px of overflow), which leaves the page
+    /// resting at a non-zero horizontal scroll offset and clips flush-left
+    /// content — labels, form fields — against the screen edge. University
+    /// pages loaded here are expected to scroll vertically only.
+    private static let overflowGuardScript = WKUserScript(
+        source: """
+        (function () {
+            var style = document.createElement('style');
+            style.textContent = 'html, body { overflow-x: hidden !important; max-width: 100% !important; }';
+            document.documentElement.appendChild(style);
+        })();
+        """,
+        injectionTime: .atDocumentEnd,
+        forMainFrameOnly: true
+    )
+
     init(url: URL, title: String) {
         initialURL = url
         fallbackTitle = title
@@ -26,6 +43,7 @@ final class InAppBrowserController: NSObject, ObservableObject, WKNavigationDele
         configuration.applicationNameForUserAgent = "MAUverse/1.12.5"
         configuration.defaultWebpagePreferences.allowsContentJavaScript = true
         configuration.allowsInlineMediaPlayback = true
+        configuration.userContentController.addUserScript(Self.overflowGuardScript)
         webView = WKWebView(frame: .zero, configuration: configuration)
 
         super.init()
@@ -37,6 +55,12 @@ final class InAppBrowserController: NSObject, ObservableObject, WKNavigationDele
         webView.isOpaque = false
         webView.backgroundColor = .clear
         webView.scrollView.backgroundColor = .clear
+        // Some university pages sit at a slightly non-zero resting horizontal
+        // scroll offset after load, which clips flush-left content (labels,
+        // form fields) against the screen edge. Pages are meant to be
+        // vertically scrollable only, so disable horizontal rubber-banding.
+        webView.scrollView.alwaysBounceHorizontal = false
+        webView.scrollView.showsHorizontalScrollIndicator = false
 
         observations = [
             webView.observe(\.estimatedProgress, options: [.new]) { [weak self] webView, _ in
@@ -97,6 +121,12 @@ final class InAppBrowserController: NSObject, ObservableObject, WKNavigationDele
         isLoading = false
         progress = 1
         updateNavigationState(webView)
+        if webView.scrollView.contentOffset.x != 0 {
+            webView.scrollView.setContentOffset(
+                CGPoint(x: 0, y: webView.scrollView.contentOffset.y),
+                animated: false
+            )
+        }
     }
 
     func webView(
