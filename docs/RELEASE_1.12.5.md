@@ -35,7 +35,7 @@ on the exact promoted signed artifacts.
 ## Verification
 
 - [x] All four CI jobs green on release commit / run `33455483313`.
-- [ ] GitHub Release `v1.12.5` published with unsigned AAB/IPA and checksums.
+- [x] GitHub Release `v1.12.5` published with unsigned AAB/IPA and checksums.
 - [ ] Protected production Android keystore signing.
 - [ ] Apple distribution signing of the native IPA on an approved Mac.
 - [ ] Device smoke from `docs/RELEASE_CHECKLIST.md`.
