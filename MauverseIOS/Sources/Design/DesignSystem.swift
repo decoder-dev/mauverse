@@ -48,6 +48,27 @@ enum MauSpacing {
     static let xl: CGFloat = 30
 }
 
+/// Shared layout grid used across tab screens (mirrors Android LayoutMetrics).
+enum MauLayout {
+    static let pageHorizontal: CGFloat = 22
+    static let pageTop: CGFloat = 14
+    static let pageBottomTabClearance: CGFloat = 108
+    static let gridGutter: CGFloat = 12
+    static let gridRow: CGFloat = 12
+    static let sectionStack: CGFloat = 22
+    static let sectionHeaderBottom: CGFloat = 10
+    static let cardPadding: CGFloat = 16
+    static let cardMinHeight: CGFloat = 140
+    static let maxContentWidth: CGFloat = 760
+
+    static var twoColumnGrid: [GridItem] {
+        [
+            GridItem(.flexible(), spacing: gridGutter),
+            GridItem(.flexible(), spacing: gridGutter),
+        ]
+    }
+}
+
 enum MauRadius {
     static let compact: CGFloat = 16
     static let card: CGFloat = 24
@@ -200,6 +221,14 @@ extension View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// Standard tab-root scroll insets: 22 pt sides, 12 pt grid gutter, 108 pt tab clearance.
+    func mauTabPageContent(maxWidth: CGFloat = MauLayout.maxContentWidth) -> some View {
+        frame(maxWidth: maxWidth)
+            .padding(.horizontal, MauLayout.pageHorizontal)
+            .padding(.top, MauLayout.pageTop)
+            .padding(.bottom, MauLayout.pageBottomTabClearance)
     }
 }
 

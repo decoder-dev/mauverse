@@ -7,6 +7,7 @@
              xmlns:viewmodel="clr-namespace:mau.ViewModel.News"
              xmlns:fonts="clr-namespace:mau.Resources.Fonts"
              BackgroundColor="{DynamicResource Background}"
+             xmlns:utils="clr-namespace:mau.Utils"
              x:DataType="viewmodel:NewsViewModel"
              Shell.NavBarIsVisible="False"
              Title="Новости">
@@ -25,7 +26,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </ContentPage.Resources>
-    <Grid RowDefinitions="auto,auto,*" Padding="16,18,16,16" RowSpacing="10">
+    <Grid RowDefinitions="auto,auto,*" Padding="{x:Static utils:LayoutMetrics.PagePadding}" RowSpacing="10">
         <VerticalStackLayout Spacing="3" Margin="0,0,0,4">
             <Label Text="Новости" Style="{StaticResource PageTitle}" />
             <Label Text="События и объявления университета"

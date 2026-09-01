@@ -92,60 +92,69 @@ private enum ServiceCategory: String, CaseIterable, Identifiable {
 }
 
 struct ServicesView: View {
-    private let columns = [GridItem(.flexible(), spacing: 13), GridItem(.flexible(), spacing: 13)]
-
     var body: some View {
         ZStack {
             MauBackground()
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Сервисы").font(.system(size: 36, weight: .bold, design: .rounded))
+                VStack(alignment: .leading, spacing: MauLayout.sectionStack) {
+                    VStack(alignment: .leading, spacing: 7) {
+                        Text("Сервисы")
+                            .font(.system(size: 34, weight: .bold, design: .rounded))
+                            .foregroundStyle(MauTheme.ink)
                         Text("Учебные сервисы и разделы сайта МАУ")
                             .font(.subheadline)
                             .foregroundStyle(MauTheme.muted)
                     }
 
                     ForEach(ServiceCategory.allCases) { category in
-                        MauSectionHeader(title: category.rawValue)
-                        LazyVGrid(columns: columns, spacing: 13) {
-                            ForEach(category.services) { service in
-                                NavigationLink(destination: ServiceDestination(service: service)) {
-                                    VStack(alignment: .leading, spacing: 16) {
-                                        HStack {
-                                            IconTile(systemName: service.icon, color: service.color)
-                                            Spacer()
-                                            Image(systemName: "arrow.up.right")
-                                                .font(.caption.bold())
-                                                .foregroundStyle(MauTheme.muted)
-                                        }
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            Text(service.title)
-                                                .font(.subheadline.weight(.semibold))
-                                                .foregroundStyle(MauTheme.ink)
-                                                .multilineTextAlignment(.leading)
-                                                .lineLimit(2)
-                                            Text(service.subtitle)
-                                                .font(.caption2)
-                                                .foregroundStyle(MauTheme.muted)
-                                                .lineLimit(1)
-                                        }
-                                        .frame(maxWidth: .infinity, minHeight: 42, alignment: .topLeading)
+                        VStack(alignment: .leading, spacing: MauLayout.sectionHeaderBottom) {
+                            MauSectionHeader(title: category.rawValue)
+                            LazyVGrid(columns: MauLayout.twoColumnGrid, spacing: MauLayout.gridRow) {
+                                ForEach(category.services) { service in
+                                    NavigationLink(destination: ServiceDestination(service: service)) {
+                                        ServiceCardContent(service: service)
                                     }
-                                    .padding(16)
-                                    .frame(maxWidth: .infinity, minHeight: 135, alignment: .topLeading)
+                                    .mauPressable()
+                                    .mauGlass(radius: MauRadius.card, style: .interactive)
                                 }
-                                .mauPressable()
-                                .mauGlass(radius: MauRadius.card, style: .interactive)
                             }
                         }
                     }
                 }
-                .padding(20)
-                .padding(.bottom, 96)
+                .mauTabPageContent()
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private struct ServiceCardContent: View {
+    let service: MauService
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                IconTile(systemName: service.icon, color: service.color)
+                Spacer()
+                Image(systemName: "arrow.up.right")
+                    .font(.caption.bold())
+                    .foregroundStyle(MauTheme.muted)
+            }
+            VStack(alignment: .leading, spacing: 4) {
+                Text(service.title)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(MauTheme.ink)
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(2)
+                Text(service.subtitle)
+                    .font(.caption2)
+                    .foregroundStyle(MauTheme.muted)
+                    .lineLimit(1)
+            }
+            .frame(maxWidth: .infinity, minHeight: 42, alignment: .topLeading)
+        }
+        .padding(MauLayout.cardPadding)
+        .frame(maxWidth: .infinity, minHeight: MauLayout.cardMinHeight, alignment: .topLeading)
     }
 }
 

@@ -34,28 +34,28 @@ namespace mau.ViewModel.Services
             _navigation = navigation;
             ServiceDTO[] universityServices =
             [
-                CreateService("ЭИОС", FluentUI.book_open_microphone_24_regular, "eios"),
-                CreateService("Онлайн-формы", FluentUI.certificate_24_regular, "forms"),
-                CreateService("Мессенджер ЭИОС", FluentUI.chat_24_regular, "chats"),
-                CreateService("Навигатор по корпусам", FluentUI.map_24_regular, "campus"),
-                CreateService("Учебные задолженности", FluentUI.book_24_regular, "study_info"),
-                CreateService("Цифровые сервисы", FluentUI.building_24_regular, "digital")
+                CreateService("ЭИОС", "Курсы и задания", FluentUI.book_open_microphone_24_regular, "eios"),
+                CreateService("Онлайн-формы", "Справки и обращения", FluentUI.certificate_24_regular, "forms"),
+                CreateService("Мессенджер ЭИОС", "Сообщения в ЭИОС", FluentUI.chat_24_regular, "chats"),
+                CreateService("Навигатор по корпусам", "Корпуса и маршруты", FluentUI.map_24_regular, "campus"),
+                CreateService("Учебные задолженности", "Проверка успеваемости", FluentUI.book_24_regular, "study_info"),
+                CreateService("Цифровые сервисы", "Почта, ЭИОС, библиотека", FluentUI.building_24_regular, "digital")
             ];
 
             ServiceDTO[] portalServices =
             [
-                CreateService("Студенту", FluentUI.people_community_24_regular, "student_guide"),
-                CreateService("Абитуриенту", FluentUI.hat_graduation_24_regular, "applicant"),
-                CreateService("Наука", FluentUI.beaker_24_regular, "science_guide"),
-                CreateService("International", FluentUI.globe_24_regular, "international")
+                CreateService("Студенту", "Гид по разделу «Студенту»", FluentUI.people_community_24_regular, "student_guide"),
+                CreateService("Абитуриенту", "Поступление и приёмная", FluentUI.hat_graduation_24_regular, "applicant"),
+                CreateService("Наука", "Наука и исследования", FluentUI.beaker_24_regular, "science_guide"),
+                CreateService("International", "English and international", FluentUI.globe_24_regular, "international")
             ];
 
             ServiceDTO[] directories =
             [
-                CreateService("Контакты преподавателей", FluentUI.person_support_24_regular, "teacher_info"),
-                CreateService("Подразделения и телефоны", FluentUI.phone_24_regular, "telephones"),
-                CreateService("Контакты и реквизиты", FluentUI.document_one_page_24_regular, "contacts"),
-                CreateService("Календарь событий", FluentUI.calendar_ltr_24_regular, "events")
+                CreateService("Контакты преподавателей", "Поиск по имени", FluentUI.person_support_24_regular, "teacher_info"),
+                CreateService("Подразделения и телефоны", "Телефоны и кабинеты", FluentUI.phone_24_regular, "telephones"),
+                CreateService("Контакты и реквизиты", "Приёмка и платежи", FluentUI.document_one_page_24_regular, "contacts"),
+                CreateService("Календарь событий", "Анонсы пресс-центра", FluentUI.calendar_ltr_24_regular, "events")
             ];
 
             ServiceRows =
@@ -102,9 +102,10 @@ namespace mau.ViewModel.Services
             }
         }
 
-        static ServiceDTO CreateService(string name, string glyph, string page) => new()
+        static ServiceDTO CreateService(string name, string subtitle, string glyph, string page) => new()
         {
             ServiceName = name,
+            Subtitle = subtitle,
             Glyph = glyph,
             ServicePage = page,
             Role = UserRole.All

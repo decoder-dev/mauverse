@@ -77,8 +77,7 @@ struct ProfileView: View {
                         .font(.caption)
                         .foregroundStyle(MauTheme.muted)
                 }
-                .padding(20)
-                .padding(.bottom, 96)
+                .mauTabPageContent()
             }
         }
         .navigationTitle("Профиль")

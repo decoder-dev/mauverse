@@ -250,8 +250,7 @@ struct ScheduleView: View {
                         .animation(MauMotion.soft, value: model.selectedDate)
                     }
                 }
-                .padding(20)
-                .padding(.bottom, 96)
+                .mauTabPageContent()
             }
             .refreshable { await reload() }
         }
