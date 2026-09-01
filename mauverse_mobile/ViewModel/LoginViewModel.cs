@@ -199,13 +199,14 @@ namespace mau.ViewModel
             if (existingUser.Role == UserRole.Student && !string.IsNullOrWhiteSpace(existingUser.GroupName))
             {
                 var userSubgroups = await _userRequests.GetSubGroupsAsync(existingUser.GroupName, cancellationToken);
-                while (user.SubGroupId == string.Empty && userSubgroups.SubGroups.Any())
+                var availableSubgroups = userSubgroups.SubGroups?.ToList() ?? [];
+                while (user.SubGroupId == string.Empty && availableSubgroups.Count > 0)
                 {
                     var subgroup = await Shell.Current.DisplayActionSheetAsync(
                         "Выберите подгруппу",
                         "Выбрать позже в профиле",
                         null,
-                        buttons: userSubgroups.SubGroups.Select(p => p.Name).ToArray());
+                        buttons: availableSubgroups.Select(p => p.Name).ToArray());
                     if (subgroup is null || subgroup == "Выбрать позже в профиле")
                     {
                         await AppShell.DisplaySnackbarAsync(
@@ -213,7 +214,7 @@ namespace mau.ViewModel
                         break;
                     }
 
-                    var selectedSubgroup = userSubgroups.SubGroups.FirstOrDefault(p => p.Name == subgroup);
+                    var selectedSubgroup = availableSubgroups.FirstOrDefault(p => p.Name == subgroup);
                     if (selectedSubgroup != null)
                     {
                         user.SubGroupId = selectedSubgroup.GroupId;
