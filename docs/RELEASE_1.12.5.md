@@ -10,8 +10,8 @@ on the exact promoted signed artifacts.
 
 | Client | Path | Version | Build |
 | --- | --- | --- | --- |
-| Android (MAUI) | `mauverse_mobile` | `1.12.5` | `versionCode` 34 |
-| iPhone (SwiftUI) | `MauverseIOS` | `1.12.5` | `CURRENT_PROJECT_VERSION` 34 |
+| Android (MAUI) | `mauverse_mobile` | `1.12.5` | `versionCode` 35 |
+| iPhone (SwiftUI) | `MauverseIOS` | `1.12.5` | `CURRENT_PROJECT_VERSION` 35 |
 
 - Package: `com.pmi4freal.mauverse3`
 - Release commit: `17f6f98fc0949cc4d30b092a2024c70b9569373f` (`main`)
@@ -30,6 +30,7 @@ on the exact promoted signed artifacts.
 
 - Group input hints in profile (Android + iOS): autocomplete from schedule while typing.
 - API `get_subgroups` exact-match fix; null-safe subgroup handling in profile/login flows.
+- Unified tab screen spacing on iOS and Android (22pt side margins, 12pt gutter, 108pt tab clearance); Services cards no longer flush with screen edges.
 - History/authorship consolidated under `decoder-dev`.
 
 ## Verification
