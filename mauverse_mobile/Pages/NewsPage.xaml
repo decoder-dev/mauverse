@@ -26,8 +26,11 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </ContentPage.Resources>
-    <Grid RowDefinitions="auto,auto,*" Padding="{x:Static utils:LayoutMetrics.PagePadding}" RowSpacing="10">
-        <VerticalStackLayout Spacing="3" Margin="0,0,0,4">
+    <Grid RowDefinitions="auto,auto,*"
+          Padding="{x:Static utils:LayoutMetrics.PagePadding}"
+          RowSpacing="{x:Static utils:LayoutMetrics.SectionHeaderSpacing}"
+          MaximumWidthRequest="{x:Static utils:LayoutMetrics.MaxContentWidth}">
+        <VerticalStackLayout Spacing="3" Margin="{x:Static utils:LayoutMetrics.PageHeaderBottomMargin}">
             <Label Text="Новости" Style="{StaticResource PageTitle}" />
             <Label Text="События и объявления университета"
                    Style="{StaticResource SectionSubtitle}" />
@@ -43,7 +46,7 @@
                         SelectionMode="Single">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Horizontal"
-                                   ItemSpacing="6"/>
+                                   ItemSpacing="{x:Static utils:LayoutMetrics.GridGutter}"/>
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="viewmodel:Buttons">

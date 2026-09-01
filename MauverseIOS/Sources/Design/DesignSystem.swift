@@ -50,8 +50,8 @@ enum MauSpacing {
 
 /// Shared layout grid used across tab screens (mirrors Android LayoutMetrics).
 enum MauLayout {
-    static let pageHorizontal: CGFloat = 22
-    static let pageTop: CGFloat = 14
+    static let pageHorizontal: CGFloat = 28
+    static let pageTop: CGFloat = 20
     static let pageBottomTabClearance: CGFloat = 108
     static let gridGutter: CGFloat = 12
     static let gridRow: CGFloat = 12
@@ -223,12 +223,18 @@ extension View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    /// Standard tab-root scroll insets: 22 pt sides, 12 pt grid gutter, 108 pt tab clearance.
+    /// Standard tab-root scroll insets: 28 pt sides, 12 pt grid gutter, 108 pt tab clearance.
     func mauTabPageContent(maxWidth: CGFloat = MauLayout.maxContentWidth) -> some View {
         frame(maxWidth: maxWidth)
+            .frame(maxWidth: .infinity)
             .padding(.horizontal, MauLayout.pageHorizontal)
             .padding(.top, MauLayout.pageTop)
             .padding(.bottom, MauLayout.pageBottomTabClearance)
+    }
+
+    /// Trailing inset for horizontal chip/card rows inside tab pages.
+    func mauHorizontalScrollTrailingInset() -> some View {
+        padding(.trailing, MauLayout.gridGutter)
     }
 }
 

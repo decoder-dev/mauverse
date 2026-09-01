@@ -119,7 +119,7 @@ struct ScheduleView: View {
         ZStack {
             MauBackground()
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: MauLayout.sectionStack) {
                     HStack(alignment: .top) {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Расписание")
@@ -163,29 +163,30 @@ struct ScheduleView: View {
                                 .font(.caption.bold())
                                 .foregroundStyle(MauTheme.muted)
                         }
-                        .padding(17)
+                        .padding(MauLayout.cardPadding)
                         .mauSurface(radius: 22)
                     }
                     .buttonStyle(.plain)
 
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 10) {
+                        HStack(spacing: MauLayout.gridGutter) {
                             ForEach(model.dates, id: \.self) { date in
                                 DateChip(date: date, selected: Calendar.current.isDate(date, inSameDayAs: model.selectedDate))
                                     .onTapGesture { withAnimation(.snappy) { model.selectedDate = date } }
                             }
                         }
                         .padding(.vertical, 2)
+                        .mauHorizontalScrollTrailingInset()
                     }
 
                     if !model.availableTeachers.isEmpty || !model.availableRooms.isEmpty {
-                        VStack(alignment: .leading, spacing: 10) {
+                        VStack(alignment: .leading, spacing: MauLayout.sectionHeaderBottom) {
                             if !model.availableTeachers.isEmpty {
                                 Text("Преподаватель")
                                     .font(.caption.weight(.semibold))
                                     .foregroundStyle(MauTheme.muted)
                                 ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack(spacing: 8) {
+                                    HStack(spacing: MauLayout.gridGutter) {
                                         FilterChip(
                                             title: "Все",
                                             selected: model.selectedTeacher == nil
@@ -197,6 +198,7 @@ struct ScheduleView: View {
                                             ) { model.selectTeacher(teacher) }
                                         }
                                     }
+                                    .mauHorizontalScrollTrailingInset()
                                 }
                             }
                             if !model.availableRooms.isEmpty {
@@ -204,7 +206,7 @@ struct ScheduleView: View {
                                     .font(.caption.weight(.semibold))
                                     .foregroundStyle(MauTheme.muted)
                                 ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack(spacing: 8) {
+                                    HStack(spacing: MauLayout.gridGutter) {
                                         FilterChip(
                                             title: "Все",
                                             selected: model.selectedRoom == nil
@@ -216,6 +218,7 @@ struct ScheduleView: View {
                                             ) { model.selectRoom(room) }
                                         }
                                     }
+                                    .mauHorizontalScrollTrailingInset()
                                 }
                             }
                         }
@@ -375,7 +378,7 @@ private struct LessonCard: View {
             }
             Spacer()
         }
-        .padding(17)
+        .padding(MauLayout.cardPadding)
         .mauGlass(radius: MauRadius.card, style: .interactive)
     }
 }

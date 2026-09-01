@@ -30,9 +30,9 @@
 
     <ScrollView>
         <VerticalStackLayout Padding="{x:Static utils:LayoutMetrics.PagePadding}"
-                             Spacing="22"
+                             Spacing="{x:Static utils:LayoutMetrics.SectionStackSpacing}"
                              MaximumWidthRequest="{x:Static utils:LayoutMetrics.MaxContentWidth}">
-            <Grid ColumnDefinitions="*,auto" ColumnSpacing="12">
+            <Grid ColumnDefinitions="*,auto" ColumnSpacing="{x:Static utils:LayoutMetrics.GridGutter}">
                 <VerticalStackLayout Spacing="5" VerticalOptions="Center">
                     <Label Text="{Binding TodayLabel}"
                            Style="{StaticResource HeaderMeta}" />
@@ -195,11 +195,11 @@
                 </Border>
             </VerticalStackLayout>
 
-            <VerticalStackLayout Spacing="10">
+            <VerticalStackLayout Spacing="{x:Static utils:LayoutMetrics.SectionHeaderSpacing}">
                 <Label Text="Быстрый доступ" Style="{StaticResource SectionTitle}" />
-                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="{x:Static utils:LayoutMetrics.GridGutter}">
                     <Border Style="{StaticResource SurfacePanel}"
-                            Padding="10"
+                            Padding="{x:Static utils:LayoutMetrics.ServiceCardPaddingThickness}"
                             MinimumHeightRequest="88"
                             SemanticProperties.Description="Открыть расписание">
                         <VerticalStackLayout Spacing="7" VerticalOptions="Center">
@@ -221,7 +221,7 @@
                     </Border>
                     <Border Grid.Column="1"
                             Style="{StaticResource SurfacePanel}"
-                            Padding="10"
+                            Padding="{x:Static utils:LayoutMetrics.ServiceCardPaddingThickness}"
                             MinimumHeightRequest="88"
                             SemanticProperties.Description="Открыть сервисы">
                         <VerticalStackLayout Spacing="7" VerticalOptions="Center">
@@ -243,7 +243,7 @@
                     </Border>
                     <Border Grid.Column="2"
                             Style="{StaticResource SurfacePanel}"
-                            Padding="10"
+                            Padding="{x:Static utils:LayoutMetrics.ServiceCardPaddingThickness}"
                             MinimumHeightRequest="88"
                             SemanticProperties.Description="Открыть новости">
                         <VerticalStackLayout Spacing="7" VerticalOptions="Center">

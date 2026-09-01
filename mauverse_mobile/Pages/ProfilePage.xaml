@@ -27,7 +27,9 @@
         </ResourceDictionary>
     </ContentPage.Resources>
     <ScrollView>
-        <VerticalStackLayout Padding="{x:Static utils:LayoutMetrics.PagePadding}" Spacing="20" MaximumWidthRequest="620">
+        <VerticalStackLayout Padding="{x:Static utils:LayoutMetrics.PagePadding}"
+                             Spacing="{x:Static utils:LayoutMetrics.SectionStackSpacing}"
+                             MaximumWidthRequest="{x:Static utils:LayoutMetrics.MaxContentWidth}">
             <VerticalStackLayout Spacing="3">
                 <Label Text="Профиль" Style="{StaticResource PageTitle}" />
                 <Label Text="Учетная запись и учебные данные"
@@ -120,7 +122,7 @@
                         HorizontalOptions="Fill"
                         Command="{Binding Edit}" />
                 <Border Style="{StaticResource SurfacePanel}"
-                        Padding="14"
+                        Padding="{x:Static utils:LayoutMetrics.ServiceCardPaddingThickness}"
                         SemanticProperties.Description="Открыть настройки приложения">
                     <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="12">
                         <Label Text="{x:Static fonts:FluentUI.settings_24_regular}"
