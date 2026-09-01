@@ -5,6 +5,7 @@
              xmlns:viewmodel="clr-namespace:mau.ViewModel"
              xmlns:fonts="clr-namespace:mau.Resources.Fonts"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:utils="clr-namespace:mau.Utils"
              x:Class="mau.MainPage"
              x:DataType="viewmodel:MainViewModel"
              Shell.NavBarIsVisible="False"
@@ -28,9 +29,9 @@
     </ContentPage.Resources>
 
     <ScrollView>
-        <VerticalStackLayout Padding="16,18,16,32"
+        <VerticalStackLayout Padding="{x:Static utils:LayoutMetrics.PagePadding}"
                              Spacing="22"
-                             MaximumWidthRequest="720">
+                             MaximumWidthRequest="{x:Static utils:LayoutMetrics.MaxContentWidth}">
             <Grid ColumnDefinitions="*,auto" ColumnSpacing="12">
                 <VerticalStackLayout Spacing="5" VerticalOptions="Center">
                     <Label Text="{Binding TodayLabel}"

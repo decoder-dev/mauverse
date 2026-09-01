@@ -4,6 +4,7 @@
              x:Name="PageRoot"
              xmlns:viewmodel="clr-namespace:mau.ViewModel"
              xmlns:fonts="clr-namespace:mau.Resources.Fonts"
+             xmlns:utils="clr-namespace:mau.Utils"
              x:Class="mau.ProfilePage"
              Title="Профиль"
              x:DataType="viewmodel:ProfileViewModel"
@@ -26,7 +27,7 @@
         </ResourceDictionary>
     </ContentPage.Resources>
     <ScrollView>
-        <VerticalStackLayout Padding="16,18,16,32" Spacing="20" MaximumWidthRequest="620">
+        <VerticalStackLayout Padding="{x:Static utils:LayoutMetrics.PagePadding}" Spacing="20" MaximumWidthRequest="620">
             <VerticalStackLayout Spacing="3">
                 <Label Text="Профиль" Style="{StaticResource PageTitle}" />
                 <Label Text="Учетная запись и учебные данные"

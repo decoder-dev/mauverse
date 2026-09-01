@@ -111,8 +111,7 @@ struct NewsView: View {
                         }
                     }
                 }
-                .padding(20)
-                .padding(.bottom, 96)
+                .mauTabPageContent()
             }
             .refreshable { await model.load() }
         }

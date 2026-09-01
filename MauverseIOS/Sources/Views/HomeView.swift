@@ -157,9 +157,9 @@ struct HomeView: View {
                         )
                     }
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 14)
-                .padding(.bottom, 96)
+                .padding(.horizontal, MauLayout.pageHorizontal)
+                .padding(.top, MauLayout.pageTop)
+                .padding(.bottom, MauLayout.pageBottomTabClearance)
             }
             .refreshable { await model.load(user: session.user) }
         }
@@ -227,8 +227,8 @@ struct HomeView: View {
     private var quickActions: some View {
         MauGlassStack {
             LazyVGrid(
-                columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
-                spacing: 12
+                columns: MauLayout.twoColumnGrid,
+                spacing: MauLayout.gridRow
             ) {
                 PremiumQuickCard(title: "Расписание", subtitle: "Занятия и аудитории", icon: "calendar", color: MauTheme.blue) {
                     withAnimation(MauMotion.soft) { selectedTab = 1 }
@@ -439,7 +439,7 @@ private struct PremiumQuickCardContent: View {
         }
         .foregroundStyle(MauTheme.ink)
         .frame(maxWidth: .infinity, minHeight: 105, alignment: .topLeading)
-        .padding(16)
+        .padding(MauLayout.cardPadding)
         .mauGlass(radius: MauRadius.card, style: .interactive)
     }
 }
