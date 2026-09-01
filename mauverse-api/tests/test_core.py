@@ -26,6 +26,8 @@ from apps.database.queries.debt_queries import (
 )
 from apps.database.queries.user_queries import (
     get_subgroups as database_get_subgroups,
+)
+from apps.database.queries.user_queries import (
     get_user_info_query as database_get_user_info_query,
 )
 from apps.database.settings import DBSettings, MailSettings, ParsingSettings, mail_config
