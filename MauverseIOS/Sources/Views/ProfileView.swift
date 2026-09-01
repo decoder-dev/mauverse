@@ -74,7 +74,7 @@ struct ProfileView: View {
                     .buttonStyle(.plain)
                     .mauSurface()
 
-                    Text("MAUverse 1.12.5 (38)")
+                    Text("MAUverse 1.12.5 (39)")
                         .font(.caption)
                         .foregroundStyle(MauTheme.muted)
                 }
