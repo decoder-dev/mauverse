@@ -35,7 +35,7 @@
                 <Label Text="Учетная запись и учебные данные"
                        Style="{StaticResource SectionSubtitle}" />
             </VerticalStackLayout>
-            <Grid ColumnDefinitions="56,*" ColumnSpacing="14">
+            <Grid ColumnDefinitions="56,*" ColumnSpacing="{x:Static utils:LayoutMetrics.GridGutter}">
                 <Border HeightRequest="56"
                         WidthRequest="56"
                         Padding="0"
@@ -124,7 +124,7 @@
                 <Border Style="{StaticResource SurfacePanel}"
                         Padding="{x:Static utils:LayoutMetrics.ServiceCardPaddingThickness}"
                         SemanticProperties.Description="Открыть настройки приложения">
-                    <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="12">
+                    <Grid ColumnDefinitions="auto,*,auto" ColumnSpacing="{x:Static utils:LayoutMetrics.GridGutter}">
                         <Label Text="{x:Static fonts:FluentUI.settings_24_regular}"
                                FontFamily="{x:Static fonts:FluentUI.FontFamily}"
                                FontSize="23"

@@ -150,13 +150,17 @@
         <CollectionView Grid.Row="2"
                         ItemsSource="{Binding Days}"
                         ItemSizingStrategy="MeasureFirstItem"
-                        ItemsLayout="HorizontalList"
                         MinimumHeightRequest="66"
                         HorizontalScrollBarVisibility="Never"
                         SelectionMode="Single"
                         SelectionChangedCommand="{Binding SelectDayCommand}"
                         SelectedItem="{Binding SelectedDay}"
-                        ItemTemplate="{StaticResource DateButtonTemplate}" />
+                        ItemTemplate="{StaticResource DateButtonTemplate}">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Horizontal"
+                                   ItemSpacing="{x:Static utils:LayoutMetrics.GridGutter}" />
+            </CollectionView.ItemsLayout>
+        </CollectionView>
 
         <Grid Grid.Row="3" ColumnDefinitions="auto,*,auto" ColumnSpacing="{x:Static utils:LayoutMetrics.GridGutter}">
             <Border HeightRequest="8"

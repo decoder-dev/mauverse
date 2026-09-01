@@ -79,7 +79,7 @@
         <Setter Property="Stroke" Value="{DynamicResource BorderSubtle}" />
         <Setter Property="HorizontalOptions" Value="Center" />
         <Setter Property="BackgroundColor" Value="{DynamicResource Surface}"/>
-        <Setter Property="Margin" Value="4"/>
+        <Setter Property="Margin" Value="0"/>
         <Setter Property="Padding" Value="11,0,11,8"/>
         <Setter Property="StrokeShape" Value="RoundRectangle 18"/>
         <Setter Property="StrokeThickness" Value="1"/>

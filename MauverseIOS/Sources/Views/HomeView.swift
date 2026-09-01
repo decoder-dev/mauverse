@@ -301,7 +301,7 @@ private struct MoodleNotificationCard: View {
                     .foregroundStyle(MauTheme.muted)
             }
         }
-        .padding(16)
+        .padding(MauLayout.cardPadding)
         .frame(width: 272, height: 164, alignment: .topLeading)
         .mauSurface(radius: 22)
     }
@@ -437,7 +437,7 @@ private struct PremiumQuickCardContent: View {
             }
         }
         .foregroundStyle(MauTheme.ink)
-        .frame(maxWidth: .infinity, minHeight: 105, alignment: .topLeading)
+        .frame(maxWidth: .infinity, minHeight: MauLayout.cardMinHeight, alignment: .topLeading)
         .padding(MauLayout.cardPadding)
         .mauGlass(radius: MauRadius.card, style: .interactive)
     }

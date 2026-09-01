@@ -5,12 +5,13 @@
              xmlns:viewmodel="clr-namespace:mau.ViewModel.News"
              xmlns:fonts="clr-namespace:mau.Resources.Fonts"
              xmlns:controls="clr-namespace:mau.Controls"
+             xmlns:utils="clr-namespace:mau.Utils"
              xmlns:dto="clr-namespace:mau.DTOModels"
              x:Class="mau.Templates.CardTemplate">
     <DataTemplate x:Key="NewsItemTemplate" x:DataType="dto:RssDTO">
         <Border Padding="0"
                 controls:LiquidGlass.UsesLiquidGlass="True"
-                Margin="0,0,0,10"
+                Margin="{x:Static utils:LayoutMetrics.ListItemBottomMargin}"
                 BackgroundColor="{DynamicResource Surface}"
                 Stroke="{DynamicResource BorderSubtle}"
                 StrokeThickness="1"
@@ -31,8 +32,8 @@
                        MinimumHeightRequest="176" />
                 <Grid Grid.Row="1"
                       ColumnDefinitions="*,24"
-                      Padding="14,12,12,14"
-                      ColumnSpacing="8">
+                      Padding="{x:Static utils:LayoutMetrics.ServiceCardPaddingThickness}"
+                      ColumnSpacing="{x:Static utils:LayoutMetrics.GridGutter}">
                     <VerticalStackLayout Spacing="6">
                         <Label Text="{Binding Publish}"
                                Style="{StaticResource Eyebrow}"
