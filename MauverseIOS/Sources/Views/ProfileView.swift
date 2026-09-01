@@ -10,7 +10,7 @@ struct ProfileView: View {
         ZStack {
             MauBackground()
             ScrollView {
-                VStack(spacing: 22) {
+                VStack(spacing: MauLayout.sectionStack) {
                     VStack(spacing: 13) {
                         ZStack {
                             Circle().fill(.white.opacity(0.16))
@@ -40,11 +40,11 @@ struct ProfileView: View {
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 26)
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, MauLayout.cardPadding)
                     .background(MauTheme.heroGradient, in: RoundedRectangle(cornerRadius: MauRadius.hero, style: .continuous))
                     .shadow(color: MauTheme.blue.opacity(0.2), radius: 20, y: 10)
 
-                    VStack(alignment: .leading, spacing: 18) {
+                    VStack(alignment: .leading, spacing: MauLayout.sectionHeaderBottom) {
                         Label("Учебные данные", systemImage: "graduationcap.fill")
                             .font(.headline)
                             .foregroundStyle(MauTheme.blue)
@@ -54,7 +54,7 @@ struct ProfileView: View {
                         Divider()
                         ProfileRow(label: "Зачётная книжка", value: session.user?.creditBook)
                     }
-                    .padding(20)
+                    .padding(MauLayout.cardPadding)
                     .mauSurface()
 
                     VStack(spacing: 0) {
@@ -73,7 +73,7 @@ struct ProfileView: View {
                     .buttonStyle(.plain)
                     .mauSurface()
 
-                    Text("MAUverse 1.12.5 (35)")
+                    Text("MAUverse 1.12.5 (36)")
                         .font(.caption)
                         .foregroundStyle(MauTheme.muted)
                 }

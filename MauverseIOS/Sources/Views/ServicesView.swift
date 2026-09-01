@@ -97,14 +97,7 @@ struct ServicesView: View {
             MauBackground()
             ScrollView {
                 VStack(alignment: .leading, spacing: MauLayout.sectionStack) {
-                    VStack(alignment: .leading, spacing: 7) {
-                        Text("Сервисы")
-                            .font(.system(size: 34, weight: .bold, design: .rounded))
-                            .foregroundStyle(MauTheme.ink)
-                        Text("Учебные сервисы и разделы сайта МАУ")
-                            .font(.subheadline)
-                            .foregroundStyle(MauTheme.muted)
-                    }
+                    pageTitle("Сервисы", subtitle: "Учебные сервисы и разделы сайта МАУ")
 
                     ForEach(ServiceCategory.allCases) { category in
                         VStack(alignment: .leading, spacing: MauLayout.sectionHeaderBottom) {

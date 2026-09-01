@@ -51,17 +51,11 @@ struct NewsView: View {
         ZStack {
             MauBackground()
             ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Новости")
-                            .font(.system(size: 36, weight: .bold, design: .rounded))
-                        Text("Главное в жизни университета")
-                            .font(.subheadline)
-                            .foregroundStyle(MauTheme.muted)
-                    }
+                VStack(alignment: .leading, spacing: MauLayout.sectionStack) {
+                    pageTitle("Новости", subtitle: "Главное в жизни университета")
 
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 9) {
+                        HStack(spacing: MauLayout.gridGutter) {
                             ForEach(NewsFilter.allCases) { filter in
                                 Button {
                                     withAnimation(MauMotion.snappy) {
@@ -85,6 +79,7 @@ struct NewsView: View {
                                 .sensoryFeedback(.selection, trigger: model.filter)
                             }
                         }
+                        .mauHorizontalScrollTrailingInset()
                     }
 
                     if model.isLoading {
@@ -101,7 +96,7 @@ struct NewsView: View {
                     } else if model.items.isEmpty {
                         EmptyState(icon: "newspaper", title: "Новостей пока нет", message: "Попробуйте выбрать другую категорию")
                     } else {
-                        LazyVStack(spacing: 14) {
+                        LazyVStack(spacing: MauLayout.gridRow) {
                             if let first = model.items.first {
                                 HeroNewsCard(item: first, category: model.filter.title)
                             }
@@ -173,7 +168,7 @@ private struct NewsCard: View {
                 }
             }
             .frame(maxWidth: .infinity, minHeight: 106, alignment: .topLeading)
-            .padding(16)
+            .padding(MauLayout.cardPadding)
         }
         .clipShape(RoundedRectangle(cornerRadius: MauRadius.card, style: .continuous))
     }
@@ -253,7 +248,7 @@ private struct HeroNewsCard: View {
                         .multilineTextAlignment(.leading)
                 }
             }
-            .padding(20)
+            .padding(MauLayout.cardPadding)
         }
         .frame(maxWidth: .infinity)
         .clipShape(RoundedRectangle(cornerRadius: MauRadius.hero, style: .continuous))

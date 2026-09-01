@@ -96,7 +96,7 @@ struct HomeView: View {
         ZStack {
             MauBackground()
             ScrollView {
-                VStack(alignment: .leading, spacing: MauSpacing.lg) {
+                VStack(alignment: .leading, spacing: MauLayout.sectionStack) {
                     header
 
                     if session.user?.groupName?.isEmpty != false {
@@ -123,11 +123,12 @@ struct HomeView: View {
                     if !model.notifications.isEmpty {
                         MauSectionHeader(title: "Уведомления портала")
                         ScrollView(.horizontal, showsIndicators: false) {
-                            LazyHStack(spacing: 12) {
+                            LazyHStack(spacing: MauLayout.gridRow) {
                                 ForEach(model.notifications) { notification in
                                     MoodleNotificationCard(notification: notification)
                                 }
                             }
+                            .mauHorizontalScrollTrailingInset()
                         }
                     }
 
@@ -157,9 +158,7 @@ struct HomeView: View {
                         )
                     }
                 }
-                .padding(.horizontal, MauLayout.pageHorizontal)
-                .padding(.top, MauLayout.pageTop)
-                .padding(.bottom, MauLayout.pageBottomTabClearance)
+                .mauTabPageContent()
             }
             .refreshable { await model.load(user: session.user) }
         }
@@ -213,7 +212,7 @@ struct HomeView: View {
                 Spacer()
                 Image(systemName: "chevron.right").foregroundStyle(MauTheme.muted)
             }
-            .padding(18)
+            .padding(MauLayout.cardPadding)
         }
         .buttonStyle(.plain)
         .mauGlass(radius: MauRadius.card)
@@ -333,7 +332,7 @@ private struct HomeDataErrorCard: View {
                     .foregroundStyle(MauTheme.blue)
             }
         }
-        .padding(17)
+        .padding(MauLayout.cardPadding)
         .mauSurface(radius: 22)
     }
 }
@@ -385,7 +384,7 @@ private struct NextLessonCard: View {
         }
         .foregroundStyle(.white)
         .frame(maxWidth: .infinity, minHeight: 176, alignment: .topLeading)
-        .padding(22)
+        .padding(20)
         .background(MauTheme.heroGradient, in: RoundedRectangle(cornerRadius: MauRadius.hero, style: .continuous))
         .overlay(alignment: .topTrailing) {
             Circle()
@@ -486,7 +485,7 @@ private struct FeaturedNewsCard: View {
                     .foregroundStyle(.white)
                     .lineLimit(3)
             }
-            .padding(20)
+            .padding(MauLayout.cardPadding)
         }
         .frame(maxWidth: .infinity)
         .frame(height: 250)
