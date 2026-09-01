@@ -684,7 +684,7 @@ private struct DebtsView: View {
                                             Text(debt.markType ?? "Задолженность")
                                                 .font(.caption).foregroundStyle(.red)
                                         }
-                                        Spacer()
+                                        .frame(maxWidth: .infinity, alignment: .leading)
                                     }
                                     .padding(12)
                                     .background(Color.red.opacity(0.06), in: RoundedRectangle(cornerRadius: 14))

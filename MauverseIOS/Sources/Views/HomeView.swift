@@ -348,10 +348,11 @@ private struct NextLessonCard: View {
                 Label("БЛИЖАЙШЕЕ ЗАНЯТИЕ", systemImage: "sparkles")
                     .font(.caption2.bold())
                     .tracking(0.8)
-                Spacer()
+                    .layoutPriority(1)
                 Text(group ?? "")
                     .font(.caption.weight(.semibold))
                     .lineLimit(1)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
             }
             .foregroundStyle(.white.opacity(0.82))
 

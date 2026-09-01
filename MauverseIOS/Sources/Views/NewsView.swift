@@ -226,12 +226,14 @@ private struct HeroNewsCard: View {
                         .font(.caption2.bold())
                         .tracking(0.8)
                         .foregroundStyle(MauTheme.blue)
-                    Spacer()
+                        .lineLimit(1)
+                        .layoutPriority(1)
                     if let date = item.publish {
                         Text(date)
                             .font(.caption2)
                             .foregroundStyle(MauTheme.muted)
                             .lineLimit(1)
+                            .frame(maxWidth: .infinity, alignment: .trailing)
                     }
                 }
                 Text(item.title ?? "Новости университета")

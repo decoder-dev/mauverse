@@ -346,16 +346,17 @@ private struct LessonCard: View {
             .padding(.top, 4)
 
             VStack(alignment: .leading, spacing: 6) {
-                HStack(alignment: .top) {
+                HStack(alignment: .top, spacing: 8) {
                     Text(item.name ?? "Занятие")
                         .font(.headline)
-                    Spacer(minLength: 8)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     Text(kind.title)
                         .font(.caption2.bold())
                         .foregroundStyle(kind.color)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 5)
                         .background(kind.color.opacity(0.11), in: Capsule())
+                        .layoutPriority(1)
                 }
                 if let teacher = item.teacher, !teacher.isEmpty {
                     Label(teacher, systemImage: "person.fill")
