@@ -14,16 +14,16 @@ on the exact promoted signed artifacts.
 | iPhone (SwiftUI) | `MauverseIOS` | `1.12.5` | `CURRENT_PROJECT_VERSION` 39 |
 
 - Package: `com.pmi4freal.mauverse3`
-- Release commit: `TBD` (`main`)
+- Release commit: `025f969fcb4ef4292af3b89d2ffda8f2ec758943` (`main`)
 - Tag / GitHub Release: https://github.com/decoder-dev/mauverse/releases/tag/v1.12.5
-- CI on release artifacts: `TBD`
+- CI on release artifacts: https://github.com/decoder-dev/mauverse/actions/runs/33491913305
 
 ## Published artifacts (unsigned)
 
 | Artifact | SHA-256 |
 | --- | --- |
-| `mauverse-android-arm64-unsigned.aab` | `TBD` |
-| `mauverse-native-ios-arm64-unsigned.ipa` | `TBD` |
+| `mauverse-android-arm64-unsigned.aab` | `b7a5e1497969ee8d50f38dc2cbb73f2b27992f03c7fdb772c6a544d4689c039a` |
+| `mauverse-native-ios-arm64-unsigned.ipa` | `032d1402f082595d7415569445cf098f4a341372ff14f9092c91cc2eeec831f3` |
 
 ## Product changes
 
@@ -39,7 +39,7 @@ on the exact promoted signed artifacts.
 
 ## Verification
 
-- [ ] All four CI jobs green on release commit.
+- [x] All four CI jobs green on release commit / run `33491913305`.
 - [x] GitHub Release `v1.12.5` published with unsigned AAB/IPA and checksums.
 - [ ] Protected production Android keystore signing.
 - [ ] Apple distribution signing of the native IPA on an approved Mac.
