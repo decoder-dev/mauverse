@@ -38,7 +38,7 @@ def get_group_id(group_name: str) -> dict[str, Any]:
                     FROM 1c.groups
                     WHERE groups.group = %s;
                 """
-    group_info = execute_query(schedule_db_connect, group_query, (group_name,))
+    group_info = execute_query(schedule_db_connect, group_query, (group_name.upper(),))
 
     if len(group_info) == 1:
         result["groupid"] = group_info[0][0]
@@ -50,14 +50,22 @@ def get_group_id(group_name: str) -> dict[str, Any]:
 
 def get_subgroups(group_name: str) -> dict[str, Any]:
     result = {}
+    normalized = group_name.strip().upper()
+    if not normalized:
+        return {"error": "Не указана группа", "subgroups": []}
+
     group_query = """
                 SELECT UID, groups.group, speciality, UID_mg
                 FROM 1c.groups
-                WHERE groups.group LIKE %s
-                Order by maingroup_id asc;
+                WHERE groups.group = %s OR groups.group LIKE %s
+                ORDER BY maingroup_id ASC;
             """
 
-    group_info = execute_query(schedule_db_connect, group_query, (f"%{group_name}%",))
+    group_info = execute_query(
+        schedule_db_connect,
+        group_query,
+        (normalized, f"{normalized}-%"),
+    )
 
     if len(group_info) > 0:
         result["groupid"] = group_info[0][0]

@@ -25,6 +25,7 @@ from apps.database.queries.debt_queries import (
     get_debts_by_credit_book_query as database_get_debts_by_credit_book_query,
 )
 from apps.database.queries.user_queries import (
+    get_subgroups as database_get_subgroups,
     get_user_info_query as database_get_user_info_query,
 )
 from apps.database.settings import DBSettings, MailSettings, ParsingSettings, mail_config
@@ -904,6 +905,33 @@ class ReliabilityAndAbuseTests(unittest.TestCase):
 
         self.assertIn('"--workers", "1"', contents)
         self.assertNotIn('"--workers", "2"', contents)
+
+    @patch("apps.database.queries.user_queries.execute_query")
+    def test_get_subgroups_uses_exact_group_match(self, execute):
+        execute.return_value = [
+            ("uid-main", "ИС-21", "Информатика", ""),
+            ("uid-sub", "ИС-21-1", "Информатика", "uid-main"),
+        ]
+
+        result = database_get_subgroups("ис-21")
+
+        execute.assert_called_once()
+        query, params = execute.call_args[0][1], execute.call_args[0][2]
+        self.assertIn("groups.group = %s", query)
+        self.assertEqual(("ИС-21", "ИС-21-%"), params)
+        self.assertEqual("uid-main", result["groupid"])
+        self.assertEqual("Информатика", result["speciality"])
+        self.assertEqual(
+            [{"groupid": "uid-sub", "name": "ИС-21-1"}],
+            result["subgroups"],
+        )
+
+    @patch("apps.database.queries.user_queries.execute_query")
+    def test_get_subgroups_rejects_empty_group(self, execute):
+        result = database_get_subgroups("   ")
+
+        execute.assert_not_called()
+        self.assertEqual({"error": "Не указана группа", "subgroups": []}, result)
 
     @patch("apps.database.queries.user_queries.execute_query")
     def test_ambiguous_local_user_profile_fails_closed(self, execute):

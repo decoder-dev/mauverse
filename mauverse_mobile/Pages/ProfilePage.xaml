@@ -18,6 +18,13 @@
                                         Command="{Binding CancelPendingOperationsCommand}"
                                         EventName="Disappearing" />
     </ContentPage.Behaviors>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Templates/SearchListTemplate.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ContentPage.Resources>
     <ScrollView>
         <VerticalStackLayout Padding="16,18,16,32" Spacing="20" MaximumWidthRequest="620">
             <VerticalStackLayout Spacing="3">
@@ -61,8 +68,21 @@
                                 IsEnabled="{Binding IsEdit}">
                             <Entry Text="{Binding Group}"
                                    IsEnabled="{Binding IsEdit}"
-                                   Placeholder="Название группы" />
+                                   Placeholder="Например, ИС-21">
+                                <Entry.Behaviors>
+                                    <toolkit:EventToCommandBehavior BindingContext="{Binding Source={x:Reference PageRoot}, Path=BindingContext, x:DataType={x:Type ContentPage}}"
+                                                                    EventName="TextChanged"
+                                                                    Command="{Binding GroupTextChangedCommand}"/>
+                                </Entry.Behaviors>
+                            </Entry>
                         </Border>
+                        <Label Text="{Binding GroupHint}"
+                               Style="{StaticResource SectionSubtitle}"
+                               IsVisible="{Binding IsEdit}" />
+                        <CollectionView IsVisible="{Binding IsGroupListVisible}"
+                                        MaximumHeightRequest="220"
+                                        ItemsSource="{Binding GroupList}"
+                                        ItemTemplate="{StaticResource GroupListItemTemplate}" />
                     </VerticalStackLayout>
 
                     <Button Text="{Binding ButtonChangeLabel}"

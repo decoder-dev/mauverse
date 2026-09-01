@@ -41,6 +41,12 @@ namespace mau.ViewModel
         string _editLabel = string.Empty;
         [ObservableProperty]
         string _groupDescription = string.Empty;
+        [ObservableProperty]
+        string _groupHint = DefaultGroupHint;
+        [ObservableProperty]
+        bool _isGroupListVisible;
+        [ObservableProperty]
+        List<string> _groupList = [];
         private readonly DbConnect _context;
         private readonly IUserRequests _userRequests;
         private readonly IValidationRequests _validationRequests;
@@ -49,6 +55,12 @@ namespace mau.ViewModel
         private readonly AsyncRelayCommand _loadData;
         private User _user;
         private string? _subgroupsLoadedForGroup;
+        private CancellationTokenSource? _groupThrottleCts;
+        private bool _groupSelected;
+
+        const string DefaultGroupHint = "Введите код группы, например ИС-21. Появятся подсказки из расписания.";
+        const string ShortGroupHint = "Введите минимум 2 символа — покажем подсказки из расписания.";
+        const string SelectedGroupHint = "Группа выбрана из списка расписания.";
 
         public ProfileViewModel(DbConnect context,
             IUserRequests userRequests,
@@ -253,31 +265,116 @@ namespace mau.ViewModel
 
         void GetProfile()
         {
+            if (CurrentUser is null)
+                return;
+
             Name = CurrentUser.FullName;
             CreditBook = CurrentUser.CreditBook;
             Group = CurrentUser.GroupName;
             GroupDescription = CurrentUser.GroupDescription;
         }
 
-        async Task ChangeSubgroupAsync(CancellationToken cancellationToken)
+        [RelayCommand(AllowConcurrentExecutions = true)]
+        async Task GroupTextChanged()
         {
-            var groupInfo = await _userRequests.GetSubGroupsAsync(CurrentUser.GroupName, cancellationToken);
-            if (groupInfo.SubGroups?.Count() > 0)
+            if (!IsEdit || _groupSelected)
+                return;
+
+            var current = new CancellationTokenSource();
+            var previous = Interlocked.Exchange(ref _groupThrottleCts, current);
+            previous?.Cancel();
+            try
             {
-                var subgroup = await Shell.Current.DisplayActionSheetAsync("Выберите подгруппу",
-                    null,
-                    null,
-                    buttons: groupInfo.SubGroups.Select(p => p.Name).ToArray());
-                if (subgroup == null)
+                await Task.Delay(150, current.Token);
+                var query = Group.Trim();
+                if (string.IsNullOrWhiteSpace(query))
                 {
+                    GroupHint = DefaultGroupHint;
+                    IsGroupListVisible = false;
+                    GroupList.Clear();
                     return;
                 }
-                var selectedSubgroup = groupInfo.SubGroups.FirstOrDefault(p => p.Name == subgroup);
-                if (selectedSubgroup is null)
-                    return;
 
-                CurrentUser.SubGroupId = selectedSubgroup.GroupId;
+                if (query.Length < 2)
+                {
+                    GroupHint = ShortGroupHint;
+                    IsGroupListVisible = false;
+                    GroupList.Clear();
+                    return;
+                }
+
+                var groups = (await _userRequests.GetGroupAsync(query, current.Token)).ToList();
+                current.Token.ThrowIfCancellationRequested();
+                IsGroupListVisible = true;
+                GroupList = groups.Count > 0
+                    ? groups
+                    : ["Ничего не найдено"];
+                GroupHint = groups.Count > 0
+                    ? "Выберите группу из списка или продолжите ввод"
+                    : "Группа не найдена. Проверьте код, например ИС-21";
             }
+            catch (OperationCanceledException)
+            {
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex);
+                GroupList = [];
+                IsGroupListVisible = false;
+                GroupHint = "Не удалось загрузить подсказки. Проверьте соединение";
+            }
+            finally
+            {
+                Interlocked.CompareExchange(ref _groupThrottleCts, null, current);
+                current.Dispose();
+            }
+        }
+
+        [RelayCommand]
+        void GroupSelected(string group)
+        {
+            if (string.IsNullOrWhiteSpace(group) || group == "Ничего не найдено")
+                return;
+
+            _groupSelected = true;
+            Group = group;
+            IsGroupListVisible = false;
+            GroupList.Clear();
+            GroupHint = SelectedGroupHint;
+            _groupSelected = false;
+        }
+
+        void ResetGroupSuggestions()
+        {
+            Interlocked.Exchange(ref _groupThrottleCts, null)?.Cancel();
+            IsGroupListVisible = false;
+            GroupList.Clear();
+            GroupHint = DefaultGroupHint;
+        }
+
+        async Task ChangeSubgroupAsync(CancellationToken cancellationToken)
+        {
+            if (CurrentUser is null || string.IsNullOrWhiteSpace(CurrentUser.GroupName))
+                return;
+
+            var groupInfo = await _userRequests.GetSubGroupsAsync(CurrentUser.GroupName, cancellationToken);
+            var subgroups = groupInfo.SubGroups?.ToList() ?? [];
+            if (subgroups.Count == 0)
+                return;
+
+            var subgroup = await Shell.Current.DisplayActionSheetAsync("Выберите подгруппу",
+                null,
+                null,
+                buttons: subgroups.Select(p => p.Name).ToArray());
+            if (subgroup == null)
+            {
+                return;
+            }
+            var selectedSubgroup = subgroups.FirstOrDefault(p => p.Name == subgroup);
+            if (selectedSubgroup is null)
+                return;
+
+            CurrentUser.SubGroupId = selectedSubgroup.GroupId;
             _context.Users.Update(CurrentUser);
             await _context.SaveChangesAsync(cancellationToken);
             await SetCurrentUserAsync(_context, cancellationToken);
@@ -285,7 +382,9 @@ namespace mau.ViewModel
         }
         async Task IsHaveSubgroups(CancellationToken cancellationToken)
         {
-            if (CurrentUser.Role != UserRole.Student || string.IsNullOrWhiteSpace(Group))
+            if (CurrentUser is null ||
+                CurrentUser.Role != UserRole.Student ||
+                string.IsNullOrWhiteSpace(Group))
             {
                 SubGroupButtonIsVisible = false;
                 return;
@@ -296,6 +395,9 @@ namespace mau.ViewModel
         }
         async Task EditInfoAsync(CancellationToken cancellationToken)
         {
+            if (CurrentUser is null)
+                return;
+
             if (IsEdit)
             {
                 if (string.IsNullOrWhiteSpace(Group))
@@ -318,7 +420,7 @@ namespace mau.ViewModel
                     CurrentUser.GroupId = groupInfo.GroupId;
                     CurrentUser.GroupDescription = groupInfo.Speciality;
                     CurrentUser.SubGroupId = string.Empty;
-                    SubGroupButtonIsVisible = groupInfo.SubGroups.Any();
+                    SubGroupButtonIsVisible = groupInfo.SubGroups?.Any() == true;
                     _subgroupsLoadedForGroup = normalizedGroup;
                 }
                 CurrentUser.CreditBook = CreditBook?.Trim() ?? string.Empty;
@@ -327,6 +429,7 @@ namespace mau.ViewModel
                 await SetCurrentUserAsync(_context, cancellationToken);
                 _user = CurrentUser;
                 IsEdit = false;
+                ResetGroupSuggestions();
                 ButtonEditLabel = "Редактировать";
                 if (groupChanged)
                 {
@@ -336,6 +439,7 @@ namespace mau.ViewModel
             }
             ButtonEditLabel = "Сохранить";
             IsEdit = true;
+            GroupHint = DefaultGroupHint;
         }
 
         private async Task RunSafelyAsync(
@@ -371,6 +475,7 @@ namespace mau.ViewModel
             Edit.Cancel();
             Change.Cancel();
             Exit.Cancel();
+            Interlocked.Exchange(ref _groupThrottleCts, null)?.Cancel();
         }
     }
 }

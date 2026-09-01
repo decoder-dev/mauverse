@@ -4,7 +4,25 @@
              xmlns:controls="clr-namespace:mau.Controls"
              xmlns:models="clr-namespace:mau.Models"
              xmlns:viewmodel="clr-namespace:mau.ViewModel.Services"
+             xmlns:profile="clr-namespace:mau.ViewModel"
              x:Class="mau.Templates.SearchListTemplate">
+    <DataTemplate x:Key="GroupListItemTemplate" x:DataType="x:String">
+        <Border Margin="0,0,0,4"
+                controls:LiquidGlass.UsesLiquidGlass="True"
+                Padding="12,8"
+                MinimumHeightRequest="48"
+                BackgroundColor="{DynamicResource Surface}"
+                Stroke="{DynamicResource BorderSubtle}"
+                StrokeThickness="1"
+                SemanticProperties.Description="{Binding .}"
+                SemanticProperties.Hint="Выбрать группу">
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding Path=GroupSelectedCommand, Source={RelativeSource AncestorType={x:Type profile:ProfileViewModel}}, x:DataType={x:Type profile:ProfileViewModel}}"
+                                      CommandParameter="{Binding .}" />
+            </Border.GestureRecognizers>
+            <Label VerticalOptions="Center" Text="{Binding .}" Style="{StaticResource ListLabel}"/>
+        </Border>
+    </DataTemplate>
     <DataTemplate x:Key="TeacherListItemTemplate" x:DataType="x:String">
         <Border Margin="0,0,0,4"
                 controls:LiquidGlass.UsesLiquidGlass="True"

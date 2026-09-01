@@ -265,6 +265,16 @@ actor ScheduleAPIClient {
         }
     }
 
+    func suggestGroups(matching query: String, limit: Int = 5) async throws -> [String] {
+        let normalized = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard normalized.count >= 2 else { return [] }
+        return try await groups()
+            .map(\.group)
+            .filter { $0.localizedStandardContains(normalized) }
+            .prefix(limit)
+            .map { $0 }
+    }
+
     func teachers(matching name: String) async throws -> [ScheduleTeacher] {
         let query = [URLQueryItem(name: "name", value: name)]
         let response: ScheduleTeachersResponse = try await get("teachers/search", query: query)

@@ -137,6 +137,10 @@ private struct ProfileEditor: View {
     @State private var creditBook = ""
     @State private var isSaving = false
     @State private var errorMessage: String?
+    @State private var groupHint: String? = "Введите код группы, например ИС-21. Появятся подсказки из расписания."
+    @State private var groupSuggestions: [String] = []
+    @State private var isLoadingSuggestions = false
+    @State private var suggestionTask: Task<Void, Never>?
 
     var body: some View {
         NavigationStack {
@@ -144,6 +148,35 @@ private struct ProfileEditor: View {
                 Section("Расписание") {
                     TextField("Учебная группа", text: $group)
                         .textInputAutocapitalization(.characters)
+                        .onChange(of: group) { _, newValue in
+                            scheduleSuggestions(for: newValue)
+                        }
+                    if let groupHint {
+                        Text(groupHint)
+                            .font(.footnote)
+                            .foregroundStyle(MauTheme.muted)
+                    }
+                    if isLoadingSuggestions {
+                        ProgressView()
+                            .controlSize(.small)
+                    } else if !groupSuggestions.isEmpty {
+                        ForEach(groupSuggestions, id: \.self) { suggestion in
+                            Button {
+                                group = suggestion
+                                groupSuggestions = []
+                                groupHint = "Группа выбрана из списка расписания"
+                            } label: {
+                                HStack {
+                                    Text(suggestion)
+                                        .foregroundStyle(MauTheme.ink)
+                                    Spacer()
+                                    Image(systemName: "arrow.up.left")
+                                        .font(.caption.bold())
+                                        .foregroundStyle(MauTheme.blue)
+                                }
+                            }
+                        }
+                    }
                     if let errorMessage {
                         Text(errorMessage)
                             .font(.footnote)
@@ -174,6 +207,46 @@ private struct ProfileEditor: View {
             .onAppear {
                 group = session.user?.groupName ?? ""
                 creditBook = session.user?.creditBook ?? ""
+            }
+            .onDisappear {
+                suggestionTask?.cancel()
+            }
+        }
+    }
+
+    private func scheduleSuggestions(for value: String) {
+        suggestionTask?.cancel()
+        let query = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard query.count >= 2 else {
+            groupSuggestions = []
+            isLoadingSuggestions = false
+            groupHint = query.isEmpty
+                ? "Введите код группы, например ИС-21. Появятся подсказки из расписания."
+                : "Введите минимум 2 символа — покажем подсказки из расписания"
+            return
+        }
+
+        suggestionTask = Task {
+            try? await Task.sleep(for: .milliseconds(150))
+            guard !Task.isCancelled else { return }
+            await MainActor.run { isLoadingSuggestions = true }
+            do {
+                let suggestions = try await ScheduleAPIClient.shared.suggestGroups(matching: query)
+                guard !Task.isCancelled else { return }
+                await MainActor.run {
+                    groupSuggestions = suggestions
+                    isLoadingSuggestions = false
+                    groupHint = suggestions.isEmpty
+                        ? "Группа не найдена. Проверьте код, например ИС-21"
+                        : "Выберите группу из списка или продолжите ввод"
+                }
+            } catch {
+                guard !Task.isCancelled else { return }
+                await MainActor.run {
+                    groupSuggestions = []
+                    isLoadingSuggestions = false
+                    groupHint = "Не удалось загрузить подсказки. Проверьте соединение"
+                }
             }
         }
     }
