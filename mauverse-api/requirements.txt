@@ -1,6 +1,6 @@
 babel==2.18.0
 beautifulsoup4==4.15.0
-click==8.4.2
+click==8.5.0
 fastapi==0.141.1
 lxml==6.1.1
 mysql-connector-python==9.7.0
