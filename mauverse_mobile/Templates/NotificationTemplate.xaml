@@ -15,7 +15,7 @@
                 Padding="{x:Static utils:LayoutMetrics.ServiceCardPaddingThickness}"
                 Stroke="{DynamicResource BorderSubtle}"
                 StrokeThickness="1"
-                StrokeShape="RoundRectangle 8"
+                StrokeShape="RoundRectangle 20"
                 BackgroundColor="{DynamicResource Surface}">
             <Grid RowDefinitions="auto,*,auto" RowSpacing="8">
                 <Grid ColumnDefinitions="auto,*" ColumnSpacing="8">

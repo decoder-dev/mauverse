@@ -52,7 +52,8 @@ enum MauSpacing {
 enum MauLayout {
     static let pageHorizontal: CGFloat = 28
     static let pageTop: CGFloat = 20
-    static let pageBottomTabClearance: CGFloat = 108
+    /// Extra breathing room below tab content. Tab bar safe-area inset is applied automatically.
+    static let pageBottomTabClearance: CGFloat = 28
     static let gridGutter: CGFloat = 12
     static let gridRow: CGFloat = 12
     static let sectionStack: CGFloat = 22
@@ -229,7 +230,8 @@ extension View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    /// Standard tab-root scroll insets: 28 pt sides, 12 pt grid gutter, 108 pt tab clearance.
+    /// Standard tab-root scroll insets: 28 pt sides, 12 pt grid gutter, 28 pt extra bottom breathing room.
+    /// Tab bar safe-area inset is applied by the system and must not be double-counted.
     func mauTabPageContent(maxWidth: CGFloat = MauLayout.maxContentWidth) -> some View {
         frame(maxWidth: maxWidth)
             .frame(maxWidth: .infinity)
@@ -247,13 +249,14 @@ extension View {
 struct IconTile: View {
     let systemName: String
     var color = MauTheme.blue
+    @ScaledMetric(relativeTo: .title3) private var side: CGFloat = 44
 
     var body: some View {
         Image(systemName: systemName)
-            .font(.system(size: 20, weight: .semibold))
+            .font(.system(size: side * 0.45, weight: .semibold))
             .foregroundStyle(.white)
-            .frame(width: 44, height: 44)
-            .background(color.gradient, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .frame(width: side, height: side)
+            .background(color.gradient, in: RoundedRectangle(cornerRadius: side * 0.32, style: .continuous))
             .shadow(color: color.opacity(0.28), radius: 8, y: 3)
     }
 }

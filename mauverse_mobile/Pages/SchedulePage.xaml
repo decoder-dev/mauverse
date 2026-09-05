@@ -29,10 +29,11 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </ContentPage.Resources>
-    <Grid Padding="{x:Static utils:LayoutMetrics.PagePadding}"
+    <Grid Padding="{x:Static utils:LayoutMetrics.PagePaddingNoBottom}"
           RowDefinitions="auto,auto,auto,auto,*"
           RowSpacing="{x:Static utils:LayoutMetrics.SectionHeaderSpacing}"
-          MaximumWidthRequest="{x:Static utils:LayoutMetrics.MaxContentWidth}">
+          MaximumWidthRequest="{x:Static utils:LayoutMetrics.MaxContentWidth}"
+          HorizontalOptions="Center">
         <Grid ColumnDefinitions="*,auto" ColumnSpacing="{x:Static utils:LayoutMetrics.GridGutter}" Margin="{x:Static utils:LayoutMetrics.PageHeaderBottomMargin}">
             <VerticalStackLayout Spacing="3" VerticalOptions="Center">
                 <Label Text="Расписание" Style="{StaticResource PageTitle}" />
@@ -190,6 +191,7 @@
                        Style="{StaticResource EmptyStateTitle}" />
             </Border>
             <CollectionView ItemsSource="{Binding Schedules}"
+                            Padding="{x:Static utils:LayoutMetrics.ScrollBottomClearance}"
                             ItemTemplate="{StaticResource ScheduleDataTemplate}" />
             <ActivityIndicator IsVisible="{Binding IsScheduleBusy}"
                                IsRunning="{Binding IsScheduleBusy}"

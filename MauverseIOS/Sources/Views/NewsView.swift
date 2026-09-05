@@ -97,12 +97,12 @@ struct NewsView: View {
                         EmptyState(icon: "newspaper", title: "Новостей пока нет", message: "Попробуйте выбрать другую категорию")
                     } else {
                         LazyVStack(spacing: MauLayout.gridRow) {
-                            if let first = model.items.first {
-                                HeroNewsCard(item: first, category: model.filter.title)
-                            }
-                            ForEach(Array(model.items.dropFirst())) {
-                                NewsCard(item: $0, category: model.filter.title)
-                            }
+                        if let first = model.items.first {
+                            HeroNewsCard(item: first, category: model.filter == .all ? nil : model.filter.title)
+                        }
+                        ForEach(Array(model.items.dropFirst())) {
+                            NewsCard(item: $0, category: model.filter == .all ? nil : model.filter.title)
+                        }
                         }
                     }
                 }
@@ -111,13 +111,14 @@ struct NewsView: View {
             .refreshable { await model.load() }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .navigationBar)
         .task { if model.items.isEmpty { await model.load() } }
     }
 }
 
 private struct NewsCard: View {
     let item: NewsItem
-    let category: String
+    let category: String?
 
     @ViewBuilder
     var body: some View {
@@ -150,10 +151,12 @@ private struct NewsCard: View {
                 .clipped()
             }
             VStack(alignment: .leading, spacing: 7) {
-                Text(category.uppercased())
-                    .font(.system(size: 9, weight: .bold))
-                    .tracking(0.7)
-                    .foregroundStyle(MauTheme.blue)
+                if let category {
+                    Text(category.uppercased())
+                        .font(.system(size: 9, weight: .bold))
+                        .tracking(0.7)
+                        .foregroundStyle(MauTheme.blue)
+                }
                 Text(item.title ?? "Новость")
                     .font(.system(size: 15, weight: .semibold))
                     .multilineTextAlignment(.leading)
@@ -176,7 +179,7 @@ private struct NewsCard: View {
 
 private struct HeroNewsCard: View {
     let item: NewsItem
-    let category: String
+    let category: String?
 
     @ViewBuilder
     var body: some View {
@@ -222,12 +225,14 @@ private struct HeroNewsCard: View {
 
             VStack(alignment: .leading, spacing: 9) {
                 HStack {
-                    Text(category.uppercased())
-                        .font(.caption2.bold())
-                        .tracking(0.8)
-                        .foregroundStyle(MauTheme.blue)
-                        .lineLimit(1)
-                        .layoutPriority(1)
+                    if let category {
+                        Text(category.uppercased())
+                            .font(.caption2.bold())
+                            .tracking(0.8)
+                            .foregroundStyle(MauTheme.blue)
+                            .lineLimit(1)
+                            .layoutPriority(1)
+                    }
                     if let date = item.publish {
                         Text(date)
                             .font(.caption2)

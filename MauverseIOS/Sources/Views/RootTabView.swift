@@ -8,7 +8,7 @@ struct RootTabView: View {
             NavigationStack { HomeView(selectedTab: $selectedTab) }
                 .tabItem { Label("Главная", systemImage: "house.fill") }
                 .tag(0)
-            NavigationStack { ScheduleView() }
+            NavigationStack { ScheduleView(selectedTab: $selectedTab) }
                 .tabItem { Label("Расписание", systemImage: "calendar") }
                 .tag(1)
             NavigationStack { ServicesView() }

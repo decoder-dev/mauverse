@@ -11,7 +11,9 @@
              x:Class="mau.Templates.ScheduleTemplate">
     <converters:MenuPopupConverter x:Key="MenuParametersConverter" />
     <DataTemplate x:Key="ScheduleDataTemplate" x:DataType="models:Schedule">
-        <Grid Margin="0,5" ColumnDefinitions="62,*" ColumnSpacing="{x:Static utils:LayoutMetrics.GridGutter}">
+        <Grid Margin="{x:Static utils:LayoutMetrics.ListItemBottomMargin}"
+              ColumnDefinitions="56,*"
+              ColumnSpacing="{x:Static utils:LayoutMetrics.GridGutter}">
             <VerticalStackLayout Padding="0,12,0,0"
                                  Spacing="2"
                                  HorizontalOptions="Center">

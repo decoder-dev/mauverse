@@ -27,9 +27,10 @@
         </ResourceDictionary>
     </ContentPage.Resources>
     <Grid RowDefinitions="auto,auto,*"
-          Padding="{x:Static utils:LayoutMetrics.PagePadding}"
+          Padding="{x:Static utils:LayoutMetrics.PagePaddingNoBottom}"
           RowSpacing="{x:Static utils:LayoutMetrics.SectionHeaderSpacing}"
-          MaximumWidthRequest="{x:Static utils:LayoutMetrics.MaxContentWidth}">
+          MaximumWidthRequest="{x:Static utils:LayoutMetrics.MaxContentWidth}"
+          HorizontalOptions="Center">
         <VerticalStackLayout Spacing="3" Margin="{x:Static utils:LayoutMetrics.PageHeaderBottomMargin}">
             <Label Text="Новости" Style="{StaticResource PageTitle}" />
             <Label Text="События и объявления университета"
@@ -88,6 +89,7 @@
                             ItemSizingStrategy="MeasureAllItems"
                             ItemsSource="{Binding News}"
                             SelectedItem="{Binding SelectedNews}"
+                            Padding="{x:Static utils:LayoutMetrics.ScrollBottomClearance}"
                             ItemTemplate="{StaticResource NewsItemTemplate}" />
             <Border Style="{StaticResource SurfacePanel}"
                     IsVisible="{Binding IsEmpty}"
