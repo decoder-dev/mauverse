@@ -200,7 +200,7 @@ struct HomeView: View {
     }
 
     private var missingGroupCard: some View {
-        NavigationLink(destination: ProfileView()) {
+        Button { withAnimation(MauMotion.soft) { selectedTab = 4 } } label: {
             HStack(spacing: 15) {
                 IconTile(systemName: "person.3.fill", color: .orange)
                 VStack(alignment: .leading, spacing: 4) {
@@ -209,7 +209,7 @@ struct HomeView: View {
                         .font(.caption)
                         .foregroundStyle(MauTheme.muted)
                 }
-                Spacer()
+                Spacer(minLength: 0)
                 Image(systemName: "chevron.right").foregroundStyle(MauTheme.muted)
             }
             .padding(MauLayout.cardPadding)
@@ -440,8 +440,8 @@ private struct PremiumQuickCardContent: View {
             }
         }
         .foregroundStyle(MauTheme.ink)
-        .frame(maxWidth: .infinity, minHeight: MauLayout.cardMinHeight, alignment: .topLeading)
         .padding(MauLayout.cardPadding)
+        .frame(maxWidth: .infinity, minHeight: MauLayout.cardMinHeight, alignment: .topLeading)
         .mauGlass(radius: MauRadius.card, style: .interactive)
     }
 }
@@ -491,7 +491,7 @@ private struct FeaturedNewsCard: View {
             .padding(MauLayout.cardPadding)
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 250)
+        .frame(minHeight: 250)
         .clipShape(RoundedRectangle(cornerRadius: MauRadius.hero, style: .continuous))
     }
 }

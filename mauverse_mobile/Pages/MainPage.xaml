@@ -31,7 +31,8 @@
     <ScrollView>
         <VerticalStackLayout Padding="{x:Static utils:LayoutMetrics.PagePadding}"
                              Spacing="{x:Static utils:LayoutMetrics.SectionStackSpacing}"
-                             MaximumWidthRequest="{x:Static utils:LayoutMetrics.MaxContentWidth}">
+                             MaximumWidthRequest="{x:Static utils:LayoutMetrics.MaxContentWidth}"
+                             HorizontalOptions="Center">
             <Grid ColumnDefinitions="*,auto" ColumnSpacing="{x:Static utils:LayoutMetrics.GridGutter}">
                 <VerticalStackLayout Spacing="5" VerticalOptions="Center">
                     <Label Text="{Binding TodayLabel}"
@@ -199,7 +200,7 @@
                 <Label Text="Быстрый доступ" Style="{StaticResource SectionTitle}" />
                 <Grid ColumnDefinitions="*,*,*" ColumnSpacing="{x:Static utils:LayoutMetrics.GridGutter}">
                     <Border Style="{StaticResource SurfacePanel}"
-                            Padding="{x:Static utils:LayoutMetrics.ServiceCardPaddingThickness}"
+                            Padding="{x:Static utils:LayoutMetrics.CompactTilePaddingThickness}"
                             MinimumHeightRequest="88"
                             SemanticProperties.Description="Открыть расписание">
                         <VerticalStackLayout Spacing="7" VerticalOptions="Center">
@@ -212,7 +213,7 @@
                                    FontFamily="MontserratSemiBold"
                                    FontSize="11"
                                    MaxLines="2"
-                                   LineBreakMode="WordWrap"
+                                   LineBreakMode="TailTruncation"
                                    HorizontalTextAlignment="Center" />
                         </VerticalStackLayout>
                         <Border.GestureRecognizers>
@@ -221,7 +222,7 @@
                     </Border>
                     <Border Grid.Column="1"
                             Style="{StaticResource SurfacePanel}"
-                            Padding="{x:Static utils:LayoutMetrics.ServiceCardPaddingThickness}"
+                            Padding="{x:Static utils:LayoutMetrics.CompactTilePaddingThickness}"
                             MinimumHeightRequest="88"
                             SemanticProperties.Description="Открыть сервисы">
                         <VerticalStackLayout Spacing="7" VerticalOptions="Center">
@@ -234,7 +235,7 @@
                                    FontFamily="MontserratSemiBold"
                                    FontSize="11"
                                    MaxLines="2"
-                                   LineBreakMode="WordWrap"
+                                   LineBreakMode="TailTruncation"
                                    HorizontalTextAlignment="Center" />
                         </VerticalStackLayout>
                         <Border.GestureRecognizers>
@@ -243,7 +244,7 @@
                     </Border>
                     <Border Grid.Column="2"
                             Style="{StaticResource SurfacePanel}"
-                            Padding="{x:Static utils:LayoutMetrics.ServiceCardPaddingThickness}"
+                            Padding="{x:Static utils:LayoutMetrics.CompactTilePaddingThickness}"
                             MinimumHeightRequest="88"
                             SemanticProperties.Description="Открыть новости">
                         <VerticalStackLayout Spacing="7" VerticalOptions="Center">
@@ -256,7 +257,7 @@
                                    FontFamily="MontserratSemiBold"
                                    FontSize="11"
                                    MaxLines="2"
-                                   LineBreakMode="WordWrap"
+                                   LineBreakMode="TailTruncation"
                                    HorizontalTextAlignment="Center" />
                         </VerticalStackLayout>
                         <Border.GestureRecognizers>
@@ -267,7 +268,7 @@
             </VerticalStackLayout>
 
             <VerticalStackLayout Spacing="10" IsVisible="{Binding IsProfileReady}">
-                <Grid ColumnDefinitions="*,auto">
+                <Grid ColumnDefinitions="*,auto" ColumnSpacing="{x:Static utils:LayoutMetrics.GridGutter}">
                     <Label Text="Расписание на сегодня" Style="{StaticResource SectionTitle}" />
                     <Label Grid.Column="1"
                            Text="{Binding ScheduleSummaryLabel}"
@@ -298,7 +299,8 @@
                 </Border>
                 <CollectionView ItemsSource="{Binding Notifications}"
                                 ItemSizingStrategy="MeasureAllItems"
-                                MinimumHeightRequest="156"
+                                MinimumHeightRequest="176"
+                                Padding="0,0,12,0"
                                 HorizontalScrollBarVisibility="Never"
                                 ItemTemplate="{StaticResource NotificationItemTemplate}">
                     <CollectionView.ItemsLayout>

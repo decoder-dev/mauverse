@@ -113,6 +113,7 @@ final class ScheduleViewModel: ObservableObject {
 
 struct ScheduleView: View {
     @EnvironmentObject private var session: SessionStore
+    @Binding var selectedTab: Int
     @StateObject private var model = ScheduleViewModel()
 
     var body: some View {
@@ -142,8 +143,8 @@ struct ScheduleView: View {
                         .disabled(model.isLoading)
                     }
 
-                    NavigationLink {
-                        ProfileView()
+                    Button {
+                        selectedTab = 4
                     } label: {
                         HStack(spacing: 12) {
                             IconTile(systemName: "person.3.fill")
@@ -155,7 +156,7 @@ struct ScheduleView: View {
                                     .foregroundStyle(MauTheme.muted)
                                     .lineLimit(1)
                             }
-                            Spacer()
+                            Spacer(minLength: 0)
                             Image(systemName: "chevron.right")
                                 .font(.caption.bold())
                                 .foregroundStyle(MauTheme.muted)
@@ -255,6 +256,7 @@ struct ScheduleView: View {
             .refreshable { await reload() }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .navigationBar)
         .task { if model.items.isEmpty { await reload() } }
     }
 
@@ -325,6 +327,7 @@ private struct FilterChip: View {
 private struct LessonCard: View {
     let item: ScheduleItem
     private var kind: LessonKind { LessonKind(value: item.pairType) }
+    @ScaledMetric(relativeTo: .subheadline) private var timeColumn: CGFloat = 52
 
     var body: some View {
         HStack(alignment: .top, spacing: 15) {
@@ -332,7 +335,7 @@ private struct LessonCard: View {
                 Text(item.startTime ?? "—").font(.subheadline.bold())
                 Text(item.endTime ?? "").font(.caption2).foregroundStyle(MauTheme.muted)
             }
-            .frame(width: 52)
+            .frame(minWidth: timeColumn, alignment: .leading)
 
             VStack(spacing: 0) {
                 Circle()
@@ -341,9 +344,11 @@ private struct LessonCard: View {
                     .overlay(Circle().stroke(kind.color.opacity(0.22), lineWidth: 6))
                 Rectangle()
                     .fill(kind.color.opacity(0.2))
-                    .frame(width: 2, height: 64)
+                    .frame(width: 2)
+                    .frame(maxHeight: .infinity)
             }
             .padding(.top, 4)
+            .frame(maxHeight: .infinity, alignment: .top)
 
             VStack(alignment: .leading, spacing: 6) {
                 HStack(alignment: .top, spacing: 8) {

@@ -29,7 +29,8 @@
     <ScrollView>
         <VerticalStackLayout Padding="{x:Static utils:LayoutMetrics.PagePadding}"
                              Spacing="{x:Static utils:LayoutMetrics.SectionStackSpacing}"
-                             MaximumWidthRequest="{x:Static utils:LayoutMetrics.MaxContentWidth}">
+                             MaximumWidthRequest="{x:Static utils:LayoutMetrics.MaxContentWidth}"
+                             HorizontalOptions="Center">
             <VerticalStackLayout Spacing="3">
                 <Label Text="Профиль" Style="{StaticResource PageTitle}" />
                 <Label Text="Учетная запись и учебные данные"
