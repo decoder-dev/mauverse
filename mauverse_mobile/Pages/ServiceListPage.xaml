@@ -14,14 +14,17 @@
           MaximumWidthRequest="{x:Static utils:LayoutMetrics.MaxContentWidth}"
           HorizontalOptions="Center">
         <CollectionView ItemsSource="{Binding ServiceRows}"
-                        VerticalScrollBarVisibility="Never"
-                        Padding="{x:Static utils:LayoutMetrics.ScrollBottomClearance}">
+                        VerticalScrollBarVisibility="Never">
             <CollectionView.Header>
                 <VerticalStackLayout Spacing="7" Margin="{x:Static utils:LayoutMetrics.PageHeaderBottomMargin}">
                     <Label Text="Сервисы" Style="{StaticResource PageTitle}" />
                     <Label Text="{Binding PageDescription}" Style="{StaticResource SectionSubtitle}" />
                 </VerticalStackLayout>
             </CollectionView.Header>
+            <CollectionView.Footer>
+                <BoxView HeightRequest="{x:Static utils:LayoutMetrics.PageBottomTabClearance}"
+                         Color="Transparent" />
+            </CollectionView.Footer>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="viewmodel:ServiceRow">
                     <VerticalStackLayout Spacing="{x:Static utils:LayoutMetrics.SectionHeaderSpacing}"
