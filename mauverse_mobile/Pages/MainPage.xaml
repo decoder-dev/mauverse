@@ -300,7 +300,6 @@
                 <CollectionView ItemsSource="{Binding Notifications}"
                                 ItemSizingStrategy="MeasureAllItems"
                                 MinimumHeightRequest="176"
-                                Padding="0,0,12,0"
                                 HorizontalScrollBarVisibility="Never"
                                 ItemTemplate="{StaticResource NotificationItemTemplate}">
                     <CollectionView.ItemsLayout>

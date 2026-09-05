@@ -191,8 +191,12 @@
                        Style="{StaticResource EmptyStateTitle}" />
             </Border>
             <CollectionView ItemsSource="{Binding Schedules}"
-                            Padding="{x:Static utils:LayoutMetrics.ScrollBottomClearance}"
-                            ItemTemplate="{StaticResource ScheduleDataTemplate}" />
+                            ItemTemplate="{StaticResource ScheduleDataTemplate}">
+                <CollectionView.Footer>
+                    <BoxView HeightRequest="{x:Static utils:LayoutMetrics.PageBottomTabClearance}"
+                             Color="Transparent" />
+                </CollectionView.Footer>
+            </CollectionView>
             <ActivityIndicator IsVisible="{Binding IsScheduleBusy}"
                                IsRunning="{Binding IsScheduleBusy}"
                                SemanticProperties.Description="Загрузка расписания"

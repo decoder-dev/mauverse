@@ -89,8 +89,12 @@
                             ItemSizingStrategy="MeasureAllItems"
                             ItemsSource="{Binding News}"
                             SelectedItem="{Binding SelectedNews}"
-                            Padding="{x:Static utils:LayoutMetrics.ScrollBottomClearance}"
-                            ItemTemplate="{StaticResource NewsItemTemplate}" />
+                            ItemTemplate="{StaticResource NewsItemTemplate}">
+                <CollectionView.Footer>
+                    <BoxView HeightRequest="{x:Static utils:LayoutMetrics.PageBottomTabClearance}"
+                             Color="Transparent" />
+                </CollectionView.Footer>
+            </CollectionView>
             <Border Style="{StaticResource SurfacePanel}"
                     IsVisible="{Binding IsEmpty}"
                     VerticalOptions="Start">
